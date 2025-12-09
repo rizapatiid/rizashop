@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -26,6 +25,14 @@ class User extends Authenticatable
         'role',
         'is_active',
         'profile_photo',
+        // ❌ HAPUS semua field alamat lama karena sekarang pakai tabel addresses
+        // 'address_full',
+        // 'village',
+        // 'subdistrict',
+        // 'city',
+        // 'province',
+        // 'country',
+        // 'postal_code',
     ];
 
     /**
@@ -46,4 +53,23 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * RELATIONSHIP: User punya banyak alamat (multi-address)
+     */
+    public function addresses()
+    {
+        return $this->hasMany(Address::class)
+            ->orderByDesc('is_primary')
+            ->orderBy('updated_at', 'desc');
+    }
+
+    /**
+     * RELATIONSHIP: Ambil alamat utama user
+     */
+    public function primaryAddress()
+    {
+        return $this->hasOne(Address::class)
+            ->where('is_primary', true);
+    }
 }
