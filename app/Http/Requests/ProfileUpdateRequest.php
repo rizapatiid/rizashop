@@ -17,7 +17,35 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['string', 'max:255'],
-            'email' => ['email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
+
+            'email' => [
+                'email',
+                'max:255',
+                Rule::unique(User::class)->ignore($this->user()->id),
+            ],
+
+            // Kode negara nomor HP (contoh: +62)
+            'phone_country' => [
+                'required',
+                'string',
+                'max:5',
+            ],
+
+            // Nomor HP (hanya angka)
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[0-9]+$/', // hanya angka
+            ],
+
+            // Foto profil (opsional)
+            'profile_photo' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048', // 2MB
+            ],
         ];
     }
 }

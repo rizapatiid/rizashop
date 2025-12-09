@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -26,13 +27,36 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $data = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // PROSES UPLOAD FOTO PROFIL
+        if ($request->hasFile('profile_photo')) {
+            $file = $request->file('profile_photo');
+
+            // sanitize filename
+            $filename = time() . '_' . preg_replace('/[^A-Za-z0-9\-\_\.]/', '_', $file->getClientOriginalName());
+
+            // simpan file ke storage/app/public/profile
+            $file->storeAs('public/profile', $filename);
+
+            // hapus foto lama jika ada
+            if (!empty($user->profile_photo) && Storage::exists('public/profile/' . $user->profile_photo)) {
+                Storage::delete('public/profile/' . $user->profile_photo);
+            }
+
+            $data['profile_photo'] = $filename;
         }
 
-        $request->user()->save();
+        // fill other validated fields (name, email, phone_country, phone, dll)
+        $user->fill($data);
+
+        // jika email berubah, reset verifikasi
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
