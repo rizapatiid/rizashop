@@ -1,3 +1,31 @@
+LIST DALAM PROJEK SAYA INI
+RENCANA AKAN DIBUAT TAMPILAN KHUSUS UNTUK (ADMIN - SELLER - PELANGGAN)
+TAPI SAAT INI SAYA FINALKAN DI (SELLER - PELANGGAN AJA)
+
+A. AUTH (LOGIN,REGISTER,FORGET PASSWORD) - tampilan sudah saya custom
+B. DASHBOARD BERBEDA ANTARA USER BIASA (PELANGGAN) DAN ADMIN (SELLER)
+   - /dashboard (nanti akan disesuaikan menjadi /)
+   - /masterdashboard (sementara nanti akan disesuaikan menjadi /seller)
+C. TAMPILAN PROFILE PAGE CUSTOM /account (EDIT FOTO PROFIL, EDIT PROFILE, UBAH PASSWORD, HAPUS AKUN) - nantinya akan dibedakan tampilan antara admin (seller) dan user biasa (pelanggan)
+   - detail profil
+   - alamat (sudah fix)
+     - add alamat
+     - hapus alamat
+     - edit alamat
+     - jadikan alamat utama
+   - bantuan 
+   - hubungi cs (dalam pengembangan - rencana akan dibuat Live chat dengan admin/seller)
+D. Di dashboard Admin sudah ada fitur
+  - Products /products (sistem sudah berjalan tapi tampilan masih dalam pengembangan)
+    - add product
+    - edit product
+    - hapus product
+  - manajement pengguna  /users (sistem sudah berjalan tapi tampilan masih dalam pengembangan)
+    - add pengguna
+    - edit pengguna
+    - hapus pengguna
+
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
