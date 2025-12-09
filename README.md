@@ -3,9 +3,11 @@ RENCANA AKAN DIBUAT TAMPILAN KHUSUS UNTUK (ADMIN - SELLER - PELANGGAN)
 TAPI SAAT INI SAYA FINALKAN DI (SELLER - PELANGGAN AJA)
 
 A. AUTH (LOGIN,REGISTER,FORGET PASSWORD) - tampilan sudah saya custom
+
 B. DASHBOARD BERBEDA ANTARA USER BIASA (PELANGGAN) DAN ADMIN (SELLER)
    - /dashboard (nanti akan disesuaikan menjadi /)
    - /masterdashboard (sementara nanti akan disesuaikan menjadi /seller)
+
 C. TAMPILAN PROFILE PAGE CUSTOM /account (EDIT FOTO PROFIL, EDIT PROFILE, UBAH PASSWORD, HAPUS AKUN) - nantinya akan dibedakan tampilan antara admin (seller) dan user biasa (pelanggan)
    - detail profil
    - alamat (sudah fix)
@@ -15,6 +17,7 @@ C. TAMPILAN PROFILE PAGE CUSTOM /account (EDIT FOTO PROFIL, EDIT PROFILE, UBAH P
      - jadikan alamat utama
    - bantuan 
    - hubungi cs (dalam pengembangan - rencana akan dibuat Live chat dengan admin/seller)
+
 D. Di dashboard Admin sudah ada fitur
   - Products /products (sistem sudah berjalan tapi tampilan masih dalam pengembangan)
     - add product
