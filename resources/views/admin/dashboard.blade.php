@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('layouts.nav_masterdashboard')
+
 
 @section('content')
 <div class="container mx-auto p-6">

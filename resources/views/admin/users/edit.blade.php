@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('layouts.nav_masterdashboard')
+
 
 @section('content')
 <style>
@@ -307,7 +308,10 @@ const deleteForm = document.getElementById('deleteForm');
 // OPEN MODAL
 if(deleteBtn){
   deleteBtn.addEventListener('click', () => {
-    deleteForm.setAttribute('action','{{ url("/masterdashboard/users/".$user->id) }}');
+    deleteForm.setAttribute(
+      'action',
+      '{{ route("admin.users.destroy", $user->id) }}'
+    );
     modalBackdrop.style.display = 'flex';
   });
 }

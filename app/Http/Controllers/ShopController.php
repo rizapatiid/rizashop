@@ -52,10 +52,22 @@ class ShopController extends Controller
 
         session()->put('cart', $cart);
 
+        if ($request->ajax()) {
+            $total = collect($cart)->reduce(function ($c, $i) {
+                return $c + ($i['price'] * $i['qty']);
+            }, 0);
+            return response()->json([
+                'success' => true,
+                'count' => collect($cart)->sum('qty'),
+                'total' => $total,
+                'total_formatted' => 'Rp ' . number_format($total, 0, ',', '.'),
+            ]);
+        }
+
         return redirect()->route('shop.cart')->with('success', 'Produk ditambahkan ke keranjang.');
     }
 
-    // hapus 1 item dari keranjang
+    // hapus 1 item dari keranjang (form non-AJAX)
     public function removeFromCart(Product $product)
     {
         $cart = session()->get('cart', []);
@@ -82,5 +94,63 @@ class ShopController extends Controller
         session()->forget('cart');
 
         return redirect()->route('shop.index')->with('success', 'Checkout berhasil (simulasi).');
+    }
+
+    /*
+     * AJAX: update qty untuk item (dipanggil oleh mini-cart & halaman cart via fetch)
+     * Route: PATCH /keranjang/item/{product}
+     */
+    public function updateItem(Request $request, Product $product)
+    {
+        $qty = intval($request->input('qty', 1));
+        if ($qty < 1) $qty = 1;
+
+        $cart = session()->get('cart', []);
+
+        if (!isset($cart[$product->id])) {
+            return response()->json(['message' => 'Item tidak ditemukan di keranjang'], 404);
+        }
+
+        // update qty
+        $cart[$product->id]['qty'] = $qty;
+        session()->put('cart', $cart);
+
+        // hitung subtotal baris, total cart, count
+        $rowSubtotal = ($cart[$product->id]['price'] ?? 0) * $cart[$product->id]['qty'];
+        $total = collect($cart)->reduce(fn($c, $i) => $c + (($i['price'] ?? 0) * ($i['qty'] ?? 1)), 0);
+        $count = collect($cart)->sum('qty');
+
+        return response()->json([
+            'success' => true,
+            'row_subtotal' => $rowSubtotal,
+            'row_subtotal_formatted' => 'Rp ' . number_format($rowSubtotal, 0, ',', '.'),
+            'total' => $total,
+            'total_formatted' => 'Rp ' . number_format($total, 0, ',', '.'),
+            'count' => $count,
+        ]);
+    }
+
+    /*
+     * AJAX: delete item (dipanggil oleh mini-cart via fetch)
+     * Route: DELETE /keranjang/item/{product}
+     */
+    public function deleteItem(Request $request, Product $product)
+    {
+        $cart = session()->get('cart', []);
+
+        if (isset($cart[$product->id])) {
+            unset($cart[$product->id]);
+            session()->put('cart', $cart);
+        }
+
+        $total = collect($cart)->reduce(fn($c, $i) => $c + (($i['price'] ?? 0) * ($i['qty'] ?? 1)), 0);
+        $count = collect($cart)->sum('qty');
+
+        return response()->json([
+            'success' => true,
+            'total' => $total,
+            'total_formatted' => 'Rp ' . number_format($total, 0, ',', '.'),
+            'count' => $count,
+        ]);
     }
 }

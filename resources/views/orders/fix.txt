@@ -1,0 +1,477 @@
+@extends('layouts.app')
+@section('content')
+
+<div class="order-page container mx-auto p-6 max-w-6xl">
+@php
+    use Illuminate\Support\Facades\Route;
+
+    $backRoute = Route::has('addresses.orders.index') ? route('addresses.orders.index') : (Route::has('orders.index') ? route('orders.index') : url('/'));
+    $paymentsShowRoute = Route::has('addresses.payments.show') ? 'addresses.payments.show' : (Route::has('payments.show') ? 'payments.show' : null);
+    $paymentsCreateRoute = Route::has('addresses.payments.create') ? 'addresses.payments.create' : (Route::has('payments.create') ? 'payments.create' : null);
+    $ordersCancelRoute = 'addresses.orders.cancel';
+    $ordersReceiveRoute = Route::has('addresses.orders.receive') ? 'addresses.orders.receive' : (Route::has('orders.receive') ? 'orders.receive' : null);
+
+    $payment = $order->payment ?? null;
+    $hasPaymentProof = ($payment && !empty($payment->proof_path));
+    $paymentStatus = $payment->status ?? null;
+    $orderStatus = $order->status ?? null;
+
+    $cancellableStatuses = ['pending', 'waiting_payment', 'waiting_confirm'];
+    $shippedStatuses = ['terkirim','shipped','delivered'];
+
+    if ($orderStatus === 'cancelled') {
+        $displayLabel = 'Pesanan Dibatalkan'; $badgeClass = 'badge-cancel'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    } elseif (in_array($orderStatus, $shippedStatuses)) {
+        $displayLabel = 'Pesanan Dikirimkan'; $badgeClass = 'badge-info'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13l4 4v6a1 1 0 0 1-1 1h-1"/><path d="M16 3v4"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="18.5" cy="17.5" r="1.5"/></svg>';
+    } elseif ($orderStatus === 'completed') {
+        $displayLabel = 'Pesanan Selesai'; $badgeClass = 'badge-success'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    } else {
+        if (!$hasPaymentProof) { $displayLabel = 'Menunggu Pembayaran'; $badgeClass = 'badge-warn'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>'; }
+        else {
+            if (in_array($paymentStatus, ['waiting_confirm','waiting_confirmation','waiting'])) {
+                $displayLabel = 'Menunggu Konfirmasi Pembayaran'; $badgeClass = 'badge-warn'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h11"/><path d="M17 2v4"/></svg>';
+            } elseif (in_array($paymentStatus, ['confirmed','paid'])) {
+                $displayLabel = 'Pesanan Diproses'; $badgeClass = 'badge-primary'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10v6a2 2 0 0 1-2 2H8"/><path d="M3 6h18"/><path d="M16 3v6"/></svg>';
+            } else {
+                $displayLabel = ucfirst(str_replace('_',' ',$paymentStatus ?: ($orderStatus?: 'pending'))); $badgeClass = 'badge-warn'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>';
+            }
+        }
+    }
+
+    $showCancel = in_array($orderStatus, $cancellableStatuses) && !in_array($orderStatus, array_merge($shippedStatuses, ['cancelled','completed']));
+    $showReceive = in_array($orderStatus, $shippedStatuses);
+
+    $history = [];
+    if ($order->created_at) {
+        $history[] = ['label' => 'Pesanan Dibuat', 'at' => $order->created_at, 'icon' => '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18"/><path d="M12 3v4"/><path d="M5 21h14"/></svg>'];
+    }
+    if ($payment && $payment->created_at) {
+        $history[] = ['label' => 'Bukti Pembayaran Diunggah', 'at' => $payment->created_at, 'icon' => '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3v4"/></svg>'];
+    }
+    if ($payment && in_array($payment->status, ['confirmed','paid']) && $payment->updated_at) {
+        $history[] = ['label' => 'Pembayaran Dikonfirmasi', 'at' => $payment->updated_at, 'icon' => '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'];
+    }
+    if (property_exists($order, 'previous_status') && !empty($order->previous_status)) {
+        $history[] = ['label' => 'Status Sebelumnya: ' . $order->previous_status, 'at' => null, 'icon' => '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/></svg>'];
+    }
+    if ($order->updated_at && $order->updated_at->ne($order->created_at)) {
+        $already = false;
+        foreach ($history as $h) {
+            if ($h['at'] && $order->updated_at && $h['at']->eq($order->updated_at)) { $already = true; break; }
+        }
+        if (!$already) {
+            $label = 'Status diubah: ' . ($order->status ? ucfirst(str_replace('_',' ',$order->status)) : 'Updated');
+            $history[] = ['label' => $label, 'at' => $order->updated_at, 'icon' => '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/></svg>'];
+        }
+    }
+    usort($history, function($a,$b){
+        if ($a['at'] && $b['at']) {
+            if ($a['at']->eq($b['at'])) return 0;
+            return $a['at']->gt($b['at']) ? -1 : 1;
+        } elseif ($a['at']) return -1;
+        elseif ($b['at']) return 1;
+        return 0;
+    });
+@endphp
+
+<style>
+:root{
+  --bg:#f7f8fb;
+  --muted:#6b7280;
+  --border:#e6eef6;
+  --accent:#4f46e5;
+  --accent-2:#06b6d4;
+  --danger:#ef4444;
+  --success:#10b981;
+  --warn:#f59e0b;
+  --card:#ffffff;
+  --radius:12px;
+  --shadow: 0 12px 30px rgba(2,6,23,0.06);
+
+  /* Size tokens (consistent) */
+  --icon-size:20px;        /* default icon */
+  --icon-sm-size:14px;     /* small */
+  --btn-height:44px;       /* button height */
+  --btn-radius:10px;
+  --badge-height:36px;
+  --badge-padding:10px 14px;
+
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* ICON STANDARDS */
+.icon{ width:var(--icon-size); height:var(--icon-size); display:block; }
+.icon-sm{ width:var(--icon-sm-size); height:var(--icon-sm-size); display:block; }
+svg.icon, svg.icon-sm { vertical-align:middle; }
+
+/* Page */
+.order-page{ background:var(--bg); padding:28px 18px; min-height:100vh; }
+.container{ max-width:1100px; margin:0 auto; }
+
+/* Top header */
+.order-top{ display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:22px; flex-wrap:wrap; }
+.breadcrumb{ display:flex; gap:12px; align-items:center; color:var(--muted); text-decoration:none; }
+.back-box{ width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--border); box-shadow:0 8px 20px rgba(2,6,23,0.03); }
+.header-title{ font-weight:800; font-size:20px; color:#0f172a; display:flex; gap:10px; align-items:center; }
+.order-no{ color:var(--accent); font-weight:900; font-size:20px; }
+.header-sub{ color:var(--muted); font-size:13px; }
+
+/* Grid */
+.grid-two{ display:grid; grid-template-columns: 1fr 380px; gap:22px; align-items:start; }
+@media(max-width:1024px){ .grid-two{ grid-template-columns: 1fr; } }
+
+/* Cards */
+.card{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); }
+.card--hover{ transition:transform .12s ease, box-shadow .12s ease; }
+.card--hover:hover{ transform:translateY(-6px); box-shadow:0 20px 40px rgba(2,6,23,0.08); }
+
+/* Badge (consistent sizing) */
+.badge{ display:inline-flex; align-items:center; gap:8px; padding:var(--badge-padding); border-radius:999px; color:#fff; font-weight:800; font-size:13px; height:var(--badge-height); box-shadow:0 6px 20px rgba(2,6,23,0.06); }
+.badge svg{ flex-shrink:0; width:var(--icon-sm-size); height:var(--icon-sm-size); }
+.badge-warn{ background:linear-gradient(90deg,#f59e0b,#f97316); }
+.badge-primary{ background:linear-gradient(90deg,var(--accent-2),#06b6d4); }
+.badge-success{ background:linear-gradient(90deg,#16a34a,#10b981); }
+.badge-info{ background:linear-gradient(90deg,var(--accent),#7c3aed); }
+.badge-cancel{ background:linear-gradient(90deg,#ef4444,#fb7185); }
+
+/* Receiver */
+.receiver{ display:flex; gap:16px; align-items:flex-start; }
+.avatar-box{ width:72px;height:72px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#f0f7ff,#fff);border:1px solid var(--border); }
+.meta{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+.addr-label{ font-weight:700; color:#0f172a; font-size:13px; }
+.addr-name{ font-weight:800; font-size:15px; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.addr-phone{ color:var(--muted); font-size:13px; }
+.addr-full{ color:var(--muted); font-size:13px; line-height:1.45; }
+
+/* Items */
+.items-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px; }
+.items-list{ display:flex; flex-direction:column; gap:12px; }
+.item{ display:flex; justify-content:space-between; gap:12px; align-items:center; padding:12px; border-radius:10px; border:1px solid #f3f6fb; background:linear-gradient(180deg,#fff,#fbfdff); transition:transform .12s ease; }
+.item:hover{ transform:translateY(-3px); }
+.item-left{ display:flex; gap:12px; align-items:center; min-width:0; }
+.thumb{ width:72px; height:72px; border-radius:10px; overflow:hidden; background:#f8fafc; border:1px solid #eef2f7; display:flex; align-items:center; justify-content:center; flex:0 0 72px; }
+.thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.item-name{ font-weight:800; color:#0f172a; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.item-meta{ color:var(--muted); font-size:13px; margin-top:6px; }
+.item-qty{ background:#f3f6fb; border-radius:8px; padding:6px 8px; font-weight:700; font-size:13px; color:#0f172a; }
+
+/* History */
+.history-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.history-controls{ display:flex; gap:8px; align-items:center; }
+.icon-btn{ width:44px; height:44px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border); background:linear-gradient(180deg,#fff,#fbfdff); cursor:pointer; transition:transform .12s ease; }
+.icon-btn:hover{ transform:translateY(-3px); }
+.history-list{ display:flex; flex-direction:column; gap:12px; margin-top:12px; padding-left:6px; }
+.history-item{ display:flex; gap:12px; align-items:center; padding:12px; border-radius:10px; border:1px solid #f3f6fb; background:#fff; }
+.h-icon{ width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #eef2f7; flex:0 0 44px; }
+.history-label{ font-weight:700; color:#0f172a; }
+.history-ts{ color:var(--muted); font-size:13px; margin-left:auto; text-align:right; }
+
+/* Timeline for wide */
+@media(min-width:900px){
+  .history-list{ position:relative; padding-left:26px; }
+  .history-list::before{ content:""; position:absolute; left:22px; top:16px; bottom:16px; width:3px; background:linear-gradient(180deg, rgba(79,70,229,0.12), rgba(6,182,212,0.08)); border-radius:2px; }
+  .history-item{ padding-left:26px; position:relative; }
+  .history-item::before{ content:""; position:absolute; left:-4px; width:12px; height:12px; border-radius:50%; background:#fff; border:3px solid var(--accent-2); top:calc(50% - 9px); box-shadow:0 6px 18px rgba(6,182,212,0.06); }
+}
+
+/* Summary */
+.summary{ position:sticky; top:86px; display:flex; flex-direction:column; gap:12px; min-width:300px; width:100%; }
+.summary-row{ display:flex; justify-content:space-between; gap:8px; align-items:center; }
+.summary-total{ font-weight:900; font-size:20px; color:#0f172a; }
+.actions{ display:flex; gap:12px; align-items:center; margin-top:12px; }
+
+/* Button system (consistent) */
+.btn{ height:var(--btn-height); padding:0 16px; border-radius:var(--btn-radius); font-weight:800; cursor:pointer; border:0; display:inline-flex; gap:8px; align-items:center; text-decoration:none; transition:transform .12s ease, box-shadow .12s ease; font-size:14px; }
+.btn:active{ transform:translateY(1px); }
+.btn svg.icon-sm{ margin-right:6px; width:var(--icon-sm-size); height:var(--icon-sm-size); }
+.btn-primary{ background:linear-gradient(90deg,var(--accent-2),#06b6d4); color:white; box-shadow:0 8px 30px rgba(6,182,212,0.12); }
+.btn-indigo{ background:linear-gradient(90deg,var(--accent),#7c3aed); color:white; box-shadow:0 8px 30px rgba(124,58,237,0.08); }
+.btn-ghost{ background:white; border:1px solid var(--border); color:#0f172a; }
+.btn-danger{ background:linear-gradient(90deg,#ef4444,#fb7185); color:white; }
+.btn-success{ background:linear-gradient(90deg,#16a34a,#10b981); color:white; }
+
+/* small text */
+.muted{ color:var(--muted); font-size:13px; }
+.sep{ height:1px;background:#f3f6fb;margin:10px 0;border-radius:4px; }
+
+/* responsive */
+@media(max-width:640px){
+  .actions{ flex-direction:column-reverse; width:100%; align-items:stretch; }
+  .summary{ position:static; }
+  .thumb{ width:64px; height:64px; flex:0 0 64px; }
+  .avatar-box{ width:64px;height:64px; }
+}
+
+/* focus */
+a:focus, button:focus { outline:3px solid rgba(79,70,229,0.12); outline-offset:3px; }
+
+/* small utilities */
+.kv{ color:var(--muted); font-size:13px; }
+.small-muted{ font-size:12px; color:var(--muted); }
+
+/* spinner inside buttons when processing */
+.btn .loader{ width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,0.2); border-top-color:rgba(255,255,255,0.9); animation:spin .9s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+</style>
+
+<!-- Top header -->
+<div class="order-top">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a href="{{ $backRoute }}" class="breadcrumb" aria-label="Kembali ke daftar pesanan">
+      <div class="back-box" aria-hidden="true">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      <div style="min-width:0;">
+        <div class="header-title">
+          <span>Order</span>
+          <span class="order-no">#{{ $order->order_number }}</span>
+        </div>
+        <div class="header-sub">{{ $order->created_at->format('d M Y, H:i') }}</div>
+      </div>
+    </a>
+  </div>
+
+  <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+    <div class="small-muted">Status saat ini</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span class="badge {{ $badgeClass ?? 'badge-warn' }}" role="status" aria-live="polite">
+        {!! $badgeIcon ?? '' !!} <span>{{ $displayLabel }}</span>
+      </span>
+      <div class="small-muted">Total: <strong>Rp {{ number_format($order->total,0,',','.') }}</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-two">
+  <!-- LEFT -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+
+    <!-- Receiver -->
+    <div class="card receiver card--hover" role="region" aria-label="Detail Penerima">
+      <div class="avatar-box" aria-hidden="true">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/><path d="M6 20c0-3.31 2.69-6 6-6s6 2.69 6 6"/></svg>
+      </div>
+
+      <div class="meta">
+        <div class="addr-label">Detail Penerima</div>
+        @php $addr = $order->address; @endphp
+        @if($addr)
+          <div class="addr-name" title="{{ $addr->recipient_name }}">{{ $addr->recipient_name }} <span class="kv">· {{ $addr->label ?? '' }}</span></div>
+          <div class="addr-phone">{{ trim(($addr->phone_country ?? '') . ' ' . ($addr->phone ?? '')) }}</div>
+          <div class="addr-full">{!! e($addr->address_full) !!}{{ $addr->village ? ', '.$addr->village : '' }}{{ $addr->subdistrict ? ', '.$addr->subdistrict : '' }}{{ $addr->city ? ', '.$addr->city : '' }}{{ $addr->province ? ', '.$addr->province : '' }}{{ $addr->postal_code ? ' - ' . $addr->postal_code : '' }}</div>
+        @else
+          <div class="muted">Tidak ada alamat pengiriman pada pesanan ini.</div>
+        @endif
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="card card--hover" aria-labelledby="itemsHeading">
+      <div class="items-head">
+        <div style="font-weight:800;font-size:15px;" id="itemsHeading">Produk <span class="kv">({{ count($order->items) }})</span></div>
+        <div class="small-muted">Ringkasan item pesanan</div>
+      </div>
+
+      <div class="items-list" role="list" aria-label="Daftar produk">
+        @foreach($order->items as $it)
+          <div class="item" role="listitem" aria-label="{{ $it->product_name }}">
+            <div class="item-left">
+              <div class="thumb" aria-hidden="true">
+                @if(!empty($it->meta['image']))
+                  <img src="{{ asset('storage/'.ltrim($it->meta['image'],'/')) }}" alt="{{ $it->product_name }}">
+                @else
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 14s1.5-2 4-2 4 2 4 2"/><circle cx="9" cy="9" r="1"/></svg>
+                @endif
+              </div>
+
+              <div style="min-width:0;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="item-name" title="{{ $it->product_name }}">{{ $it->product_name }}</div>
+                  <div class="item-qty">x{{ $it->qty }}</div>
+                </div>
+                <div class="item-meta">Rp {{ number_format($it->price,0,',','.') }} /pcs · <span class="small-muted">Berat: {{ $it->meta['weight'] ?? '-' }}</span></div>
+              </div>
+            </div>
+
+            <div style="text-align:right; min-width:140px;">
+              <div style="font-weight:800;">Rp {{ number_format($it->subtotal,0,',','.') }}</div>
+              <div class="muted" style="font-size:13px;">Subtotal</div>
+            </div>
+          </div>
+        @endforeach
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="card card--hover" aria-live="polite" aria-labelledby="statusHeading">
+      <div class="history-head">
+        <div style="font-weight:800;" id="statusHeading">Status & Catatan</div>
+        <div class="history-controls">
+          <button id="toggleHistoryBtn" class="icon-btn" aria-expanded="true" aria-controls="historyList" title="Tutup riwayat" aria-label="Tutup riwayat">
+            <svg id="chevIcon" class="icon" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="small-muted">Riwayat lengkap. Klik ikon untuk sembunyikan.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--border);">
+              {!! $badgeIcon ?? '' !!}
+            </div>
+            <div style="font-weight:800;">Status Saat Ini</div>
+          </div>
+
+          <div><span class="badge {{ $badgeClass ?? 'badge-warn' }}">{!! $badgeIcon ?? '' !!} <span>{{ $displayLabel }}</span></span></div>
+        </div>
+
+        <div id="historyList" class="history-list" style="margin-top:12px;">
+          @forelse($history as $h)
+            <div class="history-item" role="listitem">
+              <div class="h-icon" aria-hidden="true">
+                {!! $h['icon'] ?? '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>' !!}
+              </div>
+
+              <div style="min-width:0;">
+                <div class="history-label">{{ $h['label'] }}</div>
+                <div class="small-muted" style="margin-top:6px;">@if(!empty($h['at'])) {{ $h['at']->format('d M Y, H:i') }} @else — @endif</div>
+              </div>
+
+              <div class="history-ts" aria-hidden="true">@if(!empty($h['at'])) {{ $h['at']->format('d M Y, H:i') }} @else — @endif</div>
+            </div>
+          @empty
+            <div class="muted">Tidak ada riwayat tersedia.</div>
+          @endforelse
+        </div>
+
+        @if($order->updated_at && $order->updated_at->ne($order->created_at))
+          <div style="margin-top:12px;color:var(--muted);font-size:13px;"><strong>Terakhir diubah:</strong> {{ $order->updated_at->format('d M Y, H:i') }}</div>
+        @endif
+
+        <div style="margin-top:12px;">
+          <div style="font-weight:800;">Catatan</div>
+          <div style="margin-top:6px;color:var(--muted);">@if($order->notes) {{ $order->notes }} @else Tidak ada catatan @endif</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <aside>
+    <div class="card summary card--hover" role="complementary" aria-labelledby="summaryHeading">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-weight:900;" id="summaryHeading">Ringkasan Pesanan</div>
+        <div class="small-muted">Invoice</div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
+        <div class="summary-row"><div class="small-muted">Subtotal</div><div>Rp {{ number_format($order->subtotal,0,',','.') }}</div></div>
+        <div class="summary-row"><div class="small-muted">Ongkos Kirim</div><div>Rp {{ number_format($order->shipping_cost,0,',','.') }}</div></div>
+        <div class="summary-row"><div class="small-muted">Diskon</div><div>Rp {{ number_format($order->discount ?? 0,0,',','.') }}</div></div>
+        <div class="sep" aria-hidden="true"></div>
+        <div class="summary-row"><div style="font-weight:800;">Total</div><div class="summary-total">Rp {{ number_format($order->total,0,',','.') }}</div></div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <div class="actions" role="group" aria-label="Aksi pesanan">
+          <div style="flex:1;">
+            @if(!$hasPaymentProof)
+              @if($paymentsCreateRoute)
+                <a class="btn btn-primary" href="{{ route($paymentsCreateRoute, $order->id) }}" aria-label="Bayar sekarang">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                  Bayar Sekarang
+                </a>
+              @else
+                <button class="btn btn-ghost" disabled style="width:100%;">Pembayaran tidak tersedia</button>
+              @endif
+            @else
+              @if($paymentsShowRoute)
+                <a class="btn btn-indigo" href="{{ route($paymentsShowRoute, $order->id) }}" aria-label="Lihat bukti pembayaran">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
+                  Lihat Bukti
+                </a>
+              @else
+                <a class="btn btn-indigo" href="{{ asset(ltrim($order->payment->proof_path,'/')) }}" target="_blank">Lihat Bukti</a>
+              @endif
+            @endif
+          </div>
+
+          <div style="flex:1;text-align:right;">
+            @if($showReceive)
+              @if($ordersReceiveRoute)
+                <form action="{{ route($ordersReceiveRoute, $order->id) }}" method="POST" style="margin:0;">
+                  @csrf
+                  <button type="submit" class="btn btn-success" aria-label="Konfirmasi pesanan diterima">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Pesanan Diterima
+                  </button>
+                </form>
+              @else
+                <button class="btn btn-success" disabled>Pesanan Diterima</button>
+              @endif
+            @else
+              @if($showCancel)
+                <form action="{{ route($ordersCancelRoute, $order->id) }}" method="POST" style="margin:0;" onsubmit="return confirmCancel(this);">
+                  @csrf
+                  <button type="submit" class="btn btn-danger" aria-label="Batalkan pesanan">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                    Batalkan
+                  </button>
+                </form>
+              @endif
+            @endif
+          </div>
+        </div>
+      </div>
+
+      <div class="muted" style="margin-top:10px;font-size:13px;">Jika ada kendala, hubungi penjual atau admin.</div>
+    </div>
+  </aside>
+</div>
+
+<script>
+(function(){
+  const toggleBtn = document.getElementById('toggleHistoryBtn');
+  const historyList = document.getElementById('historyList');
+  const chev = document.getElementById('chevIcon');
+
+  if(!toggleBtn || !historyList) return;
+
+  let open = true;
+
+  function setState(){
+    if(open){
+      historyList.style.display = 'flex';
+      toggleBtn.setAttribute('aria-expanded','true');
+      toggleBtn.title = 'Tutup riwayat';
+      if(chev) chev.style.transform = 'rotate(180deg)';
+    } else {
+      historyList.style.display = 'none';
+      toggleBtn.setAttribute('aria-expanded','false');
+      toggleBtn.title = 'Tampilkan riwayat';
+      if(chev) chev.style.transform = 'rotate(0deg)';
+    }
+  }
+
+  setState();
+
+  toggleBtn.addEventListener('click', function(){ open = !open; setState(); });
+
+  document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ if(open){ open = false; setState(); } } });
+})();
+
+function confirmCancel(form){
+  if(!confirm('Yakin ingin membatalkan pesanan ini? Tindakan ini tidak dapat dibatalkan.')) return false;
+  const btn = form.querySelector('button');
+  if(btn){ btn.disabled = true; // show loader
+    const label = btn.innerHTML;
+    btn.innerHTML = '<span class="loader" aria-hidden="true"></span> Memproses';
+  }
+  return true;
+}
+</script>
+
+</div>
+@endsection
