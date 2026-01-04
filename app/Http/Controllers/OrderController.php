@@ -18,12 +18,64 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        $status = $request->get('status');
 
         // langsung query tabel orders berdasarkan user_id
-        $orders = Order::where('user_id', $user->id)
+        $query = Order::where('user_id', $user->id)
+            ->with(['items', 'payment'])
             ->withCount('items')
-            ->orderByDesc('created_at')
-            ->paginate(12);
+            ->orderByDesc('created_at');
+        
+        // Filter berdasarkan status
+        if ($status) {
+            switch ($status) {
+                case 'belum_bayar':
+                    // Menampilkan: Menunggu Pembayaran + Perlu Konfirmasi
+                    $query->where(function($q) {
+                        // Menunggu Pembayaran: belum upload bukti
+                        $q->where(function($subQ) {
+                            $subQ->whereIn('status', ['pending', 'waiting_payment'])
+                                ->whereDoesntHave('payment', function($paymentQ) {
+                                    $paymentQ->whereNotNull('proof_path');
+                                });
+                        });
+                        
+                        // Perlu Konfirmasi: ditolak atau need_confirmation
+                        $q->orWhere('status', 'need_confirmation')
+                          ->orWhereHas('payment', function($paymentQ) {
+                              $paymentQ->whereIn('status', ['rejected', 'declined', 'failed'])
+                                       ->whereNotNull('proof_path');
+                          });
+                    });
+                    break;
+                    
+                case 'dikemas':
+                    // Menampilkan: Pesanan Diproses (payment confirmed/paid) dan belum dikirim
+                    $query->whereHas('payment', function($q) {
+                        $q->whereIn('status', ['confirmed', 'paid'])
+                          ->whereNotNull('proof_path');
+                    })
+                    ->whereNotIn('status', ['terkirim', 'shipped', 'delivered', 'completed', 'received', 'diterima', 'cancelled']);
+                    break;
+                    
+                case 'dikirim':
+                    // Menampilkan: Pesanan Dikirimkan
+                    $query->whereIn('status', ['terkirim', 'shipped', 'delivered']);
+                    break;
+                    
+                case 'selesai':
+                    // Menampilkan: Pesanan Diterima
+                    $query->whereIn('status', ['completed', 'received', 'diterima']);
+                    break;
+                    
+                case 'dibatalkan':
+                    // Menampilkan: Pesanan Dibatalkan
+                    $query->where('status', 'cancelled');
+                    break;
+            }
+        }
+
+        $orders = $query->paginate(12);
 
         return view('orders.index', compact('orders'));
     }
