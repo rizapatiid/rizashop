@@ -113,6 +113,15 @@ Route: `/users`
   <img src="screenshots/products.png" width="80%">
 </p>
 
+### 📦 kelola Pengguna
+<p align="center">
+  <img src="screenshots/pengguna.png" width="80%">
+</p>
+
+### 📦 Pesanan
+<p align="center">
+  <img src="screenshots/pesanan.png" width="80%">
+</p>
 ---
 
 ### 🛒 Keranjang & Checkout
