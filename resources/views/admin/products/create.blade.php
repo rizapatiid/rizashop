@@ -870,7 +870,7 @@
                         <label class="text-sm font-semibold text-gray-900 mb-3 block">Jumlah Stok</label>
                         <input type="number" 
                                name="stock" 
-                               value="{{ old('stock', 0) }}" 
+                               value="{{ old('stock') }}" 
                                min="0"
                                class="input-primary w-full px-4 py-3 border border-gray-300 rounded-lg text-lg font-semibold focus:outline-none transition-all"
                                placeholder="0">
@@ -1419,7 +1419,7 @@ function addVariant() {
                     ${variantCount}
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-gray-900">Varian #${variantCount}</h3>
+                    <h3 class="text-sm font-bold text-gray-900">Varian ${variantCount}</h3>
                     <p class="text-xs text-gray-500">Isi informasi varian produk</p>
                 </div>
             </div>
@@ -1458,7 +1458,7 @@ function addVariant() {
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-xs font-semibold">Rp</span>
                         <input type="number" 
                                name="variants[${variantCount}][price_modifier]" 
-                               value="0" 
+                               value="" 
                                min="0"
                                class="input-primary w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none transition-all"
                                placeholder="0">
@@ -1468,7 +1468,7 @@ function addVariant() {
                     <label class="text-xs font-bold text-gray-900 mb-2 block">Stok</label>
                     <input type="number" 
                            name="variants[${variantCount}][stock]" 
-                           value="0" 
+                           value="" 
                            min="0"
                            class="input-primary w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none transition-all"
                            placeholder="0">
