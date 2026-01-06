@@ -1,0 +1,233 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Product;
+use App\Models\ProductVariant;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class StockService
+{
+    /**
+     * Get current stock for a product or variant
+     * 
+     * @param string $cartKey Format: "123" or "123:456"
+     * @return int
+     */
+    public function getStock(string $cartKey): int
+    {
+        [$productId, $variantId] = $this->parseCartKey($cartKey);
+
+        if ($variantId) {
+            $variant = ProductVariant::find($variantId);
+            return $variant ? $variant->stock : 0;
+        }
+
+        $product = Product::find($productId);
+        return $product ? $product->stock : 0;
+    }
+
+    /**
+     * Check if item has sufficient stock
+     * 
+     * @param string $cartKey
+     * @param int $quantity
+     * @return bool
+     */
+    public function hasStock(string $cartKey, int $quantity): bool
+    {
+        $currentStock = $this->getStock($cartKey);
+        return $currentStock >= $quantity;
+    }
+
+    /**
+     * Check if item is out of stock
+     * 
+     * @param string $cartKey
+     * @return bool
+     */
+    public function isOutOfStock(string $cartKey): bool
+    {
+        return $this->getStock($cartKey) <= 0;
+    }
+
+    /**
+     * Reduce stock after checkout
+     * 
+     * @param array $items Format: ['cart_key' => ['qty' => 2], ...]
+     * @return array ['success' => true/false, 'errors' => [...]]
+     */
+    public function reduceStock(array $items): array
+    {
+        $errors = [];
+        
+        DB::beginTransaction();
+        
+        try {
+            foreach ($items as $cartKey => $data) {
+                $quantity = $data['qty'] ?? 1;
+                
+                // Check stock availability
+                if (!$this->hasStock($cartKey, $quantity)) {
+                    $errors[] = "Stok tidak mencukupi untuk item: {$cartKey}";
+                    continue;
+                }
+                
+                // Reduce stock
+                [$productId, $variantId] = $this->parseCartKey($cartKey);
+                
+                if ($variantId) {
+                    // Reduce variant stock
+                    $variant = ProductVariant::find($variantId);
+                    if ($variant) {
+                        $variant->stock = max(0, $variant->stock - $quantity);
+                        $variant->save();
+                        
+                        Log::info("Stock reduced for variant {$variantId}: -{$quantity}, new stock: {$variant->stock}");
+                    }
+                } else {
+                    // Reduce product stock
+                    $product = Product::find($productId);
+                    if ($product) {
+                        $product->stock = max(0, $product->stock - $quantity);
+                        $product->save();
+                        
+                        Log::info("Stock reduced for product {$productId}: -{$quantity}, new stock: {$product->stock}");
+                    }
+                }
+            }
+            
+            if (empty($errors)) {
+                DB::commit();
+                return ['success' => true, 'errors' => []];
+            } else {
+                DB::rollBack();
+                return ['success' => false, 'errors' => $errors];
+            }
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Stock reduction failed: " . $e->getMessage());
+            return ['success' => false, 'errors' => ['Terjadi kesalahan saat mengurangi stok']];
+        }
+    }
+
+    /**
+     * Validate cart items stock before checkout
+     * 
+     * @param array $cart Session cart data
+     * @param array $selectedItems Selected item keys
+     * @return array ['valid' => true/false, 'errors' => [...], 'out_of_stock' => [...]]
+     */
+    public function validateCartStock(array $cart, array $selectedItems): array
+    {
+        $errors = [];
+        $outOfStock = [];
+        
+        foreach ($selectedItems as $cartKey) {
+            if (!isset($cart[$cartKey])) {
+                continue;
+            }
+            
+            $item = $cart[$cartKey];
+            $quantity = $item['qty'] ?? 1;
+            
+            // Check if out of stock
+            if ($this->isOutOfStock($cartKey)) {
+                $outOfStock[] = $item['name'];
+                $errors[] = "{$item['name']} sudah habis";
+                continue;
+            }
+            
+            // Check if quantity exceeds stock
+            if (!$this->hasStock($cartKey, $quantity)) {
+                $currentStock = $this->getStock($cartKey);
+                $errors[] = "{$item['name']} hanya tersisa {$currentStock} item";
+            }
+        }
+        
+        return [
+            'valid' => empty($errors),
+            'errors' => $errors,
+            'out_of_stock' => $outOfStock
+        ];
+    }
+
+    /**
+     * Sync cart with current stock
+     * Updates cart session with current stock data
+     * 
+     * @param array $cart
+     * @return array Updated cart
+     */
+    public function syncCartStock(array $cart): array
+    {
+        foreach ($cart as $cartKey => &$item) {
+            $currentStock = $this->getStock($cartKey);
+            $item['stock'] = $currentStock;
+            
+            // Auto adjust quantity if exceeds stock
+            if ($item['qty'] > $currentStock) {
+                $item['qty'] = max(1, $currentStock);
+            }
+        }
+        
+        return $cart;
+    }
+
+    /**
+     * Parse cart key to get product and variant ID
+     * 
+     * @param string $cartKey Format: "123" or "123:456"
+     * @return array [productId, variantId|null]
+     */
+    protected function parseCartKey(string $cartKey): array
+    {
+        if (strpos($cartKey, ':') !== false) {
+            $parts = explode(':', $cartKey);
+            return [(int)$parts[0], (int)$parts[1]];
+        }
+        
+        return [(int)$cartKey, null];
+    }
+
+    /**
+     * Get product/variant details with stock
+     * 
+     * @param string $cartKey
+     * @return array|null
+     */
+    public function getItemDetails(string $cartKey): ?array
+    {
+        [$productId, $variantId] = $this->parseCartKey($cartKey);
+        
+        if ($variantId) {
+            $variant = ProductVariant::with('product')->find($variantId);
+            if (!$variant) return null;
+            
+            return [
+                'product_id' => $productId,
+                'variant_id' => $variantId,
+                'name' => $variant->product->name,
+                'variant' => $variant->name,
+                'price' => $variant->price,
+                'stock' => $variant->stock,
+                'image' => $variant->image ?? $variant->product->image,
+            ];
+        }
+        
+        $product = Product::find($productId);
+        if (!$product) return null;
+        
+        return [
+            'product_id' => $productId,
+            'variant_id' => null,
+            'name' => $product->name,
+            'variant' => null,
+            'price' => $product->price,
+            'stock' => $product->stock,
+            'image' => $product->image,
+        ];
+    }
+}

@@ -1,245 +1,1142 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto p-6 max-w-6xl">
-    <style>
-        /* ringan: layout checkout */
-        .checkout-grid { display:grid; gap:18px; grid-template-columns: 1fr; }
-        @media(min-width:1024px){ .checkout-grid { grid-template-columns: 420px 1fr; } }
+<style>
+/* Premium Checkout UI - Enhanced Version */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .card {
-            background:#fff; border:1px solid #eef2f7; border-radius:12px; padding:16px; box-shadow:0 8px 20px rgba(2,6,23,0.04);
-        }
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
 
-        .address-row { display:flex; gap:12px; align-items:flex-start; padding:10px; border-radius:10px; border:1px solid transparent; transition:all .12s ease; }
-        .address-row:hover { border-color:#e6f0fb; background:#fbfdff; }
-        .address-radio { margin-top:6px; }
+.checkout-wrapper {
+  min-height: 100vh;
+  padding: 24px 0;
+}
 
-        .ship-row { display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:10px; border:1px solid transparent; transition:all .12s ease; }
-        .ship-row:hover { border-color:#e6f0fb; background:#fbfdff; }
+.checkout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
 
-        .product-row { display:flex; gap:12px; align-items:center; padding:10px 0; border-bottom:1px dashed #f1f5f9 }
-        .product-row:last-child { border-bottom:none; }
+/* Premium Header */
+.checkout-header {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #1a1a1a;
+  padding: 16px 20px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
 
-        .img-thumb { width:72px; height:72px; border-radius:8px; overflow:hidden; background:#f8fafc; display:flex; align-items:center; justify-content:center; }
-        .img-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.checkout-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-        .muted { color:#6b7280; font-size:13px; }
+.checkout-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-        .summary-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-weight:700; }
+.checkout-title h1 {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-        .btn-primary { background:#0ea5e9; color:#fff; padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:800; }
-        .btn-ghost { background:transparent; border:1px solid #e6eef8; color:#0f172a; padding:8px 12px; border-radius:8px; cursor:pointer; }
-    </style>
+.checkout-title svg {
+  width: 28px;
+  height: 28px;
+  color: #667eea;
+}
 
-    <h1 class="text-2xl font-bold mb-4">Checkout</h1>
+/* Grid Layout */
+.checkout-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
 
-    {{-- error / success messages --}}
+@media (min-width: 1024px) {
+  .checkout-grid {
+    grid-template-columns: 1fr 420px;
+  }
+}
+
+/* Premium Card */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  transition: all 0.3s;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+.card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-header-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-header-icon svg {
+  width: 16px;
+  height: 16px;
+  color: #fff;
+}
+
+.card-header h2 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -0.3px;
+}
+
+.card-body {
+  padding: 18px;
+}
+
+/* Address Selection - Compact */
+.address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.address-item {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #fff;
+}
+
+.address-item:hover {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.address-item input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+  cursor: pointer;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.address-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.address-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.address-label {
+  font-weight: 800;
+  font-size: 14px;
+  color: #1a1a1a;
+}
+
+.badge-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.address-recipient-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.address-recipient-name svg {
+  width: 14px;
+  height: 14px;
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+.address-detail {
+  color: #6c757d;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.address-phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #495057;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.address-phone svg {
+  width: 14px;
+  height: 14px;
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+/* Shipping Method - Compact */
+.shipping-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shipping-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #fff;
+}
+
+.shipping-item:hover {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.shipping-item input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+  cursor: pointer;
+}
+
+.shipping-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.shipping-icon svg {
+  width: 20px;
+  height: 20px;
+  color: #667eea;
+}
+
+.shipping-content {
+  flex: 1;
+}
+
+.shipping-name {
+  font-weight: 800;
+  font-size: 14px;
+  color: #1a1a1a;
+  margin-bottom: 3px;
+}
+
+.shipping-eta {
+  color: #6c757d;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shipping-eta svg {
+  width: 13px;
+  height: 13px;
+}
+
+.shipping-cost {
+  font-weight: 900;
+  font-size: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Product Items - Shopee/Tokopedia Style */
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.product-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s;
+}
+
+.product-item:last-child {
+  border-bottom: none;
+}
+
+.product-item:hover {
+  background: #fafafa;
+}
+
+.product-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.product-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #1a1a1a;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-variant {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f0f0f0;
+  color: #6c757d;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.product-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.product-qty {
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.product-price-section {
+  text-align: right;
+}
+
+.product-unit-price {
+  color: #9ca3af;
+  font-size: 11px;
+  text-decoration: line-through;
+  margin-bottom: 2px;
+}
+
+.product-total-price {
+  font-weight: 700;
+  font-size: 14px;
+  color: #1a1a1a;
+}
+
+/* Notes Section - Premium */
+.notes-section {
+  margin-top: 0;
+}
+
+.notes-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #495057;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.notes-label svg {
+  width: 16px;
+  height: 16px;
+  color: #667eea;
+}
+
+.notes-textarea {
+  width: 100%;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 13px;
+  resize: vertical;
+  transition: all 0.3s;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.notes-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+}
+
+/* Summary Section - Shopee/Tokopedia Style */
+.summary-section {
+  background: #fff;
+  border-radius: 0;
+  padding: 0;
+  margin-top: 0;
+}
+
+.summary-items-header {
+  padding: 12px 16px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 700;
+  font-size: 13px;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.summary-items-header svg {
+  width: 16px;
+  height: 16px;
+  color: #667eea;
+}
+
+.summary-calculation {
+  padding: 16px;
+  background: #fff;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+.summary-row:first-child {
+  padding-top: 0;
+}
+
+.summary-label {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.summary-divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 12px 0;
+}
+
+.summary-total-row {
+  padding: 16px;
+  background: #fafafa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 2px dashed #e9ecef;
+}
+
+.summary-total-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.summary-total-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ee4d2d;
+  letter-spacing: -0.3px;
+}
+
+/* Buttons - Shopee/Tokopedia Style */
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-primary {
+  background: #ee4d2d;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(238, 77, 45, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #d73211;
+  box-shadow: 0 4px 12px rgba(238, 77, 45, 0.4);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  color: #495057;
+}
+
+.btn-outline:hover {
+  border-color: #ee4d2d;
+  color: #ee4d2d;
+}
+
+/* Alert Messages - Premium */
+.alert {
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.alert svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.alert-error {
+  background: linear-gradient(135deg, #fff5f5 0%, #fee2e2 100%);
+  border: 2px solid #fecaca;
+  color: #991b1b;
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 2px solid #bbf7d0;
+  color: #166534;
+}
+
+.alert ul {
+  margin-top: 8px;
+  padding-left: 20px;
+}
+
+/* Empty State - Premium */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-state-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state-icon svg {
+  width: 40px;
+  height: 40px;
+  color: #adb5bd;
+}
+
+.empty-state p {
+  color: #6c757d;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+/* Info Box - Shopee Style */
+.info-box {
+  background: #fffbf0;
+  border: 1px solid #ffe8cc;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: #856404;
+  display: flex;
+  gap: 10px;
+  line-height: 1.6;
+}
+
+.info-box svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #ffa726;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .checkout-steps {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .checkout-container {
+    padding: 0 12px;
+  }
+  
+  .checkout-header {
+    padding: 16px 18px;
+  }
+  
+  .checkout-title h1 {
+    font-size: 22px;
+  }
+  
+  .checkout-title svg {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .card-body {
+    padding: 18px;
+  }
+  
+  .product-item {
+    grid-template-columns: 70px 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .product-image {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .product-name {
+    font-size: 14px;
+  }
+  
+  .product-total-price {
+    font-size: 16px;
+  }
+  
+  .summary-total .summary-value {
+    font-size: 24px;
+  }
+  
+  .address-item,
+  .shipping-item {
+    padding: 14px;
+  }
+}
+
+/* Loading Animation */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+</style>
+
+<div class="checkout-wrapper">
+  <div class="checkout-container">
+    
+    <!-- Premium Header -->
+    <div class="checkout-header">
+      <div class="checkout-header-content">
+        <div class="checkout-title">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <h1>Checkout Pesanan</h1>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert Messages -->
     @if($errors->any())
-      <div class="mb-4 p-3 rounded bg-red-50 border border-red-100 text-red-800">
-        <strong>Ada kesalahan:</strong>
-        <ul class="mt-2">
-          @foreach($errors->all() as $err)
-            <li>{{ $err }}</li>
-          @endforeach
-        </ul>
+      <div class="alert alert-error">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        <div>
+          <strong>Terjadi kesalahan:</strong>
+          <ul>
+            @foreach($errors->all() as $err)
+              <li>{{ $err }}</li>
+            @endforeach
+          </ul>
+        </div>
       </div>
     @endif
+
     @if(session('error'))
-      <div class="mb-4 p-3 rounded bg-red-50 border border-red-100 text-red-800">{{ session('error') }}</div>
+      <div class="alert alert-error">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        <div>{{ session('error') }}</div>
+      </div>
     @endif
+
     @if(session('success'))
-      <div class="mb-4 p-3 rounded bg-green-50 border border-green-100 text-green-800">{{ session('success') }}</div>
+      <div class="alert alert-success">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="9 11 12 14 22 4"></polyline>
+        </svg>
+        <div>{{ session('success') }}</div>
+      </div>
     @endif
 
-    {{-- FORM WRAPS THE ENTIRE GRID (RELIABLE SUBMIT) --}}
+    <!-- Form -->
     <form id="checkoutForm" action="{{ route('checkout.place') }}" method="POST" novalidate>
-        @csrf
+      @csrf
 
-        <div class="checkout-grid">
-            <!-- column kiri: alamat + pengiriman -->
-            <div class="card">
-                <h2 class="text-lg font-semibold mb-3">Pilih Alamat Pengiriman</h2>
-
-                @if($addresses->isEmpty())
-                    <div class="mb-3 muted">
-                        Belum ada alamat tersimpan. <a href="{{ route('profile.edit') }}#address" class="text-blue-600 underline">Tambah alamat</a>
-                    </div>
-                @endif
-
-                <div class="space-y-3 mb-4">
-                    @foreach($addresses as $addr)
-                        <label class="address-row" for="addr-{{ $addr->id }}">
-                            <input class="address-radio" type="radio" name="address_id" id="addr-{{ $addr->id }}" value="{{ $addr->id }}" {{ $addr->is_primary ? 'checked' : '' }}>
-                            <div style="flex:1;">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <div style="font-weight:700;">{{ $addr->label ?? $addr->recipient_name ?? 'Alamat' }}</div>
-                                    @if($addr->is_primary)
-                                        <div style="font-size:12px;padding:4px 8px;background:#ecf8ff;border-radius:8px;color:#0369a1;">Utama</div>
-                                    @endif
-                                </div>
-                                <div class="muted mt-1" style="white-space:pre-line;">{!! e($addr->address_full) !!}{{ $addr->village ? ', ' . e($addr->village) : '' }}{{ $addr->subdistrict ? ', ' . e($addr->subdistrict) : '' }}{{ $addr->city ? ', ' . e($addr->city) : '' }}{{ $addr->province ? ', ' . e($addr->province) : '' }}{{ $addr->postal_code ? ' - ' . e($addr->postal_code) : '' }}</div>
-                                <div class="muted mt-2">Penerima: {{ e($addr->recipient_name) }} · {{ $addr->phone_country ?? '' }} {{ $addr->phone ?? '' }}</div>
-                            </div>
-                        </label>
-                    @endforeach
-                </div>
-
-                <div class="flex items-center gap-3 mb-6">
-                    <a href="{{ route('profile.edit') }}#address" class="btn-ghost">Tambah / Kelola Alamat</a>
-                </div>
-
-                <h2 class="text-lg font-semibold mb-3">Pilih Pengiriman</h2>
-                <div class="space-y-2 mb-4">
-                    @foreach($shippingOptions as $ship)
-                        <label class="ship-row" for="ship-{{ $ship['id'] }}">
-                            <input type="radio" name="shipping_method" id="ship-{{ $ship['id'] }}" value="{{ $ship['id'] }}" data-cost="{{ $ship['cost'] }}" {{ $loop->first ? 'checked' : '' }}>
-                            <div style="flex:1;">
-                                <div style="font-weight:700;">{{ $ship['label'] }}</div>
-                                <div class="muted">Estimasi: 1-3 hari kerja</div>
-                            </div>
-                            <div style="font-weight:700;">
-                                Rp {{ number_format($ship['cost'],0,',','.') }}
-                            </div>
-                        </label>
-                    @endforeach
-                </div>
-
-                <div>
-                    <label class="muted">Catatan untuk penjual (opsional)</label>
-                    <textarea name="notes" class="w-full border rounded p-2 mt-1" rows="3" placeholder="Contoh: Tolong bungkus rapih..."></textarea>
-                </div>
-
-                <!-- hidden fields: shipping_cost akan diisi oleh JS -->
-                <input type="hidden" name="shipping_cost" id="shipping_cost" value="">
+      <div class="checkout-grid">
+        
+        <!-- Left Column -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          
+          <!-- Address Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-header-icon">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+              </div>
+              <h2>Alamat Pengiriman</h2>
             </div>
-
-            <!-- column kanan: ringkasan order -->
-            <div class="card">
-                <h2 class="text-lg font-semibold mb-3">Ringkasan Pesanan</h2>
-
-                <div class="mb-4">
-                    @foreach($cart as $c)
-                        <div class="product-row">
-                            <div class="img-thumb">
-                                @if(!empty($c['image']))
-                                    <img src="{{ asset('storage/' . ltrim($c['image'], '/')) }}" alt="{{ $c['name'] }}">
-                                @else
-                                    <div class="muted text-xs">No Image</div>
-                                @endif
-                            </div>
-
-                            <div style="flex:1;">
-                                <div style="font-weight:700;">{{ $c['name'] }}</div>
-                                <div class="muted">Qty: {{ $c['qty'] }}</div>
-                            </div>
-
-                            <div style="text-align:right;">
-                                <div style="font-weight:800;">Rp {{ number_format(($c['price'] ?? 0) * $c['qty'],0,',','.') }}</div>
-                                <div class="muted text-sm">Rp {{ number_format($c['price'] ?? 0,0,',','.') }} /pcs</div>
-                            </div>
+            <div class="card-body">
+              @if($addresses->isEmpty())
+                <div class="empty-state">
+                  <div class="empty-state-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    </svg>
+                  </div>
+                  <p>Belum ada alamat pengiriman yang tersimpan</p>
+                  <a href="{{ route('profile.edit') }}#address" class="btn btn-outline">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Tambah Alamat Baru
+                  </a>
+                </div>
+              @else
+                <div class="address-list">
+                  @foreach($addresses as $addr)
+                    <label class="address-item">
+                      <input type="radio" name="address_id" value="{{ $addr->id }}" {{ $addr->is_primary ? 'checked' : '' }}>
+                      <div class="address-content">
+                        {{-- Label Alamat --}}
+                        <div class="address-header">
+                          <span class="address-label">{{ $addr->label ?? 'Alamat' }}</span>
+                          @if($addr->is_primary)
+                            <span class="badge-primary">UTAMA</span>
+                          @endif
                         </div>
-                    @endforeach
+                        
+                        {{-- Nama Penerima --}}
+                        <div class="address-recipient-name">
+                          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                          </svg>
+                          {{ Auth::user()->name }}
+                        </div>
+                        
+                        {{-- Detail Alamat Lengkap --}}
+                        <div class="address-detail">
+                          {{ $addr->address_full }}{{ $addr->village ? ', ' . $addr->village : '' }}{{ $addr->subdistrict ? ', ' . $addr->subdistrict : '' }}{{ $addr->city ? ', ' . $addr->city : '' }}{{ $addr->province ? ', ' . $addr->province : '' }}{{ $addr->postal_code ? ' - ' . $addr->postal_code : '' }}
+                        </div>
+                        
+                        {{-- No HP Penerima --}}
+                        <div class="address-phone">
+                          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                          </svg>
+                          {{ $addr->phone_country ?? '' }} {{ $addr->phone ?? '' }}
+                        </div>
+                      </div>
+                    </label>
+                  @endforeach
                 </div>
-
-                <hr class="my-3">
-
-                <div class="summary-row">
-                    <div class="muted">Subtotal</div>
-                    <div id="subtotal_display" style="font-weight:800;">Rp {{ number_format($subtotal,0,',','.') }}</div>
-                </div>
-
-                <div class="summary-row">
-                    <div class="muted">Biaya Pengiriman</div>
-                    <div id="shipping_display" style="font-weight:800;">Rp 0</div>
-                </div>
-
-                <div class="summary-row" style="font-size:18px;">
-                    <div>Total</div>
-                    <div id="total_display" style="font-weight:900;">Rp {{ number_format($subtotal,0,',','.') }}</div>
-                </div>
-
-                <div class="mt-4">
-                    <!-- tombol submit form -->
-                    <button id="placeOrderBtn" class="btn-primary w-full" type="submit" disabled>Place Order</button>
-                </div>
-
-                <div class="mt-3 muted text-sm">
-                    Setelah klik <strong>Place Order</strong>, kamu akan diarahkan ke halaman ringkasan order. (Implementasi pembayaran / konfirmasi akan dibuat berikutnya).
-                </div>
+                
+                <a href="{{ route('profile.edit') }}#address" class="btn btn-outline" style="width:100%;margin-top:16px;">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M12 4v16m8-8H4"></path>
+                  </svg>
+                  Kelola Alamat
+                </a>
+              @endif
             </div>
+          </div>
+
+          <!-- Shipping Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-header-icon">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <rect x="1" y="3" width="15" height="13"></rect>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                  <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                  <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+              </div>
+              <h2>Pilih Pengiriman</h2>
+            </div>
+            <div class="card-body">
+              <div class="shipping-list">
+                @foreach($shippingOptions as $ship)
+                  <label class="shipping-item">
+                    <input type="radio" name="shipping_method" value="{{ $ship['id'] }}" data-cost="{{ $ship['cost'] }}" {{ $loop->first ? 'checked' : '' }}>
+                    <div class="shipping-icon">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <rect x="1" y="3" width="15" height="13"></rect>
+                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                      </svg>
+                    </div>
+                    <div class="shipping-content">
+                      <div class="shipping-name">{{ $ship['label'] }}</div>
+                      <div class="shipping-eta">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Estimasi pengiriman 1-3 hari kerja
+                      </div>
+                    </div>
+                    <div class="shipping-cost">Rp {{ number_format($ship['cost'],0,',','.') }}</div>
+                  </label>
+                @endforeach
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-header-icon">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+              </div>
+              <h2>Catatan Pesanan</h2>
+            </div>
+            <div class="card-body">
+              <div class="notes-label">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Tambahkan catatan untuk penjual (opsional)
+              </div>
+              <textarea name="notes" class="notes-textarea" rows="4" placeholder="Contoh: Tolong bungkus dengan rapih dan sertakan kartu ucapan. Kirim pada sore hari jika memungkinkan. Terima kasih!"></textarea>
+            </div>
+          </div>
+
         </div>
+
+        <!-- Right Column - Order Summary (NOT STICKY) -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+            </div>
+            <h2>Ringkasan Pesanan</h2>
+          </div>
+          <div class="card-body">
+            
+            <!-- Products List -->
+            <div class="summary-items-header">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <path d="M3 9h18"></path>
+                <path d="M9 21V9"></path>
+              </svg>
+              Produk Dipesan
+            </div>
+            
+            <div class="product-list">
+              @foreach($cart as $c)
+                <div class="product-item">
+                  <div class="product-image">
+                    @if(!empty($c['image']))
+                      <img src="{{ asset('storage/' . ltrim($c['image'], '/')) }}" alt="{{ $c['name'] }}">
+                    @else
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="32" height="32" style="color:#adb5bd;">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                      </svg>
+                    @endif
+                  </div>
+                  <div class="product-info">
+                    <div class="product-name">{{ $c['name'] }}</div>
+                    @if(!empty($c['variant']))
+                      <div class="product-variant">{{ $c['variant'] }}</div>
+                    @endif
+                    <div class="product-footer">
+                      <div class="product-qty">× {{ $c['qty'] }}</div>
+                      <div class="product-price-section">
+                        @if($c['qty'] > 1)
+                          <div class="product-unit-price">@ Rp {{ number_format($c['price'] ?? 0,0,',','.') }}</div>
+                        @endif
+                        <div class="product-total-price">Rp {{ number_format(($c['price'] ?? 0) * $c['qty'],0,',','.') }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              @endforeach
+            </div>
+
+            <!-- Summary Calculation -->
+            <div class="summary-calculation">
+              <div class="summary-row">
+                <span class="summary-label">Subtotal Produk</span>
+                <span class="summary-value" id="subtotal_display">Rp {{ number_format($subtotal,0,',','.') }}</span>
+              </div>
+              
+              <div class="summary-row">
+                <span class="summary-label">Ongkos Kirim</span>
+                <span class="summary-value" id="shipping_display">Rp 0</span>
+              </div>
+            </div>
+            
+            <div class="summary-total-row">
+              <span class="summary-total-label">Total Pembayaran</span>
+              <span class="summary-total-value" id="total_display">Rp {{ number_format($subtotal,0,',','.') }}</span>
+            </div>
+
+            <!-- Submit Button -->
+            <button id="placeOrderBtn" class="btn btn-primary" type="submit" style="width:100%;margin-top:20px;" disabled>
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+              Proses Pembayaran
+            </button>
+
+            <!-- Info Box -->
+            <div class="info-box">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <div>
+                Pastikan data pengiriman sudah benar sebelum melanjutkan pembayaran.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Hidden Fields -->
+      <input type="hidden" name="shipping_cost" id="shipping_cost" value="">
     </form>
+  </div>
 </div>
 
 <script>
-    (function(){
-        const shippingRadios = document.querySelectorAll('input[name="shipping_method"]');
-        const shippingCostInput = document.getElementById('shipping_cost');
-        const shippingDisplay = document.getElementById('shipping_display');
-        const subtotal = Number(@json($subtotal)) || 0;
-        const subtotalDisplay = document.getElementById('subtotal_display');
-        const totalDisplay = document.getElementById('total_display');
-        const placeBtn = document.getElementById('placeOrderBtn');
-        const checkoutForm = document.getElementById('checkoutForm');
+(function(){
+  const shippingRadios = document.querySelectorAll('input[name="shipping_method"]');
+  const shippingCostInput = document.getElementById('shipping_cost');
+  const shippingDisplay = document.getElementById('shipping_display');
+  const subtotal = Number(@json($subtotal)) || 0;
+  const totalDisplay = document.getElementById('total_display');
+  const placeBtn = document.getElementById('placeOrderBtn');
+  const checkoutForm = document.getElementById('checkoutForm');
 
-        function formatRupiah(n){
-            return 'Rp ' + Number(n).toLocaleString('id-ID');
-        }
+  function formatRupiah(n){
+    return 'Rp ' + Number(n).toLocaleString('id-ID');
+  }
 
-        function updateShippingAndTotal(){
-            let selected = document.querySelector('input[name="shipping_method"]:checked');
-            let cost = 0;
-            if (selected) {
-                cost = Number(selected.dataset.cost || 0);
-            }
-            shippingCostInput.value = cost;
-            shippingDisplay.textContent = formatRupiah(cost);
-            totalDisplay.textContent = formatRupiah(subtotal + cost);
-            // enable place order only when an address is selected and shipping chosen
-            const addressSelected = !!document.querySelector('input[name="address_id"]:checked');
-            placeBtn.disabled = !(addressSelected && !!selected);
-        }
+  function updateShippingAndTotal(){
+    let selected = document.querySelector('input[name="shipping_method"]:checked');
+    let cost = 0;
+    if (selected) {
+      cost = Number(selected.dataset.cost || 0);
+    }
+    shippingCostInput.value = cost;
+    shippingDisplay.textContent = formatRupiah(cost);
+    totalDisplay.textContent = formatRupiah(subtotal + cost);
+    
+    const addressSelected = !!document.querySelector('input[name="address_id"]:checked');
+    placeBtn.disabled = !(addressSelected && !!selected);
+  }
 
-        // If no address is checked, check the first one automatically (helpful)
-        const addressRadios = document.querySelectorAll('input[name="address_id"]');
-        if (addressRadios.length && !document.querySelector('input[name="address_id"]:checked')) {
-            addressRadios[0].checked = true;
-        }
+  // Auto-check first address
+  const addressRadios = document.querySelectorAll('input[name="address_id"]');
+  if (addressRadios.length && !document.querySelector('input[name="address_id"]:checked')) {
+    addressRadios[0].checked = true;
+  }
 
-        // initial set (choose first shipping)
-        updateShippingAndTotal();
+  updateShippingAndTotal();
 
-        shippingRadios.forEach(r=>{
-            r.addEventListener('change', updateShippingAndTotal);
-        });
+  shippingRadios.forEach(r => {
+    r.addEventListener('change', updateShippingAndTotal);
+  });
 
-        // address change enables place button if shipping chosen too
-        document.querySelectorAll('input[name="address_id"]').forEach(a=>{
-            a.addEventListener('change', updateShippingAndTotal);
-        });
+  addressRadios.forEach(a => {
+    a.addEventListener('change', updateShippingAndTotal);
+  });
 
-        // ensure shipping_cost sent on submit (in case user disabled JS)
-        checkoutForm.addEventListener('submit', function(e){
-            // ensure shipping_cost present
-            const sc = shippingCostInput.value;
-            if (sc === '') {
-                const sel = document.querySelector('input[name="shipping_method"]:checked');
-                shippingCostInput.value = sel ? sel.dataset.cost : 0;
-            }
+  checkoutForm.addEventListener('submit', function(e){
+    const sc = shippingCostInput.value;
+    if (sc === '') {
+      const sel = document.querySelector('input[name="shipping_method"]:checked');
+      shippingCostInput.value = sel ? sel.dataset.cost : 0;
+    }
 
-            // basic client validation
-            const addressSelected = !!document.querySelector('input[name="address_id"]:checked');
-            if (!addressSelected) {
-                e.preventDefault();
-                alert('Pilih alamat pengiriman terlebih dahulu.');
-                return false;
-            }
+    const addressSelected = !!document.querySelector('input[name="address_id"]:checked');
+    if (!addressSelected) {
+      e.preventDefault();
+      alert('Silakan pilih alamat pengiriman terlebih dahulu.');
+      return false;
+    }
 
-            // disable button to prevent double-submit
-            placeBtn.disabled = true;
-            placeBtn.textContent = 'Processing...';
-        });
-    })();
+    placeBtn.disabled = true;
+    placeBtn.innerHTML = `
+      <svg style="animation:spin 1s linear infinite;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
+        <line x1="12" y1="2" x2="12" y2="6"></line>
+        <line x1="12" y1="18" x2="12" y2="22"></line>
+        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+        <line x1="2" y1="12" x2="6" y2="12"></line>
+        <line x1="18" y1="12" x2="22" y2="12"></line>
+        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+      </svg>
+      Memproses Pesanan...
+    `;
+  });
+})();
 </script>
 @endsection

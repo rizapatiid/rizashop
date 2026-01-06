@@ -62,13 +62,14 @@
 }
 
 .tk-search { 
+  position: relative;
   display: flex; 
   align-items: center; 
   background: #f5f5f5;
   border: 2px solid transparent;
   padding: 0;
-  border-radius: 4px;
-  overflow: hidden;
+  border-radius: 24px;
+  overflow: visible;
   transition: all 0.3s;
 }
 
@@ -83,8 +84,9 @@
   outline: 0; 
   font-size: 13px; 
   width: 100%;
-  padding: 10px 14px;
+  padding: 10px 54px 10px 18px;
   background: transparent;
+  border-radius: 24px;
 }
 
 .tk-search input::placeholder {
@@ -93,18 +95,25 @@
 
 .tk-search .search-icon {
   background: #7c3aed;
-  padding: 0 18px;
+  width: 42px;
   height: 42px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border: 0;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .tk-search .search-icon:hover {
   background: #6d28d9;
+  transform: translateY(-50%) scale(1.05);
 }
 
 .tk-search .search-icon svg {
@@ -220,9 +229,32 @@
   border-radius: 14px;
   box-shadow: 0 12px 48px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
   overflow: hidden; 
-  z-index: 1500; 
+  z-index: 9999;
   display: none;
   animation: slideDown 0.2s ease-out;
+}
+
+.tk-mini-cart.show {
+  display: block;
+}
+
+/* Prevent body scroll when cart open on mobile */
+@media (max-width: 768px) {
+  body.cart-open {
+    overflow: hidden;
+  }
+  
+  .tk-mini-cart.show {
+    position: fixed;
+    right: 0;
+    left: auto;
+    top: 60px;
+    margin: 0;
+    width: 100vw;
+    max-width: 400px;
+    max-height: calc(100vh - 70px);
+    border-top-right-radius: 0;
+  }
 }
 
 @keyframes slideDown {
@@ -234,10 +266,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.tk-mini-cart.show { 
-  display: block; 
 }
 
 .tk-mini-head { 
@@ -299,10 +327,10 @@
 /* Mini cart item - Premium card design */
 .tk-mini-item { 
   display: grid; 
-  grid-template-columns: 24px 56px 1fr auto; 
-  gap: 8px; 
-  align-items: center; 
-  padding: 10px; 
+  grid-template-columns: 24px 56px 1fr 80px; 
+  gap: 10px; 
+  align-items: start;
+  padding: 12px; 
   border-radius: 10px;
   margin-bottom: 8px;
   background: #fff;
@@ -323,6 +351,8 @@
   cursor: pointer;
   accent-color: #7c3aed;
   border-radius: 4px;
+  margin: 0;
+  align-self: center;
 }
 
 /* Thumbnail - Lebih kecil */
@@ -350,7 +380,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .tk-mini-title { 
@@ -363,14 +393,15 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   line-height: 1.3;
+  word-break: break-word;
 }
 
 .tk-mini-sub { 
-  font-size: 11px; 
+  font-size: 10px; 
   color: #6b7280;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .tk-mini-variant { 
@@ -387,9 +418,9 @@
 /* Quantity controls - Compact & Modern */
 .tk-mini-controls { 
   display: flex; 
-  gap: 4px; 
+  gap: 5px; 
   align-items: center;
-  margin-top: 4px;
+  margin-top: 5px;
 }
 
 .qty-btn { 
@@ -425,12 +456,15 @@
   color: #111827;
 }
 
-/* Right side - Price & Delete */
+/* Right side - Price & Delete - FIXED */
 .item-right { 
   display: flex; 
   flex-direction: column; 
-  align-items: flex-end; 
-  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 80px;
+  height: 100%;
 }
 
 .item-total { 
@@ -438,22 +472,27 @@
   color: #7c3aed;
   font-size: 12px;
   white-space: nowrap;
+  text-align: center;
+  width: 100%;
 }
 
 .btn-trash { 
-  background: transparent;
-  border: 0; 
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
   cursor: pointer; 
-  padding: 4px;
-  border-radius: 5px;
+  padding: 6px 8px;
+  border-radius: 6px;
   display: inline-flex; 
   align-items: center; 
   justify-content: center;
   transition: all 0.2s;
+  width: fit-content;
 }
 
 .btn-trash:hover { 
   background: #fee2e2;
+  border-color: #fecaca;
+  transform: scale(1.05);
 }
 
 .btn-trash svg {
@@ -890,13 +929,19 @@
   
   .tk-search input {
     font-size: 12px;
-    padding: 8px 10px;
+    padding: 8px 48px 8px 16px;
     min-width: 150px;
   }
   
   .tk-search .search-icon {
-    padding: 0 14px;
+    width: 38px;
     height: 38px;
+    right: 3px;
+  }
+  
+  .tk-search .search-icon svg {
+    width: 18px;
+    height: 18px;
   }
   
   .icon-btn {
@@ -958,13 +1003,14 @@
   
   .tk-search input {
     font-size: 11px;
-    padding: 7px 8px;
+    padding: 7px 42px 7px 14px;
     min-width: 120px;
   }
   
   .tk-search .search-icon {
-    padding: 0 12px;
+    width: 34px;
     height: 34px;
+    right: 2px;
   }
   
   .tk-search .search-icon svg {
@@ -1003,21 +1049,16 @@
     font-size: 12px;
   }
   
-  .tk-mini-cart {
-    width: calc(100vw - 20px);
-    max-width: 100%;
-    left: 10px;
-    right: 10px;
-    margin: 8px auto;
-    border-radius: 12px;
+  .btn-login-pill {
+    padding: 7px 16px;
+    font-size: 11px;
   }
-  
-  .tk-mini-head {
-    padding: 12px 12px;
+}
+    padding: 12px;
   }
   
   .tk-mini-head .title {
-    font-size: 13px;
+    font-size: 12px;
     gap: 6px;
   }
   
@@ -1031,88 +1072,105 @@
   }
   
   .tk-mini-body {
-    padding: 8px;
-    max-height: 300px;
+    padding: 10px;
+    max-height: 320px;
   }
   
+  /* MOBILE ITEM LAYOUT - 2 ROW GRID SYSTEM */
   .tk-mini-item {
-    grid-template-columns: 18px 48px 1fr 60px;
-    gap: 6px;
-    padding: 8px;
-    margin-bottom: 6px;
-    border-radius: 8px;
+    display: grid;
+    grid-template-columns: 16px 56px 1fr;
+    grid-template-rows: auto auto;
+    gap: 8px 10px;
+    padding: 10px;
+    align-items: start;
   }
   
+  /* Checkbox - Column 1, Row 1 */
   .item-checkbox {
-    width: 12px;
-    height: 12px;
+    width: 13px;
+    height: 13px;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
   }
   
+  /* Thumbnail - Column 2, Span 2 rows */
   .tk-mini-thumb {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 6px;
+    grid-column: 2;
+    grid-row: 1 / 3;
   }
   
+  /* Product Info - Column 3, Row 1 */
   .tk-mini-meta {
-    gap: 3px;
+    grid-column: 3;
+    grid-row: 1;
+    gap: 4px;
     min-width: 0;
-    overflow: hidden;
   }
   
   .tk-mini-title {
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.3;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   
   .tk-mini-sub {
     font-size: 9px;
-    gap: 2px;
+  }
+  
+  .tk-mini-sub > div {
+    font-size: 10px !important;
   }
   
   .tk-mini-variant {
     font-size: 8px;
-    padding: 2px 4px;
-    border-radius: 3px;
+    padding: 2px 5px;
   }
   
   .tk-mini-controls {
-    gap: 3px;
-    margin-top: 3px;
+    gap: 4px;
+    margin-top: 4px;
   }
   
   .qty-btn {
-    width: 20px;
-    height: 20px;
-    font-size: 11px;
-    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
   }
   
   .qty-input {
-    width: 28px;
-    padding: 2px;
-    font-size: 9px;
-    border-radius: 4px;
+    width: 32px;
+    font-size: 10px;
   }
   
+  /* Price & Delete - Column 3, Row 2 */
   .item-right {
-    gap: 4px;
-    min-width: 60px;
+    grid-column: 3;
+    grid-row: 2;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
   }
   
   .item-total {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    text-align: right;
-    white-space: nowrap;
+    flex: 1;
+    text-align: left;
   }
   
   .btn-trash {
-    padding: 3px;
-    border-radius: 4px;
+    padding: 5px 7px;
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 5px;
+    flex-shrink: 0;
   }
   
   .btn-trash svg {
@@ -1121,8 +1179,8 @@
   }
   
   .mini-body-top {
-    padding: 0 4px 6px;
-    margin-bottom: 6px;
+    padding: 0 4px 8px;
+    margin-bottom: 8px;
   }
   
   .mini-body-top label {
@@ -1130,9 +1188,9 @@
   }
   
   .btn-delete-bulk {
-    padding: 4px 7px;
+    padding: 4px 8px;
     font-size: 9px;
-    gap: 3px;
+    gap: 4px;
     border-radius: 5px;
   }
   
@@ -1142,41 +1200,41 @@
   }
   
   .tk-mini-footer {
-    padding: 10px 12px;
-    gap: 8px;
+    padding: 12px;
+    gap: 10px;
   }
   
   .tk-mini-footer > div:first-child {
-    padding: 5px 0;
-    margin-bottom: 6px;
+    padding: 6px 0;
+    margin-bottom: 8px;
   }
   
   .tk-mini-footer > div:first-child > div {
-    font-size: 9px;
+    font-size: 10px;
     gap: 4px;
   }
   
   .tk-mini-footer > div:first-child svg {
-    width: 11px;
-    height: 11px;
+    width: 12px;
+    height: 12px;
   }
   
   .tk-mini-totals .label {
-    font-size: 10px;
+    font-size: 11px;
   }
   
   .tk-mini-totals .amount {
-    font-size: 14px;
+    font-size: 15px;
   }
   
   .tk-actions-row {
-    gap: 5px;
+    gap: 6px;
   }
   
   .btn-ghost,
   .btn-primary {
-    padding: 9px 10px;
-    font-size: 10px;
+    padding: 10px 12px;
+    font-size: 11px;
     border-radius: 6px;
   }
   
@@ -1194,7 +1252,18 @@
   .tk-search input {
     min-width: 100px;
     font-size: 10px;
-    padding: 6px 8px;
+    padding: 6px 38px 6px 12px;
+  }
+  
+  .tk-search .search-icon {
+    width: 30px;
+    height: 30px;
+    right: 2px;
+  }
+  
+  .tk-search .search-icon svg {
+    width: 14px;
+    height: 14px;
   }
   
   .tk-actions {
@@ -1216,49 +1285,78 @@
     height: 30px;
   }
   
-  .tk-mini-cart {
-    left: 8px;
-    right: 8px;
-    width: calc(100vw - 16px);
+  .tk-mini-head {
+    padding: 10px;
+  }
+  
+  .tk-mini-head .title {
+    font-size: 11px;
+  }
+  
+  .tk-mini-body {
+    padding: 8px;
   }
   
   .tk-mini-item {
-    grid-template-columns: 16px 44px 1fr 55px;
-    gap: 5px;
-    padding: 6px;
+    grid-template-columns: 14px 48px 1fr;
+    gap: 6px;
+    padding: 8px;
   }
   
   .item-checkbox {
-    width: 11px;
-    height: 11px;
+    width: 12px;
+    height: 12px;
   }
   
   .tk-mini-thumb {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
   }
   
   .tk-mini-title {
-    font-size: 9px;
+    font-size: 10px;
   }
   
   .tk-mini-sub {
     font-size: 8px;
   }
   
+  .tk-mini-sub > div {
+    font-size: 9px !important;
+  }
+  
   .qty-btn {
-    width: 18px;
-    height: 18px;
-    font-size: 10px;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
   }
   
   .qty-input {
-    width: 26px;
-    font-size: 8px;
+    width: 28px;
+    font-size: 9px;
   }
   
   .item-total {
-    font-size: 9px;
+    font-size: 10px;
+  }
+  
+  .btn-trash svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .tk-mini-footer {
+    padding: 10px;
+  }
+  
+  .tk-mini-totals .amount {
+    font-size: 14px;
+  }
+  
+  .btn-ghost,
+  .btn-primary {
+    padding: 9px 10px;
+    font-size: 10px;
   }
 }
 </style>
@@ -1308,7 +1406,9 @@
         @auth
           <a href="{{ route('orders.index') }}" class="icon-btn" title="Pesanan Saya" style="position:relative;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <path d="M3 9h18"></path>
+              <path d="M9 21V9"></path>
             </svg>
           </a>
         @endauth
@@ -1381,9 +1481,7 @@
                     @php $id = $item['id'] ?? $loopIndex; @endphp
                     <div class="tk-mini-item" data-item-id="{{ $id }}" data-price="{{ $item['price'] ?? 0 }}">
                       {{-- Checkbox --}}
-                      <div style="display:flex;align-items:center;justify-content:center;">
-                        <input type="checkbox" class="item-checkbox" data-item-id="{{ $id }}" title="Pilih item">
-                      </div>
+                      <input type="checkbox" class="item-checkbox" data-item-id="{{ $id }}" title="Pilih item">
 
                       {{-- Thumbnail --}}
                       <div class="tk-mini-thumb">
@@ -1405,7 +1503,7 @@
                           @if(!empty($item['variant']))
                             <span class="tk-mini-variant">{{ $item['variant'] }}</span>
                           @endif
-                          <div style="font-weight:600;color:#374151;">Rp {{ number_format($item['price'],0,',','.') }}</div>
+                          <div style="font-weight:600;color:#374151;font-size:10px;">Rp {{ number_format($item['price'],0,',','.') }}</div>
                         </div>
 
                         <div class="tk-mini-controls">
@@ -1420,7 +1518,7 @@
                         <div class="item-total">Rp {{ number_format(($item['price']*$item['qty']),0,',','.') }}</div>
 
                         <button class="btn-trash btn-remove-single" data-remove-id="{{ $id }}" title="Hapus">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
                           </svg>
@@ -1732,12 +1830,23 @@
       const open = miniCart.classList.toggle('show');
       cartBtn.setAttribute('aria-expanded', open?'true':'false');
       if (profileDrop) profileDrop.classList.remove('show');
+      
+      // Add/remove body class for mobile overflow control
+      if (window.innerWidth <= 768) {
+        if (open) {
+          document.body.classList.add('cart-open');
+        } else {
+          document.body.classList.remove('cart-open');
+        }
+      }
+      
       updateSelectAllState();
     });
     document.addEventListener('click', e => {
       if (!miniCart.contains(e.target) && !cartBtn.contains(e.target)) {
         miniCart.classList.remove('show');
         cartBtn.setAttribute('aria-expanded','false');
+        document.body.classList.remove('cart-open');
       }
     });
   }
@@ -2003,7 +2112,10 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (confirmModal && confirmModal.classList.contains('show')) closeConfirm();
-      if (miniCart) miniCart.classList.remove('show');
+      if (miniCart) {
+        miniCart.classList.remove('show');
+        document.body.classList.remove('cart-open');
+      }
       if (profileDrop) profileDrop.classList.remove('show');
     }
   });
