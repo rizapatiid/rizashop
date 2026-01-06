@@ -80,7 +80,7 @@ class ProductController extends Controller
                 'stock' => $validated['stock'] ?? 0,
                 'category_id' => $validated['category_id'],
                 'product_type' => $validated['product_type'],
-                'is_active' => $request->has('is_active'),
+                'is_active' => 1, // 🔥 PAKSA AKTIF
             ]);
 
             // 2. Handle Multiple Images Upload
@@ -209,7 +209,7 @@ class ProductController extends Controller
                 'stock' => $validated['stock'] ?? 0,
                 'category_id' => $validated['category_id'],
                 'product_type' => $validated['product_type'],
-                'is_active' => $request->has('is_active'),
+                'is_active' => 1, // 🔥 PAKSA AKTIF
             ]);
 
             // 2️⃣ HAPUS gambar yang ditandai untuk dihapus

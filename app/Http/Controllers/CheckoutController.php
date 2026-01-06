@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -66,7 +68,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Start checkout (POST). Accepts items[...] from cart page.
+     * Start checkout (POST). Accepts items[...] from cart page or mini cart.
      * Stores minimal selection into session('checkout_items') and redirects to checkout page.
      */
     public function start(Request $request)
@@ -102,7 +104,7 @@ class CheckoutController extends Controller
         // save minimal selection to session
         session(['checkout_items' => $selected]);
 
-        // redirect to the correct checkout route (try common names, fallback to addresses.checkout.index)
+        // redirect to the correct checkout route
         if (Route::has('checkout.index')) {
             return redirect()->route('checkout.index');
         }
@@ -181,22 +183,51 @@ class CheckoutController extends Controller
                 'shipping_method' => $data['shipping_method'] ?? null,
             ]);
 
-            foreach ($cart as $c) {
+            foreach ($cart as $cartKey => $c) {
+                // Parse cart key untuk mendapatkan product_id dan variant_id
+                $parts = explode(':', $cartKey);
+                $productId = $parts[0] ?? null;
+                $variantId = isset($parts[1]) ? $parts[1] : null;
+
                 $order->items()->create([
-                    'product_id' => $c['id'] ?? null,
+                    'product_id' => $productId,
+                    'variant_id' => $variantId, // Simpan variant_id jika ada
                     'product_name' => $c['name'] ?? 'Unknown',
                     'product_sku' => $c['sku'] ?? null,
                     'price' => $c['price'] ?? 0,
                     'qty' => $c['qty'] ?? 1,
                     'subtotal' => ($c['price'] ?? 0) * ($c['qty'] ?? 1),
-                    'meta' => ['image' => $c['image'] ?? null],
+                    'meta' => [
+                        'image' => $c['image'] ?? null,
+                        'variant' => $c['variant'] ?? null, // Simpan info variant
+                    ],
                 ]);
+
+                // Kurangi stock produk/variant
+                if ($variantId) {
+                    // Kurangi stock variant
+                    $variant = ProductVariant::find($variantId);
+                    if ($variant) {
+                        $variant->decrement('stock', $c['qty'] ?? 1);
+                    }
+                } else {
+                    // Kurangi stock produk
+                    $product = Product::find($productId);
+                    if ($product) {
+                        $product->decrement('stock', $c['qty'] ?? 1);
+                    }
+                }
             }
 
             DB::commit();
 
-            // clear sessions BEFORE redirect
-            session()->forget('cart');
+            // Hapus items yang sudah di-checkout dari cart
+            foreach (array_keys($cart) as $cartKey) {
+                unset($fullCart[$cartKey]);
+            }
+            session()->put('cart', $fullCart);
+            
+            // clear checkout_items session
             session()->forget('checkout_items');
 
             // Prefer payments.create if exists (normal flow: upload bukti pembayaran)

@@ -1,5 +1,8 @@
 @extends('layouts.nav_masterdashboard')
 
+@section('title', 'Edit Produk')
+@section('page-title', 'Edit Produk')
+
 @section('content')
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');

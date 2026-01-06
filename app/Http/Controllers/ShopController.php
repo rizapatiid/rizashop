@@ -3,122 +3,203 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
 {
-    // daftar produk untuk user
+    /*
+    |--------------------------------------------------------------------------
+    | SHOP INDEX
+    |--------------------------------------------------------------------------
+    */
     public function index()
     {
-        $products = Product::where('is_active', true)
-            ->orderByDesc('created_at')
+        $products = Product::active()
+            ->with('category')
+            ->latest()
             ->paginate(12);
 
         return view('shop.index', compact('products'));
     }
 
-    // tampilkan keranjang
+    /*
+    |--------------------------------------------------------------------------
+    | SHOP SHOW (DETAIL PRODUK + VARIANT)
+    |--------------------------------------------------------------------------
+    */
+    public function show(Product $product)
+    {
+        if (!$product->is_active) {
+            abort(404);
+        }
+
+        $product->load([
+            'category',
+            'images',
+            'variants' => fn ($q) => $q->where('is_active', true)
+        ]);
+
+        return view('shop.show', compact('product'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CART PAGE
+    |--------------------------------------------------------------------------
+    */
     public function cart()
     {
         $cart = session()->get('cart', []);
-        $total = 0;
 
-        foreach ($cart as $item) {
-            $total += $item['price'] * $item['qty'];
-        }
+        $total = collect($cart)->reduce(
+            fn ($c, $i) => $c + ($i['price'] * $i['qty']),
+            0
+        );
 
         return view('shop.cart', compact('cart', 'total'));
     }
 
-    // tambah ke keranjang
+    /*
+    |--------------------------------------------------------------------------
+    | ADD TO CART (SUPPORT VARIANT)
+    | Route: POST /keranjang/tambah/{product}
+    |--------------------------------------------------------------------------
+    */
     public function addToCart(Request $request, Product $product)
     {
-        $qty = (int) $request->input('qty', 1);
-        if ($qty < 1) $qty = 1;
+        if (!$product->is_active) {
+            abort(404);
+        }
+
+        $qty = max(1, (int) $request->input('qty', 1));
+        $variantId = $request->input('variant_id');
+
+        $variant = null;
+
+        // 🔹 Jika produk punya variant → wajib pilih
+        if ($product->variants()->where('is_active', true)->exists()) {
+            if (!$variantId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Silakan pilih varian terlebih dahulu'
+                ], 422);
+            }
+
+            $variant = ProductVariant::where('id', $variantId)
+                ->where('product_id', $product->id)
+                ->where('is_active', true)
+                ->firstOrFail();
+
+            if ($variant->stock < $qty) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stok varian tidak mencukupi'
+                ], 422);
+            }
+        } else {
+            // 🔹 Produk tanpa variant
+            if ($product->stock < $qty) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stok produk tidak mencukupi'
+                ], 422);
+            }
+        }
 
         $cart = session()->get('cart', []);
 
-        if (isset($cart[$product->id])) {
-            $cart[$product->id]['qty'] += $qty;
+        // 🔑 CART KEY (product_id atau product_id:variant_id)
+        $cartKey = $variant
+            ? $product->id . ':' . $variant->id
+            : (string) $product->id;
+
+        if (isset($cart[$cartKey])) {
+            $cart[$cartKey]['qty'] += $qty;
         } else {
-            $cart[$product->id] = [
-                'id'    => $product->id,
-                'name'  => $product->name,
-                'price' => $product->price,
-                'qty'   => $qty,
-                'image' => $product->image_path,
+            $cart[$cartKey] = [
+                'id'         => $cartKey, // tambahkan id untuk identifikasi di frontend
+                'product_id' => $product->id,
+                'variant_id' => $variant?->id,
+                'name'       => $product->name,
+                'variant'    => $variant
+                    ? $variant->variant_name . ' - ' . $variant->variant_value
+                    : null,
+                'sku'        => $variant
+                    ? $product->sku . '-' . $variant->variant_value
+                    : $product->sku,
+                'price'      => (float) $product->price + ($variant->price_modifier ?? 0),
+                'qty'        => $qty,
+                'image'      => $product->main_image,
             ];
         }
 
         session()->put('cart', $cart);
 
         if ($request->ajax()) {
-            $total = collect($cart)->reduce(function ($c, $i) {
-                return $c + ($i['price'] * $i['qty']);
-            }, 0);
+            $total = collect($cart)->reduce(
+                fn ($c, $i) => $c + ($i['price'] * $i['qty']),
+                0
+            );
+
             return response()->json([
                 'success' => true,
-                'count' => collect($cart)->sum('qty'),
-                'total' => $total,
+                'count'   => collect($cart)->sum('qty'),
+                'total'   => $total,
                 'total_formatted' => 'Rp ' . number_format($total, 0, ',', '.'),
             ]);
         }
 
-        return redirect()->route('shop.cart')->with('success', 'Produk ditambahkan ke keranjang.');
+        return redirect()
+            ->route('shop.cart')
+            ->with('success', 'Produk ditambahkan ke keranjang.');
     }
 
-    // hapus 1 item dari keranjang (form non-AJAX)
-    public function removeFromCart(Product $product)
+    /*
+    |--------------------------------------------------------------------------
+    | REMOVE FROM CART (FORM NON-AJAX)
+    | Route: DELETE /keranjang/hapus/{product}
+    |--------------------------------------------------------------------------
+    */
+    public function removeFromCart(Request $request, Product $product)
     {
+        $cartKey = $request->input('cart_key'); // dikirim dari form
+
         $cart = session()->get('cart', []);
 
-        if (isset($cart[$product->id])) {
-            unset($cart[$product->id]);
+        if ($cartKey && isset($cart[$cartKey])) {
+            unset($cart[$cartKey]);
             session()->put('cart', $cart);
         }
 
         return back()->with('success', 'Produk dihapus dari keranjang.');
     }
 
-    // checkout sederhana: hanya mengosongkan keranjang
-    public function checkout()
-    {
-        $cart = session()->get('cart', []);
-
-        if (empty($cart)) {
-            return redirect()->route('shop.cart')->with('error', 'Keranjang masih kosong.');
-        }
-
-        // Di sini nanti bisa disimpan ke tabel orders & order_items
-
-        session()->forget('cart');
-
-        return redirect()->route('shop.index')->with('success', 'Checkout berhasil (simulasi).');
-    }
-
     /*
-     * AJAX: update qty untuk item (dipanggil oleh mini-cart & halaman cart via fetch)
-     * Route: PATCH /keranjang/item/{product}
-     */
-    public function updateItem(Request $request, Product $product)
+    |--------------------------------------------------------------------------
+    | UPDATE ITEM (AJAX)
+    | Route: PATCH /keranjang/item
+    |--------------------------------------------------------------------------
+    */
+    public function updateItem(Request $request)
     {
-        $qty = intval($request->input('qty', 1));
-        if ($qty < 1) $qty = 1;
+        $cartKey = $request->input('cart_key');
+        $qty = max(1, (int) $request->input('qty', 1));
 
         $cart = session()->get('cart', []);
 
-        if (!isset($cart[$product->id])) {
-            return response()->json(['message' => 'Item tidak ditemukan di keranjang'], 404);
+        if (!isset($cart[$cartKey])) {
+            return response()->json(['message' => 'Item tidak ditemukan'], 404);
         }
 
-        // update qty
-        $cart[$product->id]['qty'] = $qty;
+        $cart[$cartKey]['qty'] = $qty;
         session()->put('cart', $cart);
 
-        // hitung subtotal baris, total cart, count
-        $rowSubtotal = ($cart[$product->id]['price'] ?? 0) * $cart[$product->id]['qty'];
-        $total = collect($cart)->reduce(fn($c, $i) => $c + (($i['price'] ?? 0) * ($i['qty'] ?? 1)), 0);
-        $count = collect($cart)->sum('qty');
+        $rowSubtotal = $cart[$cartKey]['price'] * $qty;
+        $total = collect($cart)->reduce(
+            fn ($c, $i) => $c + ($i['price'] * $i['qty']),
+            0
+        );
 
         return response()->json([
             'success' => true,
@@ -126,31 +207,36 @@ class ShopController extends Controller
             'row_subtotal_formatted' => 'Rp ' . number_format($rowSubtotal, 0, ',', '.'),
             'total' => $total,
             'total_formatted' => 'Rp ' . number_format($total, 0, ',', '.'),
-            'count' => $count,
+            'count' => collect($cart)->sum('qty'),
         ]);
     }
 
     /*
-     * AJAX: delete item (dipanggil oleh mini-cart via fetch)
-     * Route: DELETE /keranjang/item/{product}
-     */
-    public function deleteItem(Request $request, Product $product)
+    |--------------------------------------------------------------------------
+    | DELETE ITEM (AJAX)
+    | Route: DELETE /keranjang/item
+    |--------------------------------------------------------------------------
+    */
+    public function deleteItem(Request $request)
     {
+        $cartKey = $request->input('cart_key');
         $cart = session()->get('cart', []);
 
-        if (isset($cart[$product->id])) {
-            unset($cart[$product->id]);
+        if (isset($cart[$cartKey])) {
+            unset($cart[$cartKey]);
             session()->put('cart', $cart);
         }
 
-        $total = collect($cart)->reduce(fn($c, $i) => $c + (($i['price'] ?? 0) * ($i['qty'] ?? 1)), 0);
-        $count = collect($cart)->sum('qty');
+        $total = collect($cart)->reduce(
+            fn ($c, $i) => $c + ($i['price'] * $i['qty']),
+            0
+        );
 
         return response()->json([
             'success' => true,
             'total' => $total,
             'total_formatted' => 'Rp ' . number_format($total, 0, ',', '.'),
-            'count' => $count,
+            'count' => collect($cart)->sum('qty'),
         ]);
     }
 }
