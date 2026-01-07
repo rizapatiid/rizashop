@@ -697,9 +697,18 @@ body {
             <div class="cart-item-info">
               <div class="cart-item-name">{{ $item['name'] }}</div>
               
-              @if(!empty($item['variant']))
-                <div class="cart-item-variant">{{ $item['variant'] }}</div>
-              @endif
+@if(!empty($item['variant']))
+  <div class="cart-item-variant-row">
+    @if(is_array($item['variant']))
+      @foreach($item['variant'] as $v)
+        <span class="cart-item-variant">{{ $v }}</span>
+      @endforeach
+    @else
+      <span class="cart-item-variant">{{ $item['variant'] }}</span>
+    @endif
+  </div>
+@endif
+
               
               @if($isOut)
                 <div><span class="badge-out">Stok Habis</span></div>

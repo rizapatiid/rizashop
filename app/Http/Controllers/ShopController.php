@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -13,35 +14,50 @@ class ShopController extends Controller
     | SHOP INDEX
     |--------------------------------------------------------------------------
     */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::active()
+        $query = Product::active()
             ->with('category')
-            ->latest()
-            ->paginate(12);
+            ->latest();
 
-        return view('shop.index', compact('products'));
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | SHOP SHOW (DETAIL PRODUK + VARIANT)
-    |--------------------------------------------------------------------------
-    */
-    public function show(Product $product)
-    {
-        if (!$product->is_active) {
-            abort(404);
+        if ($request->filled('category')) {
+            $query->whereHas('category', function ($q) use ($request) {
+                $q->where('slug', $request->category);
+            });
         }
 
-        $product->load([
-            'category',
-            'images',
-            'variants' => fn ($q) => $q->where('is_active', true)
-        ]);
+        $products = $query->paginate(12)->withQueryString();
+        $categories = Category::orderBy('name')->get();
 
-        return view('shop.show', compact('product'));
+        return view('shop.index', compact('products', 'categories'));
     }
+
+ /*
+|--------------------------------------------------------------------------
+| SHOP SHOW
+|--------------------------------------------------------------------------
+*/
+public function show(Product $product)
+{
+    if (!$product->is_active) {
+        abort(404);
+    }
+
+    $product->load([
+        'category',
+        'images',
+        'variants' => fn ($q) => $q->where('is_active', true)
+    ]);
+
+    // ✅ TAMBAHAN: Rekomendasi produk acak (6 item)
+    $recommends = Product::active()
+        ->where('id', '!=', $product->id)
+        ->inRandomOrder()
+        ->limit(6)
+        ->get();
+
+    return view('shop.show', compact('product', 'recommends'));
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -62,8 +78,7 @@ class ShopController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | ADD TO CART (SUPPORT VARIANT)
-    | Route: POST /keranjang/tambah/{product}
+    | ADD TO CART (SUPPORT MULTI VARIANT)
     |--------------------------------------------------------------------------
     */
     public function addToCart(Request $request, Product $product)
@@ -73,32 +88,59 @@ class ShopController extends Controller
         }
 
         $qty = max(1, (int) $request->input('qty', 1));
-        $variantId = $request->input('variant_id');
+        $variantInput = $request->input('variant_id');
 
-        $variant = null;
+        $variants = collect();
+        $variantPrice = 0;
+        $variantLabels = [];
 
-        // 🔹 Jika produk punya variant → wajib pilih
         if ($product->variants()->where('is_active', true)->exists()) {
-            if (!$variantId) {
+
+            if (!$variantInput) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Silakan pilih varian terlebih dahulu'
+                    'message' => 'Silakan pilih semua varian terlebih dahulu'
                 ], 422);
             }
 
-            $variant = ProductVariant::where('id', $variantId)
+            $variantIds = collect(explode(',', $variantInput))
+                ->map(fn ($v) => (int) trim($v))
+                ->filter()
+                ->unique();
+
+            $variants = ProductVariant::whereIn('id', $variantIds)
                 ->where('product_id', $product->id)
                 ->where('is_active', true)
-                ->firstOrFail();
+                ->get();
 
-            if ($variant->stock < $qty) {
+            // 🔴 VALIDASI: 1 VARIAN PER KATEGORI
+            $requiredGroups = $product->variants
+                ->where('is_active', true)
+                ->groupBy('variant_name')
+                ->keys();
+
+            $selectedGroups = $variants->groupBy('variant_name')->keys();
+
+            if ($requiredGroups->diff($selectedGroups)->isNotEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Stok varian tidak mencukupi'
+                    'message' => 'Semua varian wajib dipilih'
                 ], 422);
             }
+
+            foreach ($variants as $v) {
+                if ($v->stock < $qty) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Stok varian tidak mencukupi'
+                    ], 422);
+                }
+
+                $variantPrice += $v->price_modifier;
+                $variantLabels[] = $v->variant_name . ': ' . $v->variant_value;
+            }
+
         } else {
-            // 🔹 Produk tanpa variant
             if ($product->stock < $qty) {
                 return response()->json([
                     'success' => false,
@@ -109,28 +151,24 @@ class ShopController extends Controller
 
         $cart = session()->get('cart', []);
 
-        // 🔑 CART KEY (product_id atau product_id:variant_id)
-        $cartKey = $variant
-            ? $product->id . ':' . $variant->id
+        // 🔑 CART KEY UNIK (product_id:variant1-variant2)
+        $cartKey = $variants->isNotEmpty()
+            ? $product->id . ':' . $variants->pluck('id')->implode('-')
             : (string) $product->id;
 
         if (isset($cart[$cartKey])) {
             $cart[$cartKey]['qty'] += $qty;
         } else {
             $cart[$cartKey] = [
-                'id'         => $cartKey, // tambahkan id untuk identifikasi di frontend
-                'product_id' => $product->id,
-                'variant_id' => $variant?->id,
-                'name'       => $product->name,
-                'variant'    => $variant
-                    ? $variant->variant_name . ' - ' . $variant->variant_value
-                    : null,
-                'sku'        => $variant
-                    ? $product->sku . '-' . $variant->variant_value
-                    : $product->sku,
-                'price'      => (float) $product->price + ($variant->price_modifier ?? 0),
-                'qty'        => $qty,
-                'image'      => $product->main_image,
+                'id'            => $cartKey,
+                'product_id'    => $product->id,
+                'variant_ids'   => $variants->pluck('id')->all(),
+                'name'          => $product->name,
+                'variant'       => $variantLabels,
+                'sku'           => $product->sku,
+                'price'         => (float) $product->price + $variantPrice,
+                'qty'           => $qty,
+                'image'         => $product->main_image,
             ];
         }
 
@@ -157,14 +195,12 @@ class ShopController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | REMOVE FROM CART (FORM NON-AJAX)
-    | Route: DELETE /keranjang/hapus/{product}
+    | REMOVE FROM CART
     |--------------------------------------------------------------------------
     */
     public function removeFromCart(Request $request, Product $product)
     {
-        $cartKey = $request->input('cart_key'); // dikirim dari form
-
+        $cartKey = $request->input('cart_key');
         $cart = session()->get('cart', []);
 
         if ($cartKey && isset($cart[$cartKey])) {
@@ -177,8 +213,7 @@ class ShopController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | UPDATE ITEM (AJAX)
-    | Route: PATCH /keranjang/item
+    | UPDATE ITEM
     |--------------------------------------------------------------------------
     */
     public function updateItem(Request $request)
@@ -211,10 +246,11 @@ class ShopController extends Controller
         ]);
     }
 
+    
+
     /*
     |--------------------------------------------------------------------------
-    | DELETE ITEM (AJAX)
-    | Route: DELETE /keranjang/item
+    | DELETE ITEM
     |--------------------------------------------------------------------------
     */
     public function deleteItem(Request $request)

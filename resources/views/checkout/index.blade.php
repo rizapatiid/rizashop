@@ -374,6 +374,24 @@ body {
   overflow: hidden;
 }
 
+.product-variant-row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;     /* ⬅️ DIPERKECIL (NAIK KE ATAS) */
+  margin-bottom: 4px;  /* ⬅️ JARAK KE QTY */
+}
+
+.product-variant{
+  background: #f1f3f5;
+  color: #495057;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .product-variant {
   display: inline-flex;
   align-items: center;
@@ -998,9 +1016,18 @@ body {
                   </div>
                   <div class="product-info">
                     <div class="product-name">{{ $c['name'] }}</div>
-                    @if(!empty($c['variant']))
-                      <div class="product-variant">{{ $c['variant'] }}</div>
-                    @endif
+                      @if(!empty($c['variant']))
+                        <div class="product-variant-row">
+                          @if(is_array($c['variant']))
+                            @foreach($c['variant'] as $v)
+                              <span class="product-variant">{{ $v }}</span>
+                            @endforeach
+                          @else
+                            <span class="product-variant">{{ $c['variant'] }}</span>
+                          @endif
+                        </div>
+                      @endif
+
                     <div class="product-footer">
                       <div class="product-qty">× {{ $c['qty'] }}</div>
                       <div class="product-price-section">
