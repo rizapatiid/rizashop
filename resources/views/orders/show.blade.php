@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@section('title', 'Detail Pesanan')
+@section('page-title', 'Detail Pesanan')
+
 @section('content')
 
 <div class="order-page container mx-auto p-6 max-w-6xl">

@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@section('title', 'Riwayat Pemesanan')
+@section('page-title', 'Riwayat Pemesanan')
+
 @section('content')
 
 @php

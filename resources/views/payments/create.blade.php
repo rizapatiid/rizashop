@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@section('title', 'Payment')
+@section('page-title', 'Payment')
+
 
 @section('content')
 <style>

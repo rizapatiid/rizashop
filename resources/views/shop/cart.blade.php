@@ -1,4 +1,7 @@
 @extends('layouts.blank')
+@section('title', 'Keranjang Belanja')
+@section('page-title', 'Keranjang Belanja')
+
 
 @section('content')
 <style>

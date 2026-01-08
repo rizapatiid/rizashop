@@ -41,7 +41,7 @@
             background: #fff;
             box-shadow: 0 1px 2px rgba(0,0,0,0.08);
             position: fixed;
-            top: 24px; /* topbar height */
+            top: 24px;
             left: 0;
             right: 0;
             z-index: 999;
@@ -66,7 +66,7 @@
             display: flex;
             align-items: center;
             flex-shrink: 0;
-            width: 200px;
+            width: 240px;
         }
 
         .admin-logo img {
@@ -351,7 +351,7 @@
 
         /* Main Content */
         .main-wrapper {
-            margin-top: 80px; /* topbar (24px) + navbar (56px) */
+            margin-top: 80px;
             margin-left: 260px;
             transition: margin-left 0.3s ease;
         }
@@ -360,9 +360,9 @@
             margin-left: 72px;
         }
         
-        /* Sidebar */
+        /* Sidebar - IMPROVED */
         .sidebar {
-            background: #ffffff;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
             border-right: 1px solid #e2e8f0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: fixed;
@@ -371,6 +371,7 @@
             bottom: 0;
             overflow-y: auto;
             z-index: 900;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
         }
         
         .sidebar-collapsed {
@@ -378,7 +379,7 @@
         }
         
         .sidebar-expanded {
-            width: 240px;
+            width: 260px;
         }
         
         /* Mobile Sidebar */
@@ -398,44 +399,80 @@
             }
         }
         
-        /* Menu Items */
+        /* Menu Section Header */
+        .menu-section-header {
+            padding: 16px 20px 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        /* Menu Items - IMPROVED */
         .menu-item {
             position: relative;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 2px 12px;
+            border-radius: 8px;
+            overflow: hidden;
         }
         
         .menu-item:hover {
-            background: #f8fafc;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            transform: translateX(4px);
+        }
+
+        .menu-item:hover i {
+            color: #0ea5e9;
+            transform: scale(1.1);
+        }
+
+        .menu-item i {
+            transition: all 0.25s ease;
         }
         
         .menu-item.active {
-            background: #eff6ff;
-            color: #2563eb;
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            color: #fff;
             font-weight: 600;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+            transform: translateX(4px);
+        }
+
+        .menu-item.active i {
+            color: #fff;
+        }
+
+        .menu-item.active .sidebar-text {
+            color: #fff;
         }
         
         .menu-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: #2563eb;
+            display: none;
         }
-        
-        /* Badge */
+
+        /* Badge - IMPROVED */
         .badge {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
         }
         
         @keyframes pulse {
             0%, 100% {
                 opacity: 1;
+                transform: scale(1);
             }
             50% {
-                opacity: .8;
+                opacity: .9;
+                transform: scale(1.05);
             }
         }
         
@@ -458,16 +495,37 @@
             background: #94a3b8;
         }
         
-        /* Quick Action */
+        /* Quick Action - IMPROVED */
         .quick-action {
-            background: white;
-            border: 2px dashed #e2e8f0;
+            background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+            border: 2px dashed #cbd5e1;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
         
         .quick-action:hover {
-            border-color: #2563eb;
-            background: #eff6ff;
+            border-color: #0ea5e9;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(14, 165, 233, 0.15);
+        }
+
+        .quick-action:hover .fa-headset {
+            color: #0ea5e9;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        /* Divider - IMPROVED */
+        .menu-divider {
+            margin: 12px 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, #e2e8f0 50%, transparent 100%);
         }
 
         /* Responsive */
@@ -513,20 +571,29 @@
 
 <body class="antialiased">
 
-<!-- TOP BAR - Match User Navbar -->
+<!-- TOP BAR -->
 <div class="admin-topbar">
     <div class="admin-container">
         🎉 Seller Center - Kelola Toko Anda dengan Mudah
     </div>
 </div>
 
-<!-- MAIN NAVIGATION - Match User Navbar -->
+<!-- MAIN NAVIGATION -->
 <nav class="admin-nav">
     <div class="admin-container">
         <div class="admin-row">
 
-            {{-- LEFT - Logo --}}
+            {{-- LEFT - Toggle + Logo --}}
             <div class="admin-left">
+                {{-- Hamburger Toggle --}}
+                <button id="toggleSidebar" class="icon-btn mr-2" title="Menu" style="width: 38px; height: 38px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
                 <a href="{{ route('admin.dashboard') }}" class="admin-logo">
                     <img src="{{ asset('images/logo/headlogo.png') }}" alt="Logo">
                 </a>
@@ -656,21 +723,14 @@
 <!-- LAYOUT CONTAINER -->
 <div class="flex">
     
-    <!-- LEFT SIDEBAR -->
+    <!-- LEFT SIDEBAR - IMPROVED -->
     <aside id="sidebar" class="sidebar sidebar-expanded custom-scrollbar">
-        
-        <!-- Toggle Button Inside Sidebar -->
-        <div class="p-3 border-b border-gray-200">
-            <button id="toggleSidebar" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-xs text-gray-600 font-medium">
-                <i class="fas fa-bars"></i>
-                <span class="sidebar-text">Ciutkan Menu</span>
-            </button>
-        </div>
         
         <!-- Main Menu -->
         <div class="py-3">
-            <div class="sidebar-text px-5 mb-2">
-                <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Menu Utama</div>
+            <div class="menu-section-header">
+                <i class="fas fa-grip-horizontal" style="font-size: 10px; color: #94a3b8;"></i>
+                <span class="menu-section-title sidebar-text">Menu Utama</span>
             </div>
             
             @php
@@ -684,50 +744,51 @@
             
             @foreach($menuItems as $item)
             <a href="{{ route(str_replace('.*', '.index', $item['route'])) }}" 
-               class="menu-item flex items-center px-5 py-2.5 {{ request()->routeIs($item['route']) ? 'active' : 'text-gray-700' }}">
-                <i class="fas {{ $item['icon'] }} w-5 text-center text-sm"></i>
-                <span class="sidebar-text ml-3 text-sm font-medium">{{ $item['label'] }}</span>
+               class="menu-item flex items-center px-4 py-3 {{ request()->routeIs($item['route']) ? 'active' : 'text-gray-700' }}">
+                <i class="fas {{ $item['icon'] }} w-5 text-center text-base"></i>
+                <span class="sidebar-text ml-3 text-sm font-semibold flex-1">{{ $item['label'] }}</span>
                 @if($item['badge'])
-                <span class="sidebar-text ml-auto badge text-white text-xs px-2 py-0.5 rounded-full font-semibold">{{ $item['badge'] }}</span>
+                <span class="sidebar-text badge text-white text-xs px-2 py-0.5 rounded-full font-bold">{{ $item['badge'] }}</span>
                 @endif
             </a>
             @endforeach
         </div>
         
         <!-- Divider -->
-        <div class="mx-5 border-t border-gray-200"></div>
+        <div class="menu-divider"></div>
         
         <!-- Secondary Menu -->
         <div class="py-3">
-            <div class="sidebar-text px-5 mb-2">
-                <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Lainnya</div>
+            <div class="menu-section-header">
+                <i class="fas fa-ellipsis-h" style="font-size: 10px; color: #94a3b8;"></i>
+                <span class="menu-section-title sidebar-text">Lainnya</span>
             </div>
             
-            <a href="#" class="menu-item flex items-center px-5 py-2.5 text-gray-700">
-                <i class="fas fa-chart-bar w-5 text-center text-sm"></i>
-                <span class="sidebar-text ml-3 text-sm font-medium">Laporan</span>
+            <a href="#" class="menu-item flex items-center px-4 py-3 text-gray-700">
+                <i class="fas fa-chart-bar w-5 text-center text-base"></i>
+                <span class="sidebar-text ml-3 text-sm font-semibold">Laporan</span>
             </a>
             
-            <a href="{{ route('admin.banners.index') }}" class="menu-item flex items-center px-5 py-2.5 {{ request()->routeIs('admin.banners.*') ? 'active' : 'text-gray-700' }}">
-                <i class="fas fa-bullhorn w-5 text-center text-sm"></i>
-                <span class="sidebar-text ml-3 text-sm font-medium">Marketing</span>
+            <a href="{{ route('admin.banners.index') }}" class="menu-item flex items-center px-4 py-3 {{ request()->routeIs('admin.banners.*') ? 'active' : 'text-gray-700' }}">
+                <i class="fas fa-bullhorn w-5 text-center text-base"></i>
+                <span class="sidebar-text ml-3 text-sm font-semibold">Marketing</span>
             </a>
             
-            <a href="#" class="menu-item flex items-center px-5 py-2.5 text-gray-700">
-                <i class="fas fa-cog w-5 text-center text-sm"></i>
-                <span class="sidebar-text ml-3 text-sm font-medium">Pengaturan</span>
+            <a href="/account" class="menu-item flex items-center px-4 py-3 text-gray-700">
+                <i class="fas fa-cog w-5 text-center text-base"></i>
+                <span class="sidebar-text ml-3 text-sm font-semibold">Pengaturan</span>
             </a>
         </div>
         
         <!-- Quick Actions -->
-        <div class="sidebar-text px-3 py-4 mb-8">
-            <a href="#" class="quick-action rounded-xl p-3 text-center block">
-                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <i class="fas fa-headset text-blue-600 text-lg"></i>
+        <div class="sidebar-text px-4 py-4 mt-4 mb-8">
+            <a href="#" class="quick-action rounded-xl p-4 text-center block">
+                <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-headset text-blue-600 text-xl"></i>
                 </div>
-                <div class="text-xs font-semibold text-gray-800 mb-1">Butuh Bantuan?</div>
-                <div class="text-xs text-gray-500 mb-2">Tim support siap membantu</div>
-                <span class="text-xs text-blue-600 font-semibold hover:underline">Hubungi Kami</span>
+                <div class="text-xs font-bold text-gray-900 mb-1">Butuh Bantuan?</div>
+                <div class="text-xs text-gray-500 mb-3">Tim support siap membantu</div>
+                <span class="inline-block text-xs text-white bg-gradient-to-r from-blue-500 to-blue-600 px-3 py-1.5 rounded-lg font-semibold hover:shadow-lg transition-all">Hubungi Kami</span>
             </a>
         </div>
         
@@ -738,7 +799,6 @@
 
     <!-- MAIN CONTENT AREA -->
     <main id="main-content" class="main-wrapper flex-1 overflow-y-auto custom-scrollbar">
-        <!-- Content -->
         <div class="p-4 sm:p-6 lg:p-8">
             @yield('content')
         </div>
@@ -755,21 +815,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileBtn = document.getElementById('admin-profile-btn');
     const profileDrop = document.getElementById('admin-profile-dropdown');
     
-    // Check if we're on mobile
     const isMobile = () => window.innerWidth < 1024;
     
-    // Load saved sidebar state
     const loadSidebarState = () => {
         const sidebarState = localStorage.getItem('sidebarState');
         return sidebarState === 'collapsed';
     };
     
-    // Save sidebar state
     const saveSidebarState = (isCollapsed) => {
         localStorage.setItem('sidebarState', isCollapsed ? 'collapsed' : 'expanded');
     };
     
-    // Initialize layout based on screen size and saved state
     const initLayout = () => {
         if (isMobile()) {
             mainContent.classList.remove('sidebar-collapsed');
@@ -785,8 +841,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.sidebar-text').forEach(el => {
                     el.classList.add('hidden');
                 });
-                
-                toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
             } else {
                 sidebar.classList.remove('sidebar-collapsed');
                 sidebar.classList.add('sidebar-expanded');
@@ -795,20 +849,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.sidebar-text').forEach(el => {
                     el.classList.remove('hidden');
                 });
-                
-                toggleBtn.innerHTML = '<i class="fas fa-bars"></i><span class="sidebar-text">Ciutkan Menu</span>';
             }
         }
     };
     
     initLayout();
     
-    // Handle window resize
     window.addEventListener('resize', () => {
         initLayout();
     });
     
-    // Desktop Toggle Sidebar
     toggleBtn?.addEventListener('click', () => {
         if (isMobile()) {
             sidebar.classList.toggle('mobile-open');
@@ -827,7 +877,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.classList.add('hidden');
             });
             
-            toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
             saveSidebarState(true);
         } else {
             sidebar.classList.remove('sidebar-collapsed');
@@ -838,23 +887,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.classList.remove('hidden');
             });
             
-            toggleBtn.innerHTML = '<i class="fas fa-bars"></i><span class="sidebar-text">Ciutkan Menu</span>';
             saveSidebarState(false);
         }
     });
     
-    // Close mobile sidebar when clicking overlay
     sidebarOverlay?.addEventListener('click', () => {
         sidebar.classList.remove('mobile-open');
         sidebarOverlay.classList.add('hidden');
     });
     
-    // Profile Dropdown
     if (profileBtn && profileDrop) {
         profileBtn.addEventListener('click', e => {
             e.stopPropagation();
             profileDrop.classList.toggle('show');
-            // Close add dropdown
             const addDrop = document.getElementById('add-dropdown');
             if (addDrop) addDrop.classList.remove('show');
         });
@@ -866,7 +911,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Add Dropdown
     const addBtn = document.getElementById('add-dropdown-btn');
     const addDrop = document.getElementById('add-dropdown');
     
@@ -874,7 +918,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addBtn.addEventListener('click', e => {
             e.stopPropagation();
             addDrop.classList.toggle('show');
-            // Close profile dropdown
             if (profileDrop) profileDrop.classList.remove('show');
         });
         

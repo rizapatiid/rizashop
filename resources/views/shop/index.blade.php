@@ -1,4 +1,6 @@
 @extends('layouts.app')
+@section('title', 'Semua Produk')
+@section('page-title', 'Semua Produk')
 
 @section('content')
 <div class="shop-container">

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
+use App\Models\ShippingMethod;
 
 class CheckoutController extends Controller
 {
@@ -22,50 +23,88 @@ class CheckoutController extends Controller
     /**
      * Show checkout page.
      */
-    public function index(Request $request)
-    {
-        $user = $request->user();
+public function index(Request $request)
+{
+    $user = $request->user();
 
-        $fullCart = session()->get('cart', []);
-        $selected = session()->get('checkout_items', null);
+    $fullCart = session()->get('cart', []);
+    $selected = session()->get('checkout_items', null);
 
-        if ($selected && is_array($selected) && count($selected) > 0) {
-            $cart = [];
-            foreach ($selected as $sel) {
-                $id = $sel['id'] ?? null;
-                $qty = intval($sel['qty'] ?? 1);
-                if ($id === null) continue;
-                if (isset($fullCart[$id])) {
-                    $item = $fullCart[$id];
-                    $item['qty'] = $qty;
-                    $cart[$id] = $item;
-                }
-            }
-            if (empty($cart)) {
-                return Redirect::route('shop.cart')->with('error', 'Item checkout tidak ditemukan. Silakan cek keranjang.');
-            }
-        } else {
-            $cart = $fullCart;
-            if (empty($cart)) {
-                return Redirect::route('shop.cart')->with('error', 'Keranjang masih kosong.');
+    if ($selected && is_array($selected) && count($selected) > 0) {
+        $cart = [];
+        foreach ($selected as $sel) {
+            $id = $sel['id'] ?? null;
+            $qty = intval($sel['qty'] ?? 1);
+            if ($id === null) continue;
+            if (isset($fullCart[$id])) {
+                $item = $fullCart[$id];
+                $item['qty'] = $qty;
+                $cart[$id] = $item;
             }
         }
-
-        $addresses = $user->addresses()->orderByDesc('is_primary')->get();
-
-        $shippingOptions = [
-            ['id' => 'jne_reg', 'label' => 'JNE - Reguler', 'cost' => 15000],
-            ['id' => 'jne_yes', 'label' => 'JNE - YES', 'cost' => 30000],
-            ['id' => 'jnt_reg', 'label' => 'J&T - Reguler', 'cost' => 14000],
-            ['id' => 'cod', 'label' => 'Bayar di Tempat (COD)', 'cost' => 0],
-        ];
-
-        $subtotal = collect($cart)->reduce(function ($carry, $item) {
-            return $carry + (($item['price'] ?? 0) * ($item['qty'] ?? 1));
-        }, 0);
-
-        return view('checkout.index', compact('cart', 'addresses', 'shippingOptions', 'subtotal'));
+        if (empty($cart)) {
+            return Redirect::route('shop.cart')
+                ->with('error', 'Item checkout tidak ditemukan. Silakan cek keranjang.');
+        }
+    } else {
+        $cart = $fullCart;
+        if (empty($cart)) {
+            return Redirect::route('shop.cart')
+                ->with('error', 'Keranjang masih kosong.');
+        }
     }
+
+    $addresses = $user->addresses()
+        ->orderByDesc('is_primary')
+        ->get();
+
+    // ✅ AMBIL SHIPPING DARI PIVOT TABLE
+    $shippingMethods = $this->getAvailableShippingMethods($cart);
+
+    $subtotal = collect($cart)->reduce(function ($carry, $item) {
+        return $carry + (($item['price'] ?? 0) * ($item['qty'] ?? 1));
+    }, 0);
+
+    return view('checkout.index', compact(
+        'cart',
+        'addresses',
+        'shippingMethods',
+        'subtotal'
+    ));
+}
+
+
+    /**
+     * Get available shipping methods based on products in cart
+     */
+    private function getAvailableShippingMethods($cart)
+    {
+        $productIds = collect($cart)
+            ->pluck('product_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($productIds->isEmpty()) {
+            return collect();
+        }
+
+        return ShippingMethod::where('is_active', true)
+            ->whereHas('products', function ($q) use ($productIds) {
+                $q->whereIn('products.id', $productIds);
+            })
+            ->with(['products' => function ($q) use ($productIds) {
+                $q->whereIn('products.id', $productIds);
+            }])
+            ->get();
+    }
+
+
+
+    /**
+     * Format shipping methods for view with cost estimation
+     */
+
 
     /**
      * Start checkout (POST). Accepts items[...] from cart page or mini cart.
@@ -129,7 +168,16 @@ class CheckoutController extends Controller
             'shipping_cost' => 'required|numeric|min:0',
         ];
 
+        // ✅ 1️⃣ VALIDASI DULU
         $data = $request->validate($rules);
+
+        // ✅ 2️⃣ BARU AMBIL SHIPPING METHOD DARI DB
+        $shippingMethod = ShippingMethod::where('code', $data['shipping_method'])->first();
+
+        if (!$shippingMethod) {
+            throw new \Exception('Metode pengiriman tidak valid.');
+        }
+
 
         // Rebuild cart
         $fullCart = session()->get('cart', []);
@@ -232,10 +280,16 @@ class CheckoutController extends Controller
                 'currency' => 'IDR',
                 'status' => 'pending',
                 'notes' => $request->input('notes') ?? null,
-                'shipping_method' => $data['shipping_method'] ?? null,
+                // ✅ FIX UTAMA
+                'shipping_method'  => $shippingMethod?->code,
+                'shipping_courier' => $shippingMethod?->name,
             ]);
 
-            Log::info('Order created', ['order_id' => $order->id, 'order_number' => $order->order_number]);
+            Log::info('Order created', [
+                'order_id' => $order->id, 
+                'order_number' => $order->order_number,
+                'shipping_courier' => $shippingMethod->name,
+            ]);
 
             // Buat order items dan kurangi stok
             Log::info('=== CREATING ORDER ITEMS & REDUCING STOCK ===');

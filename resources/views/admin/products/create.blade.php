@@ -817,7 +817,61 @@
                     </div>
                 </div>
 
+{{-- Metode Pengiriman --}}
+<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div class="px-6 py-4 bg-gradient-to-r from-sky-50 to-blue-50 border-b border-sky-100">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-bold text-gray-900">Metode Pengiriman</h2>
+                <p class="text-xs text-gray-500 mt-0.5">Pilih kurir & isi ongkir</p>
             </div>
+            <span class="badge-required">WAJIB</span>
+        </div>
+    </div>
+
+    <div class="p-6 space-y-3">
+        @foreach($shippingMethods as $method)
+            <label class="flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-sky-300 hover:bg-sky-50 transition-all">
+
+                {{-- Checkbox --}}
+                <input type="checkbox"
+                       name="shipping_methods[{{ $method->id }}][enabled]"
+                       value="1"
+                       class="shipping-checkbox w-5 h-5 text-sky-600 border-gray-300 rounded">
+
+                {{-- Info --}}
+                <div class="flex-1">
+                    <div class="font-bold text-sm text-gray-900">
+                        {{ $method->name }}
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        {{ $method->description }}
+                    </div>
+                </div>
+
+                {{-- Harga --}}
+                <div class="w-36">
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-gray-600">
+                            Rp
+                        </span>
+                        <input type="number"
+                               name="shipping_methods[{{ $method->id }}][price]"
+                               min="0"
+                               step="100"
+                               disabled
+                               class="shipping-price input-primary w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg"
+                               placeholder="0">
+                    </div>
+                </div>
+            </label>
+        @endforeach
+    </div>
+</div>
+
+            </div>
+
+            
 
             {{-- Right Sidebar - 4 cols --}}
             <div class="col-span-1 lg:col-span-4 space-y-3 sm:space-y-4 md:space-y-5">
@@ -1506,6 +1560,21 @@ function removeVariant(id) {
         }
     }, 310);
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.shipping-checkbox').forEach(cb => {
+        cb.addEventListener('change', function () {
+            const price = this.closest('label').querySelector('.shipping-price');
+            if (this.checked) {
+                price.disabled = false;
+                price.focus();
+            } else {
+                price.disabled = true;
+                price.value = '';
+            }
+        });
+    });
+});
 </script>
 
 @endsection

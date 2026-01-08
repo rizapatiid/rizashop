@@ -1,7 +1,7 @@
 @extends('layouts.nav_masterdashboard')
 
-@section('promosi', 'Create Promosi')
-@section('promosi-title', 'Create Promosi')
+@section('promosi', 'Edit Promosi')
+@section('promosi-title', 'Edit Promosi')
 
 @section('content')
 <div class="form-container">

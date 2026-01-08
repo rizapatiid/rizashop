@@ -1,4 +1,6 @@
 @extends('layouts.app')
+@section('title', 'Bukti Payment')
+@section('page-title', 'Bukti Payment')
 
 @section('content')
 

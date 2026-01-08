@@ -1,4 +1,6 @@
 @extends('layouts.app')
+@section('title', 'Detail Produk')
+@section('page-title', 'Detail Produk')
 
 @section('content')
 <div class="pd-container">

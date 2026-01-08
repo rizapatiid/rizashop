@@ -10,6 +10,8 @@ use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ShippingMethod;
+
 
 class ProductController extends Controller
 {
@@ -33,9 +35,13 @@ class ProductController extends Controller
                 ->back()
                 ->with('error', 'Belum ada kategori. Silakan jalankan: php artisan db:seed --class=CategorySeeder');
         }
+
+
+    // 🔥 TAMBAHAN: ambil shipping methods
+    $shippingMethods = ShippingMethod::where('is_active', true)->orderBy('name')->get();
         
-        return view('admin.products.create', compact('categories'));
-    }
+    return view('admin.products.create', compact('categories', 'shippingMethods'));
+}
 
     public function store(Request $request)
     {
@@ -56,6 +62,9 @@ class ProductController extends Controller
             'variants.*.values' => 'nullable|string',
             'variants.*.price_modifier' => 'nullable|numeric',
             'variants.*.stock' => 'nullable|integer|min:0',
+            'shipping_methods' => 'required|array|min:1',
+            'shipping_methods.*.enabled' => 'required|boolean',
+            'shipping_methods.*.price' => 'required|numeric|min:0',
         ], [
             'category_id.required' => 'Kategori harus dipilih',
             'category_id.exists' => 'Kategori yang dipilih tidak valid',
@@ -82,6 +91,21 @@ class ProductController extends Controller
                 'product_type' => $validated['product_type'],
                 'is_active' => 1, // 🔥 PAKSA AKTIF
             ]);
+
+            // 🔥 1️⃣ HANDLE METODE PENGIRIMAN (PIVOT TABLE)
+            $shippingSyncData = [];
+
+            foreach ($request->shipping_methods as $shippingMethodId => $data) {
+                if (isset($data['enabled'])) {
+                    $shippingSyncData[$shippingMethodId] = [
+                        'price' => $data['price'] ?? 0,
+                    ];
+                }
+            }
+
+            // Simpan ke tabel product_shipping_methods
+            $product->shippingMethods()->sync($shippingSyncData);
+
 
             // 2. Handle Multiple Images Upload
             if ($request->hasFile('images')) {
@@ -151,6 +175,11 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             
+            if (isset($product)) {
+                $product->shippingMethods()->detach();
+            }
+
+
             // Delete uploaded images if error occurs
             if (isset($product) && $product->images) {
                 foreach ($product->images as $image) {
@@ -173,10 +202,18 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $categories = Category::where('is_active', true)->orderBy('name')->get();
-        $product->load(['images', 'variants']);
-        return view('admin.products.edit', compact('product', 'categories'));
-    }
+    $categories = Category::where('is_active', true)->orderBy('name')->get();
+
+    // 🔥 TAMBAHAN: ambil semua shipping + load pivot
+    $shippingMethods = ShippingMethod::where('is_active', true)->orderBy('name')->get();
+    $product->load(['images', 'variants', 'shippingMethods']);
+
+    return view(
+        'admin.products.edit',
+        compact('product', 'categories', 'shippingMethods')
+    );
+}
+
 
     public function update(Request $request, Product $product)
     {
@@ -195,6 +232,10 @@ class ProductController extends Controller
             'variants.*.values' => 'nullable|string',
             'variants.*.price_modifier' => 'nullable|numeric',
             'variants.*.stock' => 'nullable|integer|min:0',
+            'shipping_methods' => 'required|array|min:1',
+            'shipping_methods.*.enabled' => 'required|boolean',
+            'shipping_methods.*.price' => 'required|numeric|min:0',
+
         ]);
 
         try {
@@ -293,6 +334,19 @@ class ProductController extends Controller
                     }
                 }
             }
+
+            // 🔥 9️⃣ UPDATE ONGKIR (SYNC ULANG PIVOT TABLE)
+                $shippingSyncData = [];
+
+                foreach ($request->shipping_methods as $shippingMethodId => $data) {
+                    if (isset($data['enabled'])) {
+                        $shippingSyncData[$shippingMethodId] = [
+                            'price' => $data['price'] ?? 0,
+                        ];
+                    }
+                }
+
+                $product->shippingMethods()->sync($shippingSyncData);
 
             DB::commit();
 

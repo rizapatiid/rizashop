@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminMiddleware
 {
@@ -12,11 +13,16 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->check() && auth()->user()->role === 'admin') {
-            return $next($request);
+        // Jika belum login → biarkan auth middleware yang handle
+        if (!Auth::check()) {
+            abort(403);
         }
 
-        // Jika bukan admin, tampilkan pesan kustom dan status 403
-        return response()->view('errors.unauthorized', [], 403);
+        // Jika login tapi bukan admin → tampilkan 403 page
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        return $next($request);
     }
 }

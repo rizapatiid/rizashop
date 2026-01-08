@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@section('title', 'Checkout')
+@section('page-title', 'Checkout')
+
 
 @section('content')
 <style>
@@ -909,47 +912,82 @@ body {
           </div>
 
           <!-- Shipping Card -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-header-icon">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <rect x="1" y="3" width="15" height="13"></rect>
-                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                  <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                  <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                </svg>
-              </div>
-              <h2>Pilih Pengiriman</h2>
-            </div>
-            <div class="card-body">
-              <div class="shipping-list">
-                @foreach($shippingOptions as $ship)
-                  <label class="shipping-item">
-                    <input type="radio" name="shipping_method" value="{{ $ship['id'] }}" data-cost="{{ $ship['cost'] }}" {{ $loop->first ? 'checked' : '' }}>
-                    <div class="shipping-icon">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <rect x="1" y="3" width="15" height="13"></rect>
-                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                      </svg>
-                    </div>
-                    <div class="shipping-content">
-                      <div class="shipping-name">{{ $ship['label'] }}</div>
-                      <div class="shipping-eta">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        Estimasi pengiriman 1-3 hari kerja
-                      </div>
-                    </div>
-                    <div class="shipping-cost">Rp {{ number_format($ship['cost'],0,',','.') }}</div>
-                  </label>
-                @endforeach
-              </div>
+{{-- PILIH METODE PENGIRIMAN --}}
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-icon">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="1" y="3" width="22" height="13" rx="2"></rect>
+        <path d="M16 21h2a2 2 0 0 0 2-2v-3"></path>
+        <path d="M8 21H6a2 2 0 0 1-2-2v-3"></path>
+      </svg>
+    </div>
+    <h2>Pilih Metode Pengiriman</h2>
+  </div>
+
+  <div class="card-body">
+    <div class="shipping-list">
+
+      @forelse($shippingMethods as $method)
+        @php
+          $price = $method->products->first()->pivot->price ?? 0;
+        @endphp
+
+        <label class="shipping-item">
+          <input
+            type="radio"
+            name="shipping_method"
+            value="{{ $method->code }}"
+            data-price="{{ $price }}"
+            data-courier="{{ $method->name }}"
+            class="shipping-radio"
+          >
+
+          <div class="shipping-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M3 7h13v10H3z"></path>
+              <path d="M16 10h4l1 2v5h-5z"></path>
+              <circle cx="7.5" cy="17.5" r="1.5"></circle>
+              <circle cx="17.5" cy="17.5" r="1.5"></circle>
+            </svg>
+          </div>
+
+          <div class="shipping-content">
+            <div class="shipping-name">{{ $method->name }}</div>
+            <div class="shipping-eta">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+              </svg>
+              {{ $method->description }}
             </div>
           </div>
+
+          <div class="shipping-cost">
+            Rp {{ number_format($price, 0, ',', '.') }}
+          </div>
+        </label>
+
+      @empty
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="8" y1="15" x2="16" y2="15"></line>
+            </svg>
+          </div>
+          <p>Tidak ada metode pengiriman tersedia</p>
+        </div>
+      @endforelse
+
+    </div>
+  </div>
+</div>
+
+{{-- HIDDEN INPUT (TETAP) --}}
+<input type="hidden" name="shipping_cost" id="shipping_cost">
+<input type="hidden" name="shipping_courier" id="shipping_courier">
+
 
           <!-- Notes Card -->
           <div class="card">
@@ -1085,16 +1123,18 @@ body {
 
       </div>
 
-      <!-- Hidden Fields -->
-      <input type="hidden" name="shipping_cost" id="shipping_cost" value="">
+
     </form>
   </div>
 </div>
 
 <script>
+  
 (function(){
+  
   const shippingRadios = document.querySelectorAll('input[name="shipping_method"]');
   const shippingCostInput = document.getElementById('shipping_cost');
+  const shippingCourierInput = document.getElementById('shipping_courier');
   const shippingDisplay = document.getElementById('shipping_display');
   const subtotal = Number(@json($subtotal)) || 0;
   const totalDisplay = document.getElementById('total_display');
@@ -1108,12 +1148,19 @@ body {
   function updateShippingAndTotal(){
     let selected = document.querySelector('input[name="shipping_method"]:checked');
     let cost = 0;
+    let courier = '';
+    
     if (selected) {
-      cost = Number(selected.dataset.cost || 0);
+      cost = Number(selected.dataset.price || 0);
+      courier = selected.dataset.courier || '';
     }
+    
     shippingCostInput.value = cost;
+    shippingCourierInput.value = courier;
     shippingDisplay.textContent = formatRupiah(cost);
     totalDisplay.textContent = formatRupiah(subtotal + cost);
+    
+    console.log('Shipping updated:', {cost, courier}); // Debug log
     
     const addressSelected = !!document.querySelector('input[name="address_id"]:checked');
     placeBtn.disabled = !(addressSelected && !!selected);
@@ -1137,9 +1184,12 @@ body {
 
   checkoutForm.addEventListener('submit', function(e){
     const sc = shippingCostInput.value;
+    const courier = shippingCourierInput.value;
+    
     if (sc === '') {
       const sel = document.querySelector('input[name="shipping_method"]:checked');
-      shippingCostInput.value = sel ? sel.dataset.cost : 0;
+      shippingCostInput.value = sel ? sel.dataset.price : 0;
+      shippingCourierInput.value = sel ? sel.dataset.courier : '';
     }
 
     const addressSelected = !!document.querySelector('input[name="address_id"]:checked');
@@ -1148,6 +1198,14 @@ body {
       alert('Silakan pilih alamat pengiriman terlebih dahulu.');
       return false;
     }
+
+    if (!courier) {
+      e.preventDefault();
+      alert('Silakan pilih metode pengiriman terlebih dahulu.');
+      return false;
+    }
+
+    console.log('Form submitted with courier:', courier); // Debug log
 
     placeBtn.disabled = true;
     placeBtn.innerHTML = `
@@ -1164,6 +1222,8 @@ body {
       Memproses Pesanan...
     `;
   });
+  
 })();
+
 </script>
 @endsection

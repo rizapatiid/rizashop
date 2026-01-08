@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Models\ShippingMethod;
 
 class Product extends Model
 {
@@ -111,4 +112,14 @@ class Product extends Model
     {
         $this->increment('stock', $quantity);
     }
+
+    // Relasi ke Shipping Methods
+    public function shippingMethods()
+    {
+        return $this->belongsToMany(
+            \App\Models\ShippingMethod::class,
+            'product_shipping_methods'
+        )->withPivot('price')->withTimestamps();
+    }
+
 }

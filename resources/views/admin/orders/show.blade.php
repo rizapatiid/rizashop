@@ -1,4 +1,7 @@
 @extends('layouts.nav_masterdashboard')
+@section('title', 'Lihat Pesanan')
+@section('page-title', 'Lihat Pesanan')
+
 
 @section('content')
 <div class="container mx-auto p-6 max-w-5xl" id="admin-order-show">
