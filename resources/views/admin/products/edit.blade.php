@@ -76,7 +76,7 @@
     
     .product-add-container {
         background-color: #F5F5F5;
-        min-height: calc(100vh - 56px);
+        min-height: calc(100vh - 80px); /* FIXED: 80px untuk navbar baru */
     }
 
     html, body {
@@ -239,15 +239,19 @@
         opacity: 1;
     }
 
+    /* ============================================
+       FIXED HEADER - NAVBAR BARU (80px)
+       ============================================ */
     .fixed-header-nav {
         position: fixed !important;
-        top: 56px !important;
+        top: 80px !important; /* FIXED: topbar (24px) + main nav (56px) = 80px */
         left: 0 !important;
         right: 0 !important;
         z-index: 40 !important;
         background: white !important;
         transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         margin-left: 0 !important;
+        margin-top: 4px !important; /* Tambah sedikit space dari navbar */
         width: 100% !important;
         box-sizing: border-box !important;
     }
@@ -258,7 +262,7 @@
         }
         
         .fixed-header-nav {
-            top: 56px !important;
+            top: 80px !important; /* FIXED: navbar baru 80px di mobile */
         }
         
         .space-y-6 > * + *,
@@ -361,19 +365,26 @@
         }
     }
 
+    /* Form Padding - FIXED untuk navbar baru */
     .form-with-fixed-header {
-        padding-top: 56px;
+        padding-top: 76px !important; /* FIXED: 80px navbar + 4px margin - 8px untuk lebih dekat */
     }
     
     @media (min-width: 640px) {
         .form-with-fixed-header {
-            padding-top: 64px;
+            padding-top: 80px !important; /* FIXED: reduced gap */
         }
     }
     
     @media (min-width: 768px) {
         .form-with-fixed-header {
-            padding-top: 80px;
+            padding-top: 84px !important; /* FIXED: reduced gap */
+        }
+    }
+
+    @media (max-width: 640px) {
+        .form-with-fixed-header {
+            padding-top: 132px !important; /* FIXED: 80px navbar + 52px header (reduced) */
         }
     }
 
@@ -621,7 +632,7 @@
                                                 {{-- Badge COVER untuk gambar pertama --}}
                                                 @if($i == 1)
                                                 <div class="absolute top-2 left-2 z-10">
-                                                    <span class="bg-gradient-to-r from-sky-500 to-blue-600 text-blue text-xs font-bold px-2 py-1 rounded shadow-lg">UTAMA</span>
+                                                    <span class="bg-gradient-to-r from-sky-500 to-blue-600 text-white text-xs font-bold px-2 py-1 rounded shadow-lg">UTAMA</span>
                                                 </div>
                                                 @endif
                                             </div>
@@ -641,7 +652,7 @@
                                             
                                             @if($i == 1)
                                             <div class="absolute top-2 left-2 z-10">
-                                                <span class="bg-gradient-to-r from-sky-500 to-blue-600 text-blue text-xs font-bold px-2 py-1 rounded shadow-lg">UTAMA</span>
+                                                <span class="bg-gradient-to-r from-sky-500 to-blue-600 text-white text-xs font-bold px-2 py-1 rounded shadow-lg">UTAMA</span>
                                             </div>
                                             @endif
                                         @endif
@@ -1021,9 +1032,12 @@
 <script>
 // ============================================
 // CRITICAL: Override parent layout constraints
+// FIXED: Navbar baru 80px (topbar 24px + main nav 56px)
 // ============================================
 (function() {
     'use strict';
+    
+    const NAVBAR_HEIGHT = 80; // FIXED: topbar (24px) + main nav (56px)
     
     document.addEventListener('DOMContentLoaded', function() {
         const header = document.querySelector('.fixed-header-nav');
@@ -1043,7 +1057,7 @@
             const isMobile = window.innerWidth < 1024;
             
             header.style.position = 'fixed';
-            header.style.top = '56px';
+            header.style.top = (NAVBAR_HEIGHT + 4) + 'px'; // FIXED: 80px + 4px margin untuk breathing space
             header.style.left = isMobile ? '0' : sidebarWidth + 'px';
             header.style.right = 'auto';
             header.style.zIndex = '40';
@@ -1283,12 +1297,8 @@ function toggleDeleteImage(slotNumber, isChecked) {
 let variantIndex = {{ $groupedVariants->count() ?? 0 }};
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 DOM Loaded - Variant Index:', variantIndex);
-    
     const btnTambah = document.getElementById('btn-tambah-varian');
     if (btnTambah) {
-        console.log('✅ Tombol tambah varian ditemukan');
-        
         const newBtn = btnTambah.cloneNode(true);
         btnTambah.parentNode.replaceChild(newBtn, btnTambah);
         
@@ -1296,28 +1306,17 @@ document.addEventListener('DOMContentLoaded', function() {
         freshBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('🖱️ Tombol Tambah Varian DIKLIK!');
             tambahVarianBaru();
         });
-    } else {
-        console.error('❌ Tombol tambah varian TIDAK ditemukan!');
     }
 });
 
 function tambahVarianBaru() {
-    console.log('➕ Menambah varian baru, index:', variantIndex);
-    
     const wrapper = document.getElementById('variant-wrapper');
-    if (!wrapper) {
-        console.error('❌ Wrapper tidak ditemukan!');
-        return;
-    }
+    if (!wrapper) return;
     
     const emptyMsg = document.getElementById('empty-message');
-    if (emptyMsg) {
-        console.log('🗑️ Menghapus pesan kosong');
-        emptyMsg.remove();
-    }
+    if (emptyMsg) emptyMsg.remove();
 
     variantIndex++;
     
@@ -1391,26 +1390,19 @@ function tambahVarianBaru() {
     `;
 
     wrapper.appendChild(newRow);
-    
-    console.log('✅ Varian berhasil ditambahkan! Index sekarang:', variantIndex);
 }
 
 function hapusVarianIni(button, id) {
-    console.log('🗑️ Tombol Hapus diklik! ID:', id);
-    
     const row = document.getElementById(`variant-${id}`);
     if (row) {
         row.style.opacity = '0';
         row.style.transform = 'translateY(-10px)';
         setTimeout(() => row.remove(), 300);
-        console.log('✅ Varian berhasil dihapus');
     }
     
     const wrapper = document.getElementById('variant-wrapper');
     setTimeout(() => {
         const remainingRows = wrapper.querySelectorAll('.variant-row');
-        
-        console.log('📊 Sisa varian:', remainingRows.length);
         
         if (remainingRows.length === 0) {
             const emptyMsg = document.createElement('div');
@@ -1434,18 +1426,13 @@ function hapusVarianIni(button, id) {
                 </button>
             `;
             wrapper.appendChild(emptyMsg);
-            console.log('📝 Pesan kosong ditampilkan');
         }
     }, 310);
 }
 
-
 document.getElementById('priceInput').addEventListener('input', function () {
     this.value = Math.floor(this.value || 0);
 });
-
-
 </script>
-
 
 @endsection

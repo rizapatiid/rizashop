@@ -90,7 +90,6 @@ class CheckoutController extends Controller
             $qty = intval($entry['qty'] ?? 1);
             if ($id === null) continue;
             if (!isset($cart[$id])) {
-                // skip invalid ids
                 continue;
             }
             if ($qty < 1) $qty = 1;
@@ -101,10 +100,8 @@ class CheckoutController extends Controller
             return redirect()->route('shop.cart')->with('error', 'Item terpilih tidak valid atau sudah tidak tersedia.');
         }
 
-        // save minimal selection to session
         session(['checkout_items' => $selected]);
 
-        // redirect to the correct checkout route
         if (Route::has('checkout.index')) {
             return redirect()->route('checkout.index');
         }
@@ -113,7 +110,6 @@ class CheckoutController extends Controller
             return redirect()->route('addresses.checkout.index');
         }
 
-        // fallback
         return redirect()->route('shop.cart')->with('error', 'Route checkout belum terdaftar.');
     }
 
@@ -122,10 +118,10 @@ class CheckoutController extends Controller
      */
     public function placeOrder(Request $request)
     {
+        Log::info('==================== CHECKOUT STARTED ====================');
+        
         $user = $request->user();
-
-        // log payload for quick debug (remove in production if you want)
-        Log::debug('Checkout::placeOrder payload', $request->only(['address_id','shipping_method','shipping_cost','notes']));
+        Log::info('User Info', ['user_id' => $user->id, 'email' => $user->email]);
 
         $rules = [
             'address_id' => 'required|exists:addresses,id',
@@ -135,7 +131,7 @@ class CheckoutController extends Controller
 
         $data = $request->validate($rules);
 
-        // rebuild cart from checkout_items (if exist) or full cart
+        // Rebuild cart
         $fullCart = session()->get('cart', []);
         $selected = session()->get('checkout_items', null);
 
@@ -159,7 +155,9 @@ class CheckoutController extends Controller
             return Redirect::route('shop.cart')->with('error', 'Keranjang kosong atau item tidak tersedia.');
         }
 
-        // compute totals
+        Log::info('Cart to Process', ['cart' => $cart]);
+
+        // Compute totals
         $subtotal = collect($cart)->reduce(function ($c, $i) {
             return $c + (($i['price'] ?? 0) * ($i['qty'] ?? 1));
         }, 0);
@@ -167,9 +165,63 @@ class CheckoutController extends Controller
         $shippingCost = floatval($data['shipping_cost']);
         $total = $subtotal + $shippingCost;
 
-        // transaction: create order and items
+        // Start transaction
         DB::beginTransaction();
+        
         try {
+            // Validasi stok SEBELUM membuat order
+            Log::info('=== VALIDASI STOK ===');
+            foreach ($cart as $cartKey => $c) {
+                $parts = explode(':', $cartKey);
+                $productId = intval($parts[0] ?? 0);
+                $variantId = isset($parts[1]) && $parts[1] !== '' ? intval($parts[1]) : null;
+                $qty = intval($c['qty'] ?? 1);
+
+                Log::info("Validating stock", [
+                    'cart_key' => $cartKey,
+                    'product_id' => $productId,
+                    'variant_id' => $variantId,
+                    'qty' => $qty
+                ]);
+
+                if ($variantId) {
+                    // Jika ada varian, cek stok varian DAN produk
+                    $variant = ProductVariant::find($variantId);
+                    if (!$variant) {
+                        throw new \Exception("Varian produk tidak ditemukan");
+                    }
+                    if ($variant->stock < $qty) {
+                        throw new \Exception("Stok varian '{$c['name']}' tidak mencukupi. Tersedia: {$variant->stock}, diminta: {$qty}");
+                    }
+                    
+                    $product = Product::find($productId);
+                    if (!$product) {
+                        throw new \Exception("Produk tidak ditemukan");
+                    }
+                    if ($product->stock < $qty) {
+                        throw new \Exception("Stok produk '{$product->name}' tidak mencukupi. Tersedia: {$product->stock}, diminta: {$qty}");
+                    }
+                    
+                    Log::info("Variant & Product stock OK", [
+                        'variant_id' => $variantId,
+                        'variant_stock' => $variant->stock,
+                        'product_id' => $productId,
+                        'product_stock' => $product->stock
+                    ]);
+                } else {
+                    // Jika tidak ada varian, cek stok produk saja
+                    $product = Product::find($productId);
+                    if (!$product) {
+                        throw new \Exception("Produk tidak ditemukan");
+                    }
+                    if ($product->stock < $qty) {
+                        throw new \Exception("Stok '{$c['name']}' tidak mencukupi. Tersedia: {$product->stock}, diminta: {$qty}");
+                    }
+                    Log::info("Product stock OK", ['product_id' => $productId, 'stock' => $product->stock]);
+                }
+            }
+
+            // Buat order
             $order = Order::create([
                 'user_id' => $user->id,
                 'address_id' => $data['address_id'],
@@ -183,74 +235,130 @@ class CheckoutController extends Controller
                 'shipping_method' => $data['shipping_method'] ?? null,
             ]);
 
-            foreach ($cart as $cartKey => $c) {
-                // Parse cart key untuk mendapatkan product_id dan variant_id
-                $parts = explode(':', $cartKey);
-                $productId = $parts[0] ?? null;
-                $variantId = isset($parts[1]) ? $parts[1] : null;
+            Log::info('Order created', ['order_id' => $order->id, 'order_number' => $order->order_number]);
 
-                $order->items()->create([
+            // Buat order items dan kurangi stok
+            Log::info('=== CREATING ORDER ITEMS & REDUCING STOCK ===');
+            foreach ($cart as $cartKey => $c) {
+                $parts = explode(':', $cartKey);
+                $productId = intval($parts[0] ?? 0);
+                $variantId = isset($parts[1]) && $parts[1] !== '' ? intval($parts[1]) : null;
+                $qty = intval($c['qty'] ?? 1);
+
+                // Buat order item
+                $orderItem = $order->items()->create([
                     'product_id' => $productId,
-                    'variant_id' => $variantId, // Simpan variant_id jika ada
+                    'variant_id' => $variantId,
                     'product_name' => $c['name'] ?? 'Unknown',
                     'product_sku' => $c['sku'] ?? null,
                     'price' => $c['price'] ?? 0,
-                    'qty' => $c['qty'] ?? 1,
-                    'subtotal' => ($c['price'] ?? 0) * ($c['qty'] ?? 1),
+                    'qty' => $qty,
+                    'subtotal' => ($c['price'] ?? 0) * $qty,
                     'meta' => [
                         'image' => $c['image'] ?? null,
-                        'variant' => $c['variant'] ?? null, // Simpan info variant
+                        'variant' => $c['variant'] ?? null,
                     ],
                 ]);
 
-                // Kurangi stock produk/variant
+                Log::info('Order item created', ['order_item_id' => $orderItem->id]);
+
+                // Kurangi stok
                 if ($variantId) {
-                    // Kurangi stock variant
-                    $variant = ProductVariant::find($variantId);
-                    if ($variant) {
-                        $variant->decrement('stock', $c['qty'] ?? 1);
-                    }
+                    // PENTING: Kurangi KEDUA stok (variant DAN product)
+                    
+                    // 1. Kurangi stok variant
+                    $variantStockBefore = DB::table('product_variants')->where('id', $variantId)->value('stock');
+                    
+                    DB::table('product_variants')
+                        ->where('id', $variantId)
+                        ->decrement('stock', $qty);
+                    
+                    $variantStockAfter = DB::table('product_variants')->where('id', $variantId)->value('stock');
+                    
+                    Log::info("✅ STOCK VARIANT REDUCED", [
+                        'variant_id' => $variantId,
+                        'product_name' => $c['name'],
+                        'qty_ordered' => $qty,
+                        'stock_before' => $variantStockBefore,
+                        'stock_after' => $variantStockAfter,
+                        'difference' => $variantStockBefore - $variantStockAfter
+                    ]);
+                    
+                    // 2. Kurangi stok product (total stok produk)
+                    $productStockBefore = DB::table('products')->where('id', $productId)->value('stock');
+                    
+                    DB::table('products')
+                        ->where('id', $productId)
+                        ->decrement('stock', $qty);
+                    
+                    $productStockAfter = DB::table('products')->where('id', $productId)->value('stock');
+                    
+                    Log::info("✅ STOCK PRODUCT REDUCED (from variant)", [
+                        'product_id' => $productId,
+                        'qty_ordered' => $qty,
+                        'stock_before' => $productStockBefore,
+                        'stock_after' => $productStockAfter,
+                        'difference' => $productStockBefore - $productStockAfter
+                    ]);
+                    
                 } else {
-                    // Kurangi stock produk
-                    $product = Product::find($productId);
-                    if ($product) {
-                        $product->decrement('stock', $c['qty'] ?? 1);
-                    }
+                    // Produk tanpa varian: kurangi stok product saja
+                    $stockBefore = DB::table('products')->where('id', $productId)->value('stock');
+                    
+                    DB::table('products')
+                        ->where('id', $productId)
+                        ->decrement('stock', $qty);
+                    
+                    $stockAfter = DB::table('products')->where('id', $productId)->value('stock');
+                    
+                    Log::info("✅ STOCK PRODUCT REDUCED (no variant)", [
+                        'product_id' => $productId,
+                        'product_name' => $c['name'],
+                        'qty_ordered' => $qty,
+                        'stock_before' => $stockBefore,
+                        'stock_after' => $stockAfter,
+                        'difference' => $stockBefore - $stockAfter
+                    ]);
                 }
             }
 
             DB::commit();
+            Log::info('=== TRANSACTION COMMITTED SUCCESSFULLY ===');
 
-            // Hapus items yang sudah di-checkout dari cart
+            // Hapus items dari cart
             foreach (array_keys($cart) as $cartKey) {
                 unset($fullCart[$cartKey]);
             }
             session()->put('cart', $fullCart);
-            
-            // clear checkout_items session
             session()->forget('checkout_items');
 
-            // Prefer payments.create if exists (normal flow: upload bukti pembayaran)
+            Log::info('==================== CHECKOUT FINISHED ====================');
+
+            // Redirect ke halaman payment
             if (Route::has('payments.create')) {
-                return redirect()->route('payments.create', $order->id)->with('success', 'Pesanan berhasil dibuat. Silakan unggah bukti pembayaran.');
+                return redirect()->route('payments.create', $order->id)
+                    ->with('success', 'Pesanan berhasil dibuat! Nomor: ' . $order->order_number);
             }
 
-            // fallback for prefixed routes
             if (Route::has('addresses.payments.create')) {
-                return redirect()->route('addresses.payments.create', $order->id)->with('success', 'Pesanan berhasil dibuat. Silakan unggah bukti pembayaran.');
+                return redirect()->route('addresses.payments.create', $order->id)
+                    ->with('success', 'Pesanan berhasil dibuat! Nomor: ' . $order->order_number);
             }
 
-            // fallback to orders.show if payments route missing
             if (Route::has('orders.show')) {
-                return redirect()->route('orders.show', $order->id)->with('success', 'Pesanan berhasil dibuat. Nomor: ' . $order->order_number);
+                return redirect()->route('orders.show', $order->id)
+                    ->with('success', 'Pesanan berhasil dibuat! Nomor: ' . $order->order_number);
             }
 
-            // final fallback: homepage
-            return redirect('/')->with('success', 'Pesanan berhasil dibuat. Nomor: ' . $order->order_number);
+            return redirect('/')->with('success', 'Pesanan berhasil dibuat! Nomor: ' . $order->order_number);
+            
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Checkout::placeOrder failed: '.$e->getMessage(), [
-                'exception' => $e,
+            Log::error('=== TRANSACTION ROLLED BACK ===');
+            Log::error('Checkout failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => $user->id,
             ]);
             return back()->with('error', 'Gagal membuat pesanan: ' . $e->getMessage());
         }

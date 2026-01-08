@@ -26,7 +26,6 @@
     }
 
     /* FORCE OVERRIDE PARENT LAYOUT - CRITICAL */
-    /* Override the parent layout's h-screen and overflow-y-auto */
     .flex.pt-14.h-screen {
         height: auto !important;
         min-height: auto !important;
@@ -49,7 +48,6 @@
         overflow: visible !important;
     }
 
-    /* CRITICAL: Remove overflow from main-content for sticky to work */
     main#main-content {
         overflow: visible !important;
         overflow-y: visible !important;
@@ -72,18 +70,15 @@
         padding: 0 !important;
     }
     
-    /* Main content area background */
     #main-content {
         background-color: #F5F5F5 !important;
     }
     
-    /* Product add container */
     .product-add-container {
         background-color: #F5F5F5;
-        min-height: calc(100vh - 56px);
+        min-height: calc(100vh - 80px); /* FIXED: 80px untuk navbar baru */
     }
 
-    /* Prevent over-scrolling and rubber banding */
     html, body {
         max-width: 100%;
         overscroll-behavior: none !important;
@@ -92,23 +87,19 @@
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Prevent body from being taller than content */
     body {
         position: relative;
     }
     
-    /* Fix for preventing extra scroll space */
     #app, .min-h-screen {
         min-height: auto !important;
     }
 
-    /* Custom Input Focus */
     .input-primary:focus {
         border-color: var(--tokoriza-blue);
         box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
     }
 
-    /* Image Upload Area */
     .upload-area {
         position: relative;
         transition: all 0.3s ease;
@@ -128,7 +119,6 @@
         transition: all 0.3s ease;
     }
 
-    /* Variant Card Animation */
     .variant-card {
         animation: slideIn 0.3s ease;
     }
@@ -144,7 +134,6 @@
         }
     }
 
-    /* Radio Card Styles */
     .radio-card {
         transition: all 0.2s ease;
     }
@@ -159,7 +148,6 @@
         background-color: var(--tokoriza-blue-light);
     }
 
-    /* Remove spinner from number input */
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
         -webkit-appearance: none;
@@ -170,7 +158,6 @@
         -moz-appearance: textfield;
     }
 
-    /* Scrollbar */
     ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -189,7 +176,6 @@
         background: #94a3b8;
     }
 
-    /* Button Ripple Effect */
     .btn-primary {
         position: relative;
         overflow: hidden;
@@ -216,59 +202,6 @@
         }
     }
 
-    /* Progress Steps */
-    .step-indicator {
-        display: flex;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-
-    .step {
-        flex: 1;
-        text-align: center;
-        position: relative;
-    }
-
-    .step::after {
-        content: '';
-        position: absolute;
-        top: 15px;
-        left: 50%;
-        width: 100%;
-        height: 2px;
-        background: #E5E7EB;
-        z-index: -1;
-    }
-
-    .step:last-child::after {
-        display: none;
-    }
-
-    .step-circle {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: #E5E7EB;
-        color: #999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 8px;
-        font-weight: 600;
-        font-size: 14px;
-    }
-
-    .step.active .step-circle {
-        background: var(--shopee-orange);
-        color: white;
-    }
-
-    .step.completed .step-circle {
-        background: #10B981;
-        color: white;
-    }
-
-    /* Badge Styles */
     .badge-required {
         background: linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%);
         color: white;
@@ -287,7 +220,6 @@
         font-weight: 600;
     }
 
-    /* Image Preview Overlay */
     .image-preview-overlay {
         position: absolute;
         top: 0;
@@ -307,138 +239,220 @@
         opacity: 1;
     }
 
-    /* Tooltip */
-    .tooltip {
-        position: relative;
-    }
-
-    .tooltip:hover::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #1F2937;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        white-space: nowrap;
-        margin-bottom: 8px;
-        z-index: 1000;
-    }
-
-    .tooltip:hover::before {
-        content: '';
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        border: 6px solid transparent;
-        border-top-color: #1F2937;
-        margin-bottom: 2px;
-    }
-
-    /* Fixed Header Enforcement */
+    /* ============================================
+       FIXED HEADER - NAVBAR BARU (80px)
+       ============================================ */
     .fixed-header-nav {
         position: fixed !important;
-        top: 56px !important; /* Offset dari top navbar parent (h-14 = 56px) */
-        left: 0 !important; /* Mulai dari kiri main-content */
+        top: 80px !important; /* FIXED: topbar (24px) + main nav (56px) = 80px */
+        left: 0 !important;
         right: 0 !important;
         z-index: 40 !important;
         background: white !important;
         transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         margin-left: 0 !important;
+        margin-top: 4px !important; /* Tambah sedikit space dari navbar */
         width: 100% !important;
         box-sizing: border-box !important;
     }
     
-    /* Adjust left offset based on sidebar width */
+    @media (max-width: 640px) {
+        body {
+            font-size: 14px;
+        }
+        
+        .fixed-header-nav {
+            top: 80px !important; /* FIXED: navbar baru 80px di mobile */
+        }
+        
+        .space-y-6 > * + *,
+        .space-y-5 > * + *,
+        .space-y-4 > * + * {
+            margin-top: 0.75rem !important;
+        }
+        
+        .bg-white.rounded-xl,
+        .bg-white.rounded-lg {
+            border-radius: 0.5rem !important;
+            margin-bottom: 0.75rem;
+        }
+        
+        .p-6 {
+            padding: 0.875rem !important;
+        }
+        
+        .px-6 {
+            padding-left: 0.875rem !important;
+            padding-right: 0.875rem !important;
+        }
+        
+        .py-4 {
+            padding-top: 0.625rem !important;
+            padding-bottom: 0.625rem !important;
+        }
+        
+        input:not([type="file"]):not([type="radio"]):not([type="checkbox"]),
+        select,
+        textarea {
+            font-size: 14px !important;
+            padding: 0.625rem 0.75rem !important;
+            line-height: 1.25rem !important;
+        }
+        
+        button {
+            font-size: 13px !important;
+        }
+        
+        .text-sm {
+            font-size: 13px !important;
+        }
+        
+        .text-xs {
+            font-size: 11px !important;
+        }
+        
+        .gap-6 {
+            gap: 0.75rem !important;
+        }
+        
+        .gap-4 {
+            gap: 0.625rem !important;
+        }
+        
+        .gap-3 {
+            gap: 0.5rem !important;
+        }
+        
+        .aspect-square {
+            aspect-ratio: 1 / 1;
+        }
+        
+        .lg\\:col-span-8,
+        .lg\\:col-span-4 {
+            grid-column: span 1 !important;
+        }
+        
+        .product-add-container {
+            overflow-x: hidden !important;
+        }
+    }
+    
+    @media (min-width: 641px) and (max-width: 768px) {
+        input:not([type="file"]):not([type="radio"]):not([type="checkbox"]),
+        select,
+        textarea {
+            font-size: 14px !important;
+        }
+    }
+    
     @media (min-width: 1024px) {
         .fixed-header-nav {
-            left: 240px !important; /* Default sidebar width */
+            left: 240px !important;
             width: calc(100% - 240px) !important;
         }
         
         body.sidebar-collapsed .fixed-header-nav,
         .sidebar-collapsed ~ * .fixed-header-nav {
-            left: 72px !important; /* Collapsed sidebar width */
+            left: 72px !important;
             width: calc(100% - 72px) !important;
         }
     }
     
-    /* Mobile adjustment */
     @media (max-width: 1023px) {
         .fixed-header-nav {
             left: 0 !important;
             width: 100% !important;
         }
     }
-    
-    /* Adjust for collapsed sidebar */
-    @media (min-width: 1024px) {
-        body.sidebar-collapsed .fixed-header-nav {
-            left: 72px !important;
-        }
-    }
-    
-    /* Mobile adjustment */
-    @media (max-width: 1023px) {
-        .fixed-header-nav {
-            left: 0 !important;
-        }
-    }
 
-    /* Add padding to form to compensate for fixed header */
+    /* Form Padding - FIXED untuk navbar baru */
     .form-with-fixed-header {
-        padding-top: 80px; /* Height of fixed header */
+        padding-top: 76px !important; /* FIXED: 80px navbar + 4px margin - 8px untuk lebih dekat */
+    }
+    
+    @media (min-width: 640px) {
+        .form-with-fixed-header {
+            padding-top: 80px !important; /* FIXED: reduced gap */
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .form-with-fixed-header {
+            padding-top: 84px !important; /* FIXED: reduced gap */
+        }
     }
 
-    /* Ensure parent allows sticky positioning */
+    @media (max-width: 640px) {
+        .form-with-fixed-header {
+            padding-top: 132px !important; /* FIXED: 80px navbar + 52px header (reduced) */
+        }
+    }
+
     .product-add-container {
         position: relative;
         overflow: visible !important;
+    }
+    
+    @media (max-width: 640px) {
+        .grid.grid-cols-6 {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.5rem !important;
+        }
+        
+        .grid.grid-cols-6 > div:first-child {
+            grid-column: span 2 !important;
+        }
+    }
+    
+    @media (min-width: 641px) and (max-width: 1023px) {
+        .grid.grid-cols-6 {
+            grid-template-columns: repeat(3, 1fr) !important;
+        }
+        
+        .grid.grid-cols-6 > div:first-child {
+            grid-column: span 3 !important;
+        }
     }
 </style>
 
 <div class="product-add-container">
     {{-- Top Navigation Bar --}}
     <div class="fixed-header-nav bg-white border-b sticky top-0 z-50 shadow-sm">
-        <div class="h-16 flex items-center justify-between px-6 pr-8">
-            <div class="flex items-center gap-4">
+        <div class="h-12 sm:h-14 md:h-16 flex items-center justify-between px-3 sm:px-4 md:px-6 pr-4 sm:pr-6 md:pr-8">
+            <div class="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
                 <a href="{{ route('admin.products.index') }}" 
-                   class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors">
-                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0">
+                    <svg class="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
                 </a>
-                <div class="h-8 w-px bg-gray-200"></div>
-                <div>
-                    <h1 class="text-xl font-bold text-gray-900">Tambah Produk</h1>
-                    <p class="text-xs text-gray-500">Kelola produk yang akan Anda jual</p>
+                <div class="h-5 sm:h-6 md:h-8 w-px bg-gray-200 flex-shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                    <h1 class="text-sm sm:text-base md:text-xl font-bold text-gray-900 truncate">Tambah Produk</h1>
+                    <p class="text-xs text-gray-500 hidden md:block truncate">Kelola produk yang akan Anda jual</p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0">
                 <button type="button" 
                         onclick="if(confirm('Yakin ingin mereset form?')) document.getElementById('productForm').reset();"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                    <span class="flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="hidden sm:flex px-2 sm:px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    <span class="flex items-center gap-1.5 md:gap-2">
+                        <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
-                        Reset
+                        <span class="hidden md:inline">Reset</span>
                     </span>
                 </button>
                 <button type="submit" 
                         form="productForm"
-                        class="btn-primary px-6 py-2.5 text-sm font-semibold text-white rounded-lg transition-all"
+                        class="btn-primary px-3 sm:px-4 md:px-6 py-1.5 md:py-2.5 text-xs md:text-sm font-semibold text-white rounded-lg transition-all whitespace-nowrap"
                         style="background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);">
-                    <span class="flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="flex items-center gap-1 md:gap-2">
+                        <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
-                        Simpan Produk
+                        <span>Simpan</span>
                     </span>
                 </button>
             </div>
@@ -480,23 +494,23 @@
           method="POST" 
           enctype="multipart/form-data" 
           id="productForm"
-          class="form-with-fixed-header px-6 pb-6">
+          class="form-with-fixed-header px-3 sm:px-4 md:px-6 pb-4 md:pb-6">
         @csrf
 
-        <div class="grid grid-cols-12 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 md:gap-6">
             {{-- Left Content - 8 cols --}}
-            <div class="col-span-12 lg:col-span-8 space-y-5">
+            <div class="col-span-1 lg:col-span-8 space-y-3 sm:space-y-4 md:space-y-5">
 
                 {{-- Informasi Dasar --}}
-                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                    <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                <div class="bg-white rounded-lg md:rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="px-4 md:px-6 py-3 md:py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-base font-bold text-gray-900">Informasi Dasar</h2>
-                            <span class="badge-required">WAJIB</span>
+                            <h2 class="text-sm md:text-base font-bold text-gray-900">Informasi Dasar</h2>
+                            <span class="badge-required text-[10px] md:text-xs">WAJIB</span>
                         </div>
                     </div>
                     
-                    <div class="p-6 space-y-6">
+                    <div class="p-4 md:p-6 space-y-4 md:space-y-6">
                         {{-- Nama Produk --}}
                         <div>
                             <label class="flex items-center gap-2 text-sm font-semibold text-gray-900 mb-2">
@@ -806,7 +820,7 @@
             </div>
 
             {{-- Right Sidebar - 4 cols --}}
-            <div class="col-span-12 lg:col-span-4 space-y-5">
+            <div class="col-span-1 lg:col-span-4 space-y-3 sm:space-y-4 md:space-y-5">
                 
                 {{-- Harga --}}
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -961,11 +975,15 @@
 </div>
 
 <script>
+// ============================================
 // CRITICAL: Override parent layout constraints
+// FIXED: Navbar baru 80px (topbar 24px + main nav 56px)
+// ============================================
 (function() {
     'use strict';
     
-    // CRITICAL: Make header fixed instead of sticky
+    const NAVBAR_HEIGHT = 80; // FIXED: topbar (24px) + main nav (56px)
+    
     document.addEventListener('DOMContentLoaded', function() {
         const header = document.querySelector('.fixed-header-nav');
         const sidebar = document.getElementById('sidebar');
@@ -975,56 +993,44 @@
         function updateHeaderPosition() {
             if (!header) return;
             
-            // Get actual sidebar width
             let sidebarWidth = 0;
             if (sidebar && window.innerWidth >= 1024) {
                 const sidebarRect = sidebar.getBoundingClientRect();
                 sidebarWidth = sidebarRect.width;
             }
             
-            // Check if mobile
             const isMobile = window.innerWidth < 1024;
             
-            // Set position - header starts from left edge of main-content
             header.style.position = 'fixed';
-            header.style.top = '56px'; // Top navbar height
+            header.style.top = (NAVBAR_HEIGHT + 4) + 'px'; // FIXED: 80px + 4px margin untuk breathing space
             header.style.left = isMobile ? '0' : sidebarWidth + 'px';
             header.style.right = 'auto';
             header.style.zIndex = '40';
             header.style.backgroundColor = 'white';
-            header.style.width = isMobile ? '100%' : `calc(100vw - ${sidebarWidth}px)`;
+            header.style.width = isMobile ? '100vw' : `calc(100vw - ${sidebarWidth}px)`;
             header.style.marginLeft = '0';
             header.style.boxSizing = 'border-box';
             header.style.maxWidth = '100%';
-            
-            console.log('Header updated - Sidebar width:', sidebarWidth, 'Header width:', header.style.width);
         }
         
-        // Initial positioning
         setTimeout(updateHeaderPosition, 100);
         
-        // Update on window resize
         let resizeTimeout;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(updateHeaderPosition, 150);
         });
         
-        // Watch for sidebar toggle - IMPORTANT!
         if (toggleBtn) {
             toggleBtn.addEventListener('click', function() {
-                console.log('Sidebar toggle clicked');
-                // Wait for sidebar animation to complete (transition duration is 300ms)
                 setTimeout(updateHeaderPosition, 350);
             });
         }
         
-        // Watch for sidebar class changes using MutationObserver
         if (sidebar) {
             const observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     if (mutation.attributeName === 'class') {
-                        console.log('Sidebar class changed');
                         setTimeout(updateHeaderPosition, 350);
                     }
                 });
@@ -1036,7 +1042,6 @@
             });
         }
         
-        // Remove overflow from main-content
         if (mainContent) {
             mainContent.style.overflow = 'visible';
             mainContent.style.overflowY = 'visible';
@@ -1048,15 +1053,14 @@
             mainContent.classList.remove('overflow-auto');
         }
         
-        // Ensure parent container
         const container = document.querySelector('.product-add-container');
         if (container) {
             container.style.overflow = 'visible';
+            container.style.overflowX = 'hidden';
             container.style.position = 'relative';
             container.style.backgroundColor = '#F5F5F5';
         }
         
-        // Target the flex container
         const flexContainer = document.querySelector('.flex.pt-14.h-screen');
         if (flexContainer) {
             flexContainer.style.height = 'auto';
@@ -1064,7 +1068,6 @@
         }
     });
     
-    // Double check after delay
     setTimeout(function() {
         const mainContent = document.getElementById('main-content');
         if (mainContent) {
@@ -1075,7 +1078,9 @@
     }, 100);
 })();
 
+// ============================================
 // Prevent over-scrolling - ENHANCED
+// ============================================
 (function() {
     'use strict';
     
@@ -1087,7 +1092,6 @@
         const clientHeight = document.documentElement.clientHeight;
         const maxScroll = scrollHeight - clientHeight;
         
-        // Hard stop at bottom
         if (scrollTop >= maxScroll) {
             window.scrollTo({
                 top: maxScroll,
@@ -1105,7 +1109,6 @@
         }
     }, { passive: true });
     
-    // Also prevent wheel events at bottom
     window.addEventListener('wheel', function(e) {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const scrollHeight = document.documentElement.scrollHeight;
@@ -1116,7 +1119,6 @@
         }
     }, { passive: false });
     
-    // Prevent touch overscroll on mobile
     let touchStartY = 0;
     document.addEventListener('touchstart', function(e) {
         touchStartY = e.touches[0].clientY;
@@ -1128,16 +1130,16 @@
         const scrollHeight = document.documentElement.scrollHeight;
         const clientHeight = document.documentElement.clientHeight;
         
-        // Prevent pull-down at bottom
         if (scrollTop + clientHeight >= scrollHeight - 1 && touchY < touchStartY) {
             e.preventDefault();
         }
     }, { passive: false });
 })();
 
-// Character Counter
+// ============================================
+// CHARACTER COUNTER & PROGRESS TRACKER
+// ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Product Name Counter
     const nameInput = document.getElementById('productName');
     const nameCount = document.getElementById('nameCount');
     if (nameInput && nameCount) {
@@ -1147,7 +1149,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Description Counter
     const descInput = document.getElementById('productDesc');
     const descCount = document.getElementById('descCount');
     if (descInput && descCount) {
@@ -1156,7 +1157,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Price Formatter
     const priceInput = document.getElementById('priceInput');
     if (priceInput) {
         priceInput.addEventListener('blur', function() {
@@ -1167,28 +1167,23 @@ document.addEventListener('DOMContentLoaded', function() {
         priceInput.addEventListener('input', updateProgress);
     }
 
-    // Category Change
     const categorySelect = document.querySelector('select[name="category_id"]');
     if (categorySelect) {
         categorySelect.addEventListener('change', updateProgress);
     }
 
-    // Product Type Change
     const typeRadios = document.querySelectorAll('input[name="product_type"]');
     typeRadios.forEach(radio => {
         radio.addEventListener('change', updateProgress);
     });
 
-    // Initial check
     updateProgress();
 });
 
-// Progress Tracker
 function updateProgress() {
     let completed = 0;
     const total = 5;
 
-    // Check Nama Produk (min 10 characters)
     const nameInput = document.getElementById('productName');
     const nameCheck = document.getElementById('check-name');
     if (nameInput && nameInput.value.length >= 10) {
@@ -1198,7 +1193,6 @@ function updateProgress() {
         markAsIncomplete(nameCheck);
     }
 
-    // Check Kategori
     const categorySelect = document.querySelector('select[name="category_id"]');
     const categoryCheck = document.getElementById('check-category');
     if (categorySelect && categorySelect.value) {
@@ -1208,7 +1202,6 @@ function updateProgress() {
         markAsIncomplete(categoryCheck);
     }
 
-    // Check Gambar Utama
     const imageInput = document.getElementById('image-1');
     const imageCheck = document.getElementById('check-image');
     if (imageInput && imageInput.files.length > 0) {
@@ -1218,7 +1211,6 @@ function updateProgress() {
         markAsIncomplete(imageCheck);
     }
 
-    // Check Jenis Produk
     const typeRadio = document.querySelector('input[name="product_type"]:checked');
     const typeCheck = document.getElementById('check-type');
     if (typeRadio) {
@@ -1228,7 +1220,6 @@ function updateProgress() {
         markAsIncomplete(typeCheck);
     }
 
-    // Check Harga
     const priceInput = document.getElementById('priceInput');
     const priceCheck = document.getElementById('check-price');
     if (priceInput && priceInput.value && parseFloat(priceInput.value) > 0) {
@@ -1238,7 +1229,6 @@ function updateProgress() {
         markAsIncomplete(priceCheck);
     }
 
-    // Update Progress Bar
     const percentage = Math.round((completed / total) * 100);
     const progressBar = document.getElementById('progressBar');
     const progressPercent = document.getElementById('progressPercent');
@@ -1252,7 +1242,6 @@ function updateProgress() {
         progressPercent.textContent = percentage + '%';
     }
 
-    // Update Status Message
     if (statusMessage) {
         if (percentage === 100) {
             statusMessage.style.background = 'linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)';
@@ -1319,7 +1308,9 @@ function markAsIncomplete(element) {
     }
 }
 
-// Image Preview
+// ============================================
+// IMAGE PREVIEW
+// ============================================
 function previewImage(event, slotNumber) {
     const file = event.target.files[0];
     const preview = document.getElementById(`preview-${slotNumber}`);
@@ -1327,14 +1318,12 @@ function previewImage(event, slotNumber) {
     
     if (!file) return;
     
-    // Validate size
-    if (file.size > 2097152) { // 2MB
+    if (file.size > 2097152) {
         alert('⚠️ Ukuran gambar terlalu besar!\nMaksimal 2MB per gambar.');
         event.target.value = '';
         return;
     }
     
-    // Validate type
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
         alert('⚠️ Format gambar tidak didukung!\nGunakan JPG, PNG, atau WEBP.');
@@ -1354,7 +1343,6 @@ function previewImage(event, slotNumber) {
             clearBtn.classList.add('flex');
         }
         
-        // Update progress if main image
         if (slotNumber === 1) {
             updateProgress();
         }
@@ -1399,7 +1387,9 @@ function clearImage(slotNumber) {
     }
 }
 
-// Variant Management
+// ============================================
+// VARIANT MANAGEMENT
+// ============================================
 let variantCount = 0;
 
 function addVariant() {

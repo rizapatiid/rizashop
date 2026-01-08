@@ -3,14 +3,17 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\BannerController; // ← NEW
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\HomeDashboardController; // ← NEW
 
 use App\Models\OrderItem;
 
@@ -25,10 +28,8 @@ Route::get('/dashboard', function () {
     return view('welcome');
 });
 
-// Dashboard user default (root)
-Route::get('/', function () {
-    return view('dashboard');
-})->name('dashboard');
+// Dashboard user default (root) - WITH BANNER SLIDER
+Route::get('/', [HomeDashboardController::class, 'index'])->name('dashboard'); // ← UPDATED
 
 /*
 |--------------------------------------------------------------------------
@@ -140,6 +141,19 @@ Route::middleware(['auth', 'admin'])
 
         Route::resource('products', ProductController::class);
 
+        // ============================================
+        // BANNER MANAGEMENT (NEW)
+        // ============================================
+        Route::resource('banners', BannerController::class);
+        // Generates routes:
+        // GET    /seller/banners           → admin.banners.index
+        // GET    /seller/banners/create    → admin.banners.create
+        // POST   /seller/banners           → admin.banners.store
+        // GET    /seller/banners/{id}/edit → admin.banners.edit
+        // PUT    /seller/banners/{id}      → admin.banners.update
+        // DELETE /seller/banners/{id}      → admin.banners.destroy
+        // ============================================
+
         /*
          * Admin: orders management (masterdashboard/orders...)
          */
@@ -154,5 +168,5 @@ Route::middleware(['auth', 'admin'])
             Route::post('/{order}/set-tracking', [AdminOrderController::class, 'setTracking'])->name('setTracking');
         });
     });
-
+    
 require __DIR__ . '/auth.php';

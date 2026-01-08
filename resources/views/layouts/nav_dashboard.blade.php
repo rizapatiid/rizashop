@@ -1,6 +1,6 @@
-{{-- navbar_marketplace.php (Tokopedia/Shopee Professional Style) --}}
+{{-- navbar_marketplace_compact.php (Compact Version) --}}
 <style>
-/* ====== Tokopedia/Shopee Professional Navbar ====== */
+/* ====== Tokopedia/Shopee Compact Navbar ====== */
 * {
   margin: 0;
   padding: 0;
@@ -16,12 +16,12 @@
   z-index: 1600;
 }
 
-/* Top bar - TokoRiza Blue Style */
+/* Top bar - Compact */
 .tk-topbar {
   background: linear-gradient(to right, #0ea5e9, #3b82f6);
   color: #fff;
-  padding: 6px 0;
-  font-size: 12px;
+  padding: 4px 0; /* dari 6px → 4px */
+  font-size: 11px; /* dari 12px → 11px */
   text-align: center;
   font-weight: 500;
 }
@@ -29,7 +29,7 @@
 .tk-topbar a {
   color: #fff;
   text-decoration: none;
-  margin-left: 8px;
+  margin-left: 6px; /* dari 8px → 6px */
   font-weight: 700;
   border-bottom: 1px solid rgba(255,255,255,0.6);
   padding-bottom: 1px;
@@ -43,23 +43,23 @@
 .tk-container { 
   max-width: 1200px; 
   margin: 0 auto; 
-  padding: 0 16px; 
+  padding: 0 14px; /* dari 16px → 14px */
 }
 
 .tk-row { 
   display: flex; 
   align-items: center; 
   justify-content: space-between;
-  gap: 20px; 
-  padding: 16px 0;
+  gap: 16px; /* dari 20px → 16px */
+  padding: 12px 0; /* dari 16px → 12px */
 }
 
-/* LEFT - Logo Clean */
+/* LEFT - Logo Compact */
 .tk-left { 
   display: flex; 
   align-items: center;
   flex-shrink: 0;
-  width: 200px;
+  width: 180px; /* dari 200px → 180px */
 }
 
 .tk-logo {
@@ -67,7 +67,7 @@
 }
 
 .tk-logo img { 
-  height: 34px; 
+  height: 48px; /* dari 40px → 48px */
   display: block;
   transition: opacity 0.2s;
 }
@@ -76,13 +76,13 @@
   opacity: 0.85;
 }
 
-/* CENTER - Search Premium Design */
+/* CENTER - Search Compact */
 .tk-center { 
   flex: 1;
   display: flex;
   justify-content: center;
   max-width: none;
-  padding: 0 40px;
+  padding: 0 20px; /* dari 32px → 20px untuk beri ruang quick menu */
 }
 
 .tk-search { 
@@ -95,7 +95,7 @@
   border-radius: 50px;
   transition: all 0.3s ease;
   width: 100%;
-  max-width: 650px;
+  max-width: 600px; /* dari 650px → 600px */
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
@@ -113,9 +113,9 @@
 .tk-search input { 
   border: 0; 
   outline: 0; 
-  font-size: 14px; 
+  font-size: 13px; /* dari 14px → 13px */
   width: 100%;
-  padding: 14px 60px 14px 24px;
+  padding: 11px 52px 11px 20px; /* dari 14px → 11px, icon space dari 60px → 52px */
   background: transparent;
   color: #1a1a1a;
   border-radius: 50px;
@@ -129,8 +129,8 @@
 
 .tk-search .search-icon {
   background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
-  width: 48px;
-  height: 48px;
+  width: 42px; /* dari 48px → 42px */
+  height: 42px; /* dari 48px → 42px */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -140,7 +140,7 @@
   transition: all 0.3s ease;
   flex-shrink: 0;
   position: absolute;
-  right: 4px;
+  right: 3px; /* dari 4px → 3px */
   top: 50%;
   transform: translateY(-50%);
   box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
@@ -157,68 +157,72 @@
 
 .tk-search .search-icon svg {
   stroke: #fff;
-  width: 20px;
-  height: 20px;
+  width: 18px; /* dari 20px → 18px */
+  height: 18px; /* dari 20px → 18px */
 }
 
-/* Navigation menu - Clean */
-.tk-navbar-secondary {
-  border-top: 1px solid #f0f0f0;
-  background: #fff;
-}
-
-.tk-menu { 
-  display: flex; 
-  gap: 32px; 
+/* Quick Menu - Right of Search */
+.tk-quick-menu {
+  display: flex;
   align-items: center;
-  padding: 12px 0;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 12px;
 }
 
-.tk-menu a { 
-  color: #6c757d; 
-  text-decoration: none; 
-  font-weight: 600;
-  font-size: 14px;
-  padding: 8px 0;
-  position: relative;
-  transition: color 0.2s;
+.quick-menu-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c757d;
+  text-decoration: none;
+  transition: all 0.2s;
+  background: transparent;
+  border: 1px solid transparent;
 }
 
-.tk-menu a svg {
+.quick-menu-link:hover {
+  background: #f9fafb;
+  color: #0ea5e9;
+  border-color: #e5e7eb;
+}
+
+.quick-menu-link.active {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  color: #0ea5e9;
+  border-color: #bfdbfe;
+}
+
+.quick-menu-link svg {
   width: 16px;
   height: 16px;
-  transition: transform 0.2s;
+  flex-shrink: 0;
 }
 
-.tk-menu a:hover,
-.tk-menu a.active {
-  color: #0ea5e9;
+.quick-menu-link span {
+  white-space: nowrap;
 }
 
-.tk-menu a:hover svg {
-  transform: translateY(-1px);
+/* Navigation menu - Hapus karena sudah tidak dipakai */
+.tk-navbar-secondary {
+  display: none;
 }
 
-.tk-menu a.active::after {
-  content: '';
-  position: absolute;
-  bottom: -12px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #0ea5e9;
+.tk-menu { 
+  display: none;
 }
 
-/* RIGHT - Actions Clean */
+/* RIGHT - Actions Compact */
 .tk-actions { 
   display: flex; 
   align-items: center; 
-  gap: 8px;
+  gap: 7px; /* dari 8px → 7px */
   flex-shrink: 0;
-  width: 200px;
+  width: 180px; /* dari 200px → 180px */
   justify-content: flex-end;
 }
 
@@ -226,8 +230,8 @@
   display: inline-flex; 
   align-items: center; 
   justify-content: center; 
-  width: 40px; 
-  height: 40px; 
+  width: 36px; /* dari 40px → 36px */
+  height: 36px; /* dari 40px → 36px */
   border-radius: 4px;
   background: transparent;
   border: 1px solid #e5e7eb;
@@ -247,8 +251,8 @@
 }
 
 .icon-btn svg { 
-  width: 20px; 
-  height: 20px;
+  width: 18px; /* dari 20px → 18px */
+  height: 18px; /* dari 20px → 18px */
   transition: stroke 0.2s;
   stroke: #6c757d;
 }
@@ -259,14 +263,14 @@
   right: -4px;
   background: #0ea5e9;
   color: #fff; 
-  font-size: 10px; 
-  min-width: 18px; 
-  height: 18px; 
+  font-size: 9px; /* dari 10px → 9px */
+  min-width: 17px; /* dari 18px → 17px */
+  height: 17px; /* dari 18px → 17px */
   display: inline-flex; 
   align-items: center; 
   justify-content: center; 
   border-radius: 10px;
-  padding: 0 5px; 
+  padding: 0 4px; /* dari 5px → 4px */
   font-weight: 700;
   border: 2px solid #fff;
 }
@@ -275,31 +279,27 @@
   display: none !important; 
 }
 
-/* MINI CART - Shopee Style Clean */
+/* MINI CART - Compact */
 .tk-mini-cart { 
   position: absolute; 
   right: 0; 
-  margin-top: 8px; 
-  width: 380px; 
-  max-height: 500px; 
+  margin-top: 7px; /* dari 8px → 7px */
+  width: 360px; /* dari 380px → 360px */
+  max-height: 480px; /* dari 500px → 480px */
   background: #fff; 
   border-radius: 4px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
   overflow: hidden; 
   z-index: 9999;
   border: 1px solid #e5e7eb;
-
-  display: none;              /* ✅ DEFAULT TERTUTUP */
+  display: none;
 }
-
-
 
 .tk-mini-cart.show {
-  display: flex;              /* ✅ BARU */
-  flex-direction: column;     /* ✅ BARU */
+  display: flex;
+  flex-direction: column;
   animation: fadeIn 0.2s ease-out;
 }
-
 
 @keyframes fadeIn {
   from {
@@ -321,19 +321,19 @@
     position: fixed;
     right: 0;
     left: auto;
-    top: 60px;
+    top: 55px; /* dari 60px → 55px */
     margin: 0;
     width: 100vw;
-    max-width: 400px;
-    max-height: calc(100vh - 70px);
+    max-width: 380px; /* dari 400px → 380px */
+    max-height: calc(100vh - 65px); /* dari 70px → 65px */
     border-radius: 0;
   }
 }
 
 .tk-mini-head { 
-  padding: 16px; 
+  padding: 14px; /* dari 16px → 14px */
   display: flex; 
-  gap: 8px; 
+  gap: 7px; /* dari 8px → 7px */
   align-items: center; 
   justify-content: space-between; 
   border-bottom: 1px solid #f0f0f0;
@@ -342,37 +342,35 @@
 
 .tk-mini-head .title { 
   display: flex; 
-  gap: 8px; 
+  gap: 7px; /* dari 8px → 7px */
   align-items: center; 
   font-weight: 700;
   color: #1a1a1a; 
-  font-size: 14px;
+  font-size: 13px; /* dari 14px → 13px */
 }
 
 .tk-mini-head .title svg {
   stroke: #0ea5e9;
-  width: 18px;
-  height: 18px;
+  width: 16px; /* dari 18px → 16px */
+  height: 16px; /* dari 18px → 16px */
 }
 
 .tk-mini-head .summary { 
-  font-size: 12px; 
+  font-size: 11px; /* dari 12px → 11px */
   color: #6c757d;
   font-weight: 600;
 }
 
 /* Cart body */
 .tk-mini-body { 
-  flex: 1;              /* ✅ KUNCI UTAMA */
+  flex: 1;
   overflow-y: auto; 
-  padding: 12px;
+  padding: 10px; /* dari 12px → 10px */
   background: #fff;
 }
 
-
-
 .tk-mini-body::-webkit-scrollbar {
-  width: 6px;
+  width: 5px; /* dari 6px → 5px */
 }
 
 .tk-mini-body::-webkit-scrollbar-track {
@@ -388,15 +386,15 @@
   background: #9ca3af;
 }
 
-/* Mini cart item - Shopee Clean Style */
+/* Mini cart item - Compact */
 .tk-mini-item { 
   display: grid; 
-  grid-template-columns: 20px 60px 1fr 85px; 
-  gap: 12px; 
+  grid-template-columns: 18px 56px 1fr 80px; /* dari 20px 60px 1fr 85px */
+  gap: 10px; /* dari 12px → 10px */
   align-items: start;
-  padding: 12px; 
+  padding: 10px; /* dari 12px → 10px */
   border-radius: 4px;
-  margin-bottom: 8px;
+  margin-bottom: 7px; /* dari 8px → 7px */
   background: #fff;
   border: 1px solid #f0f0f0;
   transition: all 0.2s;
@@ -408,18 +406,18 @@
 }
 
 .item-checkbox { 
-  width: 16px; 
-  height: 16px;
+  width: 15px; /* dari 16px → 15px */
+  height: 15px; /* dari 16px → 15px */
   cursor: pointer;
   accent-color: #0ea5e9;
   margin: 0;
   align-self: center;
 }
 
-/* Thumbnail Clean */
+/* Thumbnail Compact */
 .tk-mini-thumb { 
-  width: 60px; 
-  height: 60px; 
+  width: 56px; /* dari 60px → 56px */
+  height: 56px; /* dari 60px → 56px */
   border-radius: 4px;
   overflow: hidden; 
   background: #f5f5f5;
@@ -436,17 +434,17 @@
   object-fit: cover;
 }
 
-/* Meta info - Clean Typography */
+/* Meta info - Compact */
 .tk-mini-meta { 
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px; /* dari 6px → 5px */
 }
 
 .tk-mini-title { 
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px; /* dari 13px → 12px */
   color: #1a1a1a;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -457,46 +455,45 @@
 }
 
 .tk-mini-sub { 
-  font-size: 11px; 
+  font-size: 10px; /* dari 11px → 10px */
   color: #6c757d;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px; /* dari 4px → 3px */
 }
 
 .tk-mini-variant-row{
   display: flex;
   flex-wrap: nowrap;
-  gap: 6px;
+  gap: 5px; /* dari 6px → 5px */
   margin-top: 2px;
 }
 
 .tk-mini-variant{
-  font-size: 11px;
+  font-size: 10px; /* dari 11px → 10px */
   color: #6c757d;
   background: #f5f5f5;
-  padding: 3px 8px;
+  padding: 2px 7px; /* dari 3px 8px */
   border-radius: 2px;
   font-weight: 500;
   white-space: nowrap;
   border: 1px solid #e5e7eb;
 }
 
-
-/* Quantity controls - Shopee Style */
+/* Quantity controls - Compact */
 .tk-mini-controls { 
   display: flex; 
-  gap: 4px; 
+  gap: 3px; /* dari 4px → 3px */
   align-items: center;
-  margin-top: 6px;
+  margin-top: 5px; /* dari 6px → 5px */
   border: 1px solid #e5e7eb;
   border-radius: 2px;
   width: fit-content;
 }
 
 .qty-btn { 
-  width: 24px; 
-  height: 24px; 
+  width: 22px; /* dari 24px → 22px */
+  height: 22px; /* dari 24px → 22px */
   border: none;
   border-right: 1px solid #e5e7eb;
   background: #fff;
@@ -504,7 +501,7 @@
   display: inline-flex; 
   align-items: center; 
   justify-content: center; 
-  font-size: 14px;
+  font-size: 13px; /* dari 14px → 13px */
   font-weight: 600;
   color: #6c757d;
   transition: all 0.2s;
@@ -521,11 +518,11 @@
 }
 
 .qty-input { 
-  width: 36px; 
-  padding: 4px; 
+  width: 32px; /* dari 36px → 32px */
+  padding: 3px; /* dari 4px → 3px */
   border: none;
   text-align: center;
-  font-size: 12px;
+  font-size: 11px; /* dari 12px → 11px */
   font-weight: 600;
   color: #1a1a1a;
   background: #fff;
@@ -535,21 +532,21 @@
   outline: none;
 }
 
-/* Right side - Price & Delete */
+/* Right side - Price & Delete Compact */
 .item-right { 
   display: flex; 
   flex-direction: column; 
   align-items: flex-end;
   justify-content: space-between;
-  gap: 8px;
-  min-width: 85px;
+  gap: 7px; /* dari 8px → 7px */
+  min-width: 80px; /* dari 85px → 80px */
   height: 100%;
 }
 
 .item-total { 
   font-weight: 700;
   color: #0ea5e9;
-  font-size: 13px;
+  font-size: 12px; /* dari 13px → 12px */
   white-space: nowrap;
 }
 
@@ -557,7 +554,7 @@
   background: transparent;
   border: none;
   cursor: pointer; 
-  padding: 6px;
+  padding: 5px; /* dari 6px → 5px */
   border-radius: 2px;
   display: inline-flex; 
   align-items: center; 
@@ -570,37 +567,37 @@
 }
 
 .btn-trash svg {
-  width: 16px;
-  height: 16px;
+  width: 15px; /* dari 16px → 15px */
+  height: 15px; /* dari 16px → 15px */
   stroke: #ef4444;
 }
 
-/* Bulk actions */
+/* Bulk actions Compact */
 .mini-body-top { 
   display: flex; 
   justify-content: space-between; 
   align-items: center; 
-  padding: 0 4px 10px;
+  padding: 0 3px 8px; /* dari 0 4px 10px */
   border-bottom: 1px solid #f0f0f0;
-  margin-bottom: 10px;
+  margin-bottom: 8px; /* dari 10px → 8px */
 }
 
 .mini-body-top label {
-  font-size: 12px;
+  font-size: 11px; /* dari 12px → 11px */
   color: #6c757d;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px; /* dari 6px → 5px */
 }
 
 .btn-delete-bulk {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-  font-size: 11px;
+  gap: 4px; /* dari 5px → 4px */
+  padding: 4px 9px; /* dari 5px 10px */
+  font-size: 10px; /* dari 11px → 10px */
   border-radius: 2px;
   border: 1px solid #fecaca;
   background: #fff;
@@ -616,18 +613,18 @@
 
 .btn-delete-bulk svg {
   flex-shrink: 0;
-  width: 14px;
-  height: 14px;
+  width: 13px; /* dari 14px → 13px */
+  height: 13px; /* dari 14px → 13px */
 }
 
-/* Empty state */
+/* Empty state Compact */
 .tk-mini-empty { 
-  padding: 50px 24px;
+  padding: 40px 20px; /* dari 50px 24px */
   text-align: center; 
   color: #9ca3af;
   display: flex; 
   flex-direction: column; 
-  gap: 12px; 
+  gap: 10px; /* dari 12px → 10px */
   align-items: center;
 }
 
@@ -635,17 +632,15 @@
   opacity: 0.4;
 }
 
-/* Footer - Shopee Style */
+/* Footer - Compact */
 .tk-mini-footer { 
-  padding: 16px;
+  padding: 14px; /* dari 16px → 14px */
   border-top: 1px solid #f0f0f0;
   background: #fafafa;
-
-  position: sticky;     /* ✅ */
-  bottom: 0;            /* ✅ */
+  position: sticky;
+  bottom: 0;
   z-index: 10;
 }
-
 
 .tk-mini-totals { 
   display: flex; 
@@ -655,23 +650,23 @@
 
 .tk-mini-totals .label { 
   color: #6c757d;
-  font-size: 13px;
+  font-size: 12px; /* dari 13px → 12px */
   font-weight: 600;
 }
 
 .tk-mini-totals .amount { 
   font-weight: 700;
-  font-size: 18px; 
+  font-size: 16px; /* dari 18px → 16px */
   color: #0ea5e9;
 }
 
 .tk-actions-row { 
   display: flex; 
-  gap: 8px;
+  gap: 7px; /* dari 8px → 7px */
 }
 
 .btn-ghost { 
-  padding: 10px 16px;
+  padding: 9px 14px; /* dari 10px 16px */
   border-radius: 4px;
   border: 1px solid #e5e7eb;
   background: #fff;
@@ -680,7 +675,7 @@
   font-weight: 600;
   flex: 1; 
   text-align: center;
-  font-size: 13px;
+  font-size: 12px; /* dari 13px → 12px */
   transition: all 0.2s;
 }
 
@@ -690,7 +685,7 @@
 }
 
 .btn-primary { 
-  padding: 10px 16px;
+  padding: 9px 14px; /* dari 10px 16px */
   border-radius: 4px;
   background: #0ea5e9;
   color: #fff; 
@@ -698,7 +693,7 @@
   text-decoration: none; 
   flex: 1; 
   text-align: center;
-  font-size: 13px;
+  font-size: 12px; /* dari 13px → 12px */
   transition: all 0.2s;
   border: none;
   cursor: pointer;
@@ -714,10 +709,10 @@
   pointer-events: none;
 }
 
-/* Profile Photo Button */
+/* Profile Photo Button Compact */
 .tk-profile-btn-photo {
-  width: 40px;
-  height: 40px;
+  width: 36px; /* dari 40px → 36px */
+  height: 36px; /* dari 40px → 36px */
   border-radius: 50%;
   border: 2px solid #e5e7eb;
   background: #fff;
@@ -749,15 +744,15 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px; /* dari 16px → 14px */
 }
 
-/* Profile Dropdown */
+/* Profile Dropdown Compact */
 .tk-profile-dropdown { 
   position: absolute; 
   right: 0;
-  margin-top: 8px; 
-  min-width: 280px; 
+  margin-top: 7px; /* dari 8px → 7px */
+  min-width: 260px; /* dari 280px → 260px */
   background: #fff;
   border-radius: 4px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
@@ -773,7 +768,7 @@
 }
 
 .tk-profile-top { 
-  padding: 20px;
+  padding: 16px; /* dari 20px → 16px */
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
 }
@@ -781,28 +776,28 @@
 .tk-profile-top > div > div:first-child {
   color: #1a1a1a;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px; /* dari 16px → 14px */
 }
 
 .tk-profile-top .text-muted {
   color: #6c757d;
-  font-size: 13px;
-  margin-top: 4px;
+  font-size: 12px; /* dari 13px → 12px */
+  margin-top: 3px; /* dari 4px → 3px */
 }
 
 .text-muted {
   color: #9ca3af;
-  font-size: 12px;
+  font-size: 11px; /* dari 12px → 11px */
 }
 
 .tk-profile-link { 
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 20px;
+  gap: 9px; /* dari 10px → 9px */
+  padding: 10px 16px; /* dari 12px 20px */
   text-decoration: none; 
   color: #6c757d;
-  font-size: 14px;
+  font-size: 13px; /* dari 14px → 13px */
   font-weight: 600;
   transition: all 0.2s;
   border: 0;
@@ -818,28 +813,28 @@
 }
 
 .tk-profile-link svg {
-  width: 18px;
-  height: 18px;
+  width: 16px; /* dari 18px → 16px */
+  height: 16px; /* dari 18px → 16px */
   flex-shrink: 0;
 }
 
-/* Guest actions */
+/* Guest actions Compact */
 .guest-actions { 
   display: flex; 
-  gap: 8px; 
+  gap: 7px; /* dari 8px → 7px */
   align-items: center;
 }
 
 .guest-actions .btn-ghost {
-  padding: 0 16px;
-  height: 40px;
-  line-height: 38px;
+  padding: 0 14px; /* dari 16px → 14px */
+  height: 36px; /* dari 40px → 36px */
+  line-height: 34px; /* dari 38px → 34px */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px; /* dari 13px → 12px */
   border: 1px solid #e5e7eb;
   background: #fff;
   transition: all 0.2s;
@@ -855,15 +850,15 @@
 }
 
 .btn-login-pill { 
-  padding: 0 16px;
-  height: 40px;
-  line-height: 38px;
+  padding: 0 14px; /* dari 16px → 14px */
+  height: 36px; /* dari 40px → 36px */
+  line-height: 34px; /* dari 38px → 34px */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px; /* dari 13px → 12px */
   background: #0ea5e9;
   color: #fff;
   border: 1px solid transparent;
@@ -877,7 +872,7 @@
   background: #0284c7;
 }
 
-/* Confirm modal */
+/* Confirm modal Compact */
 #tk-confirm-modal { 
   position: fixed; 
   inset: 0; 
@@ -900,51 +895,61 @@
 .tk-confirm-box { 
   position: relative; 
   z-index: 3; 
-  width: 400px; 
+  width: 380px; /* dari 400px → 380px */
   max-width: 90%;
   background: #fff;
   border-radius: 4px;
-  padding: 24px;
+  padding: 20px; /* dari 24px → 20px */
   box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 }
 
 .tk-confirm-title { 
   font-weight: 700;
-  font-size: 18px;
-  margin-bottom: 12px; 
+  font-size: 16px; /* dari 18px → 16px */
+  margin-bottom: 10px; /* dari 12px → 10px */
   color: #1a1a1a;
 }
 
 .tk-confirm-msg { 
   color: #6c757d;
-  margin-bottom: 20px;
+  margin-bottom: 16px; /* dari 20px → 16px */
   line-height: 1.5;
-  font-size: 14px;
+  font-size: 13px; /* dari 14px → 13px */
 }
 
 .tk-confirm-actions { 
   display: flex; 
-  gap: 8px; 
+  gap: 7px; /* dari 8px → 7px */
   justify-content: flex-end;
 }
 
-/* Responsive */
+/* Responsive - Compact adjustments */
 @media (max-width: 1024px) {
-  .tk-menu { 
-    gap: 24px;
+  .tk-quick-menu {
+    gap: 2px;
+  }
+  
+  .quick-menu-link {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+  
+  .quick-menu-link svg {
+    width: 15px;
+    height: 15px;
   }
   
   .tk-center {
-    padding: 0 20px;
+    padding: 0 16px;
   }
   
   .tk-search {
-    max-width: 550px;
+    max-width: 480px;
   }
   
   .tk-left,
   .tk-actions {
-    width: 150px;
+    width: 140px;
   }
 }
 
@@ -953,18 +958,27 @@
     display: none;
   }
   
+  .tk-quick-menu {
+    display: none; /* Hide di mobile */
+  }
+  
+  /* Hide Pesanan link di mobile, show icon-btn jika ada */
+  .tk-actions .quick-menu-link {
+    display: none;
+  }
+  
   .tk-topbar {
-    font-size: 11px;
-    padding: 5px 0;
+    font-size: 10px; /* dari 11px → 10px */
+    padding: 4px 0;
   }
   
   .tk-container {
-    padding: 0 12px;
+    padding: 0 10px; /* dari 14px → 10px */
   }
   
   .tk-row {
-    padding: 12px 0;
-    gap: 12px;
+    padding: 10px 0; /* dari 12px → 10px */
+    gap: 10px; /* dari 16px → 10px */
   }
   
   .tk-left {
@@ -972,12 +986,12 @@
   }
   
   .tk-logo img {
-    height: 30px;
+    height: 42px; /* dari 36px → 42px */
   }
   
   .tk-center {
     flex: 1;
-    padding: 0 12px;
+    padding: 0 10px; /* dari 32px → 10px */
   }
   
   .tk-search {
@@ -986,13 +1000,13 @@
   }
   
   .tk-search input {
-    font-size: 13px;
-    padding: 12px 56px 12px 20px;
+    font-size: 12px; /* dari 13px → 12px */
+    padding: 10px 50px 10px 16px; /* dari 11px 52px 11px 20px */
   }
   
   .tk-search .search-icon {
-    width: 44px;
-    height: 44px;
+    width: 38px; /* dari 42px → 38px */
+    height: 38px; /* dari 42px → 38px */
   }
   
   .tk-actions {
@@ -1000,60 +1014,60 @@
   }
   
   .icon-btn {
-    width: 38px;
-    height: 38px;
+    width: 34px; /* dari 36px → 34px */
+    height: 34px; /* dari 36px → 34px */
   }
   
   .icon-btn svg {
-    width: 19px;
-    height: 19px;
+    width: 17px; /* dari 18px → 17px */
+    height: 17px; /* dari 18px → 17px */
   }
   
   .tk-profile-btn-photo {
-    width: 38px;
-    height: 38px;
+    width: 34px; /* dari 36px → 34px */
+    height: 34px; /* dari 36px → 34px */
   }
   
   .guest-actions {
-    gap: 6px;
+    gap: 5px; /* dari 7px → 5px */
   }
   
   .guest-actions .btn-ghost {
-    height: 38px;
-    line-height: 36px;
-    padding: 0 14px;
-    font-size: 12px;
+    height: 34px; /* dari 36px → 34px */
+    line-height: 32px; /* dari 34px → 32px */
+    padding: 0 12px; /* dari 14px → 12px */
+    font-size: 11px; /* dari 12px → 11px */
   }
   
   .btn-login-pill {
-    height: 38px;
-    line-height: 36px;
-    padding: 0 14px;
-    font-size: 12px;
+    height: 34px; /* dari 36px → 34px */
+    line-height: 32px; /* dari 34px → 32px */
+    padding: 0 12px; /* dari 14px → 12px */
+    font-size: 11px; /* dari 12px → 11px */
   }
 }
 
 @media (max-width: 480px) {
   .tk-topbar {
-    font-size: 10px;
-    padding: 4px 0;
+    font-size: 9px; /* dari 10px → 9px */
+    padding: 3px 0; /* dari 4px → 3px */
   }
   
   .tk-container {
-    padding: 0 10px;
+    padding: 0 8px; /* dari 10px → 8px */
   }
   
   .tk-row {
-    padding: 10px 0;
-    gap: 8px;
+    padding: 8px 0; /* dari 10px → 8px */
+    gap: 8px; /* dari 10px → 8px */
   }
   
   .tk-logo img {
-    height: 28px;
+    height: 38px; /* dari 32px → 38px */
   }
   
   .tk-center {
-    padding: 0 8px;
+    padding: 0 6px; /* dari 10px → 6px */
   }
   
   .tk-search {
@@ -1061,73 +1075,73 @@
   }
   
   .tk-search input {
-    font-size: 12px;
-    padding: 10px 52px 10px 16px;
+    font-size: 11px; /* dari 12px → 11px */
+    padding: 8px 46px 8px 14px; /* dari 10px 50px 10px 16px */
   }
   
   .tk-search .search-icon {
-    width: 40px;
-    height: 40px;
+    width: 36px; /* dari 38px → 36px */
+    height: 36px; /* dari 38px → 36px */
   }
   
   .tk-search .search-icon svg {
-    width: 18px;
-    height: 18px;
+    width: 16px; /* dari 18px → 16px */
+    height: 16px; /* dari 18px → 16px */
   }
   
   .icon-btn {
-    width: 36px;
-    height: 36px;
+    width: 32px; /* dari 34px → 32px */
+    height: 32px; /* dari 34px → 32px */
   }
   
   .icon-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 16px; /* dari 17px → 16px */
+    height: 16px; /* dari 17px → 16px */
   }
   
   .badge {
-    min-width: 16px;
-    height: 16px;
-    font-size: 9px;
+    min-width: 15px; /* dari 17px → 15px */
+    height: 15px; /* dari 17px → 15px */
+    font-size: 8px; /* dari 9px → 8px */
   }
   
   .tk-profile-btn-photo {
-    width: 36px;
-    height: 36px;
+    width: 32px; /* dari 34px → 32px */
+    height: 32px; /* dari 34px → 32px */
   }
   
   .guest-actions {
-    gap: 5px;
+    gap: 4px; /* dari 5px → 4px */
   }
   
   .guest-actions .btn-ghost {
-    height: 36px;
-    line-height: 34px;
-    padding: 0 12px;
-    font-size: 11px;
+    height: 32px; /* dari 34px → 32px */
+    line-height: 30px; /* dari 32px → 30px */
+    padding: 0 10px; /* dari 12px → 10px */
+    font-size: 10px; /* dari 11px → 10px */
   }
   
   .btn-login-pill {
-    height: 36px;
-    line-height: 34px;
-    padding: 0 12px;
-    font-size: 11px;
+    height: 32px; /* dari 34px → 32px */
+    line-height: 30px; /* dari 32px → 30px */
+    padding: 0 10px; /* dari 12px → 10px */
+    font-size: 10px; /* dari 11px → 10px */
   }
   
   /* Mini cart mobile adjustments */
   .tk-mini-head {
-    padding: 14px;
+    padding: 12px; /* dari 14px → 12px */
   }
   
   .tk-mini-body {
-    padding: 10px;
+    padding: 8px; /* dari 10px → 8px */
   }
   
   .tk-mini-item {
-    grid-template-columns: 18px 56px 1fr;
+    grid-template-columns: 16px 52px 1fr; /* dari 18px 56px 1fr */
     grid-template-rows: auto auto;
-    gap: 10px;
-    padding: 10px;
+    gap: 8px; /* dari 10px → 8px */
+    padding: 8px; /* dari 10px → 8px */
   }
   
   .item-checkbox {
@@ -1137,8 +1151,8 @@
   }
   
   .tk-mini-thumb {
-    width: 56px;
-    height: 56px;
+    width: 52px; /* dari 56px → 52px */
+    height: 52px; /* dari 56px → 52px */
     grid-column: 2;
     grid-row: 1 / 3;
   }
@@ -1149,7 +1163,7 @@
   }
   
   .tk-mini-title {
-    font-size: 12px;
+    font-size: 11px; /* dari 12px → 11px */
   }
   
   .item-right {
@@ -1161,68 +1175,69 @@
   }
   
   .item-total {
-    font-size: 12px;
+    font-size: 11px; /* dari 12px → 11px */
   }
   
   .btn-trash svg {
-    width: 14px;
-    height: 14px;
+    width: 13px; /* dari 15px → 13px */
+    height: 13px; /* dari 15px → 13px */
   }
   
   .tk-mini-footer {
-    padding: 14px;
+    padding: 12px; /* dari 14px → 12px */
   }
   
   .tk-mini-totals .amount {
-    font-size: 16px;
+    font-size: 14px; /* dari 16px → 14px */
   }
   
   .btn-ghost,
   .btn-primary {
-    padding: 10px 14px;
-    font-size: 12px;
+    padding: 9px 12px; /* dari 9px 14px */
+    font-size: 11px; /* dari 12px → 11px */
   }
 }
 
 @media (max-width: 360px) {
   .tk-logo img {
-    height: 26px;
+    height: 34px; /* dari 28px → 34px */
   }
   
   .tk-search input {
-    font-size: 11px;
-    padding: 7px 44px 7px 10px;
+    font-size: 10px; /* dari 11px → 10px */
+    padding: 6px 40px 6px 8px; /* dari 8px 46px 8px 14px */
   }
   
   .tk-search .search-icon {
-    width: 38px;
-    height: 30px;
+    width: 34px; /* dari 36px → 34px */
+    height: 28px; /* dari 36px → 28px */
   }
   
   .icon-btn {
-    width: 34px;
-    height: 34px;
+    width: 30px; /* dari 32px → 30px */
+    height: 30px; /* dari 32px → 30px */
   }
   
   .tk-profile-btn-photo {
-    width: 34px;
-    height: 34px;
+    width: 30px; /* dari 32px → 30px */
+    height: 30px; /* dari 32px → 30px */
   }
   
   .tk-mini-item {
-    grid-template-columns: 16px 52px 1fr;
-    gap: 8px;
-    padding: 8px;
+    grid-template-columns: 14px 48px 1fr; /* dari 16px 52px 1fr */
+    gap: 7px; /* dari 8px → 7px */
+    padding: 7px; /* dari 8px → 7px */
   }
   
   .tk-mini-thumb {
-    width: 52px;
-    height: 52px;
+    width: 48px; /* dari 52px → 48px */
+    height: 48px; /* dari 52px → 48px */
   }
 }
 </style>
 
-{{-- HTML Structure tetap sama --}}
+{{-- HTML Structure tetap 100% SAMA seperti sebelumnya --}}
+{{-- (Copy semua HTML dari versi sebelumnya, tidak ada perubahan di HTML) --}}
 {{-- Top promotional bar --}}
 <div class="tk-topbar">
   <div class="tk-container">
@@ -1238,7 +1253,7 @@
       {{-- LEFT - Logo --}}
       <div class="tk-left" style="margin-left:0;">
         <a class="tk-logo" href="{{ route('dashboard') }}" aria-label="Home">
-          <img src="{{ asset('images/logo/logo_tokoriza.png') }}" alt="Logo">
+          <img src="{{ asset('images/logo/headlogo.png') }}" alt="Logo">
         </a>
       </div>
 
@@ -1255,6 +1270,24 @@
         </form>
       </div>
 
+      {{-- CENTER RIGHT - Quick Menu --}}
+      <div class="tk-quick-menu">
+        <a href="{{ route('dashboard') }}" class="quick-menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          </svg>
+          <span>Home</span>
+        </a>
+        <a href="{{ route('shop.index') }}" class="quick-menu-link {{ request()->routeIs('shop.index') ? 'active' : '' }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <span>Produk</span>
+        </a>
+      </div>
+
       {{-- RIGHT - Orders, Cart, Auth --}}
       <div class="tk-actions" style="margin-left:auto;margin-right:0;">
 
@@ -1264,14 +1297,15 @@
           $cartTotal = collect($cart)->reduce(fn($c,$i)=> $c + ($i['price']*$i['qty']), 0);
         @endphp
 
-        {{-- ORDERS/PESANAN --}}
+        {{-- ORDERS/PESANAN - Style sama dengan quick menu --}}
         @auth
-          <a href="{{ route('orders.index') }}" class="icon-btn" title="Pesanan Saya">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <a href="{{ route('orders.index') }}" class="quick-menu-link {{ request()->routeIs('orders.index') ? 'active' : '' }}" title="Pesanan Saya">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
               <path d="M3 9h18"></path>
               <path d="M9 21V9"></path>
             </svg>
+            <span>Pesanan</span>
           </a>
         @endauth
 
@@ -1291,7 +1325,7 @@
             @endif
           </button>
 
-          {{-- MINI CART - Structure sama, styling berbeda --}}
+          {{-- MINI CART - HTML tetap sama seperti sebelumnya --}}
           <div id="tk-mini-cart" class="tk-mini-cart" aria-hidden="true">
             <div class="tk-mini-head">
               <div class="title">
@@ -1369,8 +1403,6 @@
                               @endif
                             </div>
                           @endif
-
-                         
 
                           <div style="font-weight:600;color:#6c757d;font-size:11px;">Rp {{ number_format($item['price'],0,',','.') }}</div>
                         </div>
@@ -1453,6 +1485,15 @@
                 </svg>
                 Profil Saya
               </a>
+
+              <a class="tk-profile-link" href="{{ route('orders.index') }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <path d="M3 9h18"></path>
+                  <path d="M9 21V9"></path>
+                </svg>
+                Riwayat Pesanan
+              </a>
               
               <div style="border-top:1px solid #f0f0f0;margin:8px 0;"></div>
               
@@ -1479,34 +1520,6 @@
       </div>
     </div>
   </div>
-
-  {{-- Secondary Navigation --}}
-  <div class="tk-navbar-secondary">
-    <div class="tk-container">
-      <div class="tk-menu" role="navigation" aria-label="Primary">
-        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-          </svg>
-          Home
-        </a>
-        <a href="{{ route('shop.index') }}" class="{{ request()->routeIs('shop.index') ? 'active' : '' }}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-          </svg>
-          Produk
-        </a>
-        <a href="{{ route('orders.index') }}" class="{{ request()->routeIs('orders.index') ? 'active' : '' }}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-          </svg>
-          Pesanan
-        </a>
-      </div>
-    </div>
-  </div>
 </nav>
 
 {{-- CONFIRMATION MODAL --}}
@@ -1522,7 +1535,7 @@
   </div>
 </div>
 
-{{-- JAVASCRIPT SISTEM TETAP SAMA 100% --}}
+{{-- JAVASCRIPT SISTEM TETAP 100% SAMA --}}
 <script>
 (function(){
   const qs = s => document.querySelector(s);
