@@ -15,6 +15,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\HomeDashboardController; // ← NEW
 use App\Http\Controllers\Admin\RevenueController;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 use App\Models\OrderItem;
 
@@ -23,6 +25,32 @@ use App\Models\OrderItem;
 | Web Routes
 |--------------------------------------------------------------------------
 */
+Route::get('/test-validasi', function () {
+    return '
+    <form method="POST" action="/test-validasi">
+        <input type="hidden" name="_token" value="'.csrf_token().'">
+        <button type="submit">Kirim (tanpa email)</button>
+    </form>
+    ';
+});
+
+Route::post('/test-validasi', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+    ]);
+
+    return 'OK';
+});
+
+Route::get('/test-wib', function () {
+    return [
+        'now_helper' => now()->toDateTimeString(),
+        'carbon_now' => Carbon::now()->toDateTimeString(),
+        'carbon_id'  => Carbon::now()->translatedFormat('l, d F Y H:i'),
+        'timezone'   => config('app.timezone'),
+        'locale'     => config('app.locale'),
+    ];
+});
 
 // Halaman utama
 Route::get('/dashboard', function () {
