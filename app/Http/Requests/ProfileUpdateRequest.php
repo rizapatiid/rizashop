@@ -35,13 +35,18 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()?->id),
             ],
 
-            'phone_country' => [
-                'nullable','string','max:5',
+            'postal_code' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9]*$/',
             ],
 
             'phone' => [
-                'nullable','string','max:20',
-                'regex:/^[0-9]+$/',
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9]*$/', // ⬅️ BOLEH KOSONG
             ],
 
             // --- FOTO PROFIL ---

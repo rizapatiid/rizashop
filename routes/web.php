@@ -14,6 +14,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\HomeDashboardController; // ← NEW
+use App\Http\Controllers\Admin\RevenueController;
 
 use App\Models\OrderItem;
 
@@ -153,6 +154,8 @@ Route::middleware(['auth', 'admin'])
         // PUT    /seller/banners/{id}      → admin.banners.update
         // DELETE /seller/banners/{id}      → admin.banners.destroy
         // ============================================
+        Route::get('/pendapatan', [RevenueController::class, 'index'])
+            ->name('revenue.index');
 
         /*
          * Admin: orders management (masterdashboard/orders...)
@@ -167,6 +170,7 @@ Route::middleware(['auth', 'admin'])
             // admin action: set tracking / kirimkan (input nomor resi)
             Route::post('/{order}/set-tracking', [AdminOrderController::class, 'setTracking'])->name('setTracking');
         });
+        
     });
     
 require __DIR__ . '/auth.php';

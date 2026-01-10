@@ -22,6 +22,84 @@
             background: #f5f5f5;
         }
 
+/* ===== ADD BUTTON (MATCH NOTIFICATION EXACT) ===== */
+.add-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    height:36px;
+    padding:0 14px;
+    border-radius:8px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:600;
+    color:#6b7280; /* ⬅️ SAMA DENGAN ICON NOTIF */
+    transition:all .2s ease;
+}
+
+.add-btn svg{
+    width:22px;
+    height:22px;
+    stroke:#6b7280; /* ⬅️ FIX UTAMA */
+    transition:stroke .2s ease;
+}
+
+/* HOVER = IDENTIK DENGAN NOTIFICATION */
+.add-btn:hover{
+    background:#f9fafb;
+    border-color:#0ea5e9;
+}
+
+.add-btn:hover span{
+    color:#0ea5e9;
+}
+
+.add-btn:hover svg{
+    stroke:#0ea5e9;
+}
+
+/* ACTIVE */
+.add-btn:active{
+    transform:scale(.97);
+}
+
+.add-wrapper{
+    position:relative;
+    z-index:1200;
+}
+
+#add-dropdown{
+    top:110%;
+    right:0;
+    min-width:220px;
+}
+
+
+@media (max-width:768px){
+    .add-btn span{
+        display:none;
+    }
+    .add-btn{
+        width:36px;
+        padding:0;
+        justify-content:center;
+    }
+}
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.main-wrapper {
+    overflow-x: hidden;
+}
+
+
+
+
         /* ===== TOP NAV - Match User Navbar ===== */
         .admin-topbar {
             background: linear-gradient(to right, #0ea5e9, #3b82f6);
@@ -616,35 +694,37 @@
             {{-- RIGHT - Actions --}}
             <div class="admin-actions">
 
-                {{-- Add Dropdown --}}
-                <div style="position:relative;">
-                    <button id="add-dropdown-btn" class="icon-btn" title="Tambah">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                    </button>
+{{-- Add Dropdown --}}
+<div class="add-wrapper">
+    <button id="add-dropdown-btn" class="add-btn" type="button" title="Tambah">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Tambah</span>
+    </button>
 
-                    <div id="add-dropdown" class="admin-profile-dropdown" style="min-width: 220px;">
-                        <a href="{{ route('admin.products.create') }}" class="profile-link">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <path d="M3 9h18"></path>
-                                <path d="M9 21V9"></path>
-                            </svg>
-                            Tambah Produk
-                        </a>
+    <div id="add-dropdown" class="admin-profile-dropdown">
+        <a href="{{ route('admin.products.create') }}" class="profile-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M3 9h18"/>
+                <path d="M9 21V9"/>
+            </svg>
+            Tambah Produk
+        </a>
 
-                        <a href="{{ route('admin.banners.create') }}" class="profile-link">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                <polyline points="21 15 16 10 5 21"></polyline>
-                            </svg>
-                            Buat Banner
-                        </a>
-                    </div>
-                </div>
+        <a href="{{ route('admin.banners.create') }}" class="profile-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            Buat Banner
+        </a>
+    </div>
+</div>
+
 
                 {{-- Notifications --}}
                 <button class="icon-btn" title="Notifikasi">
@@ -764,9 +844,9 @@
                 <span class="menu-section-title sidebar-text">Lainnya</span>
             </div>
             
-            <a href="#" class="menu-item flex items-center px-4 py-3 text-gray-700">
+            <a href="{{ route('admin.revenue.index') }}" class="menu-item flex items-center px-4 py-3 {{ request()->routeIs('admin.revenue.*') ? 'active' : 'text-gray-700' }}">
                 <i class="fas fa-chart-bar w-5 text-center text-base"></i>
-                <span class="sidebar-text ml-3 text-sm font-semibold">Laporan</span>
+                <span class="sidebar-text ml-3 text-sm font-semibold">Pendapatan</span>
             </a>
             
             <a href="{{ route('admin.banners.index') }}" class="menu-item flex items-center px-4 py-3 {{ request()->routeIs('admin.banners.*') ? 'active' : 'text-gray-700' }}">
@@ -782,7 +862,7 @@
         
         <!-- Quick Actions -->
         <div class="sidebar-text px-4 py-4 mt-4 mb-8">
-            <a href="#" class="quick-action rounded-xl p-4 text-center block">
+            <a href="/account#cs" class="quick-action rounded-xl p-4 text-center block">
                 <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
                     <i class="fas fa-headset text-blue-600 text-xl"></i>
                 </div>

@@ -72,6 +72,7 @@ class ProfileController extends Controller
         }
 
         $user->save();
+        $user->refresh();
 
         /** -----------------------------
          *  RESPONSE AJAX

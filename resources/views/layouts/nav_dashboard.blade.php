@@ -284,7 +284,7 @@
   border: 2px solid #fff;
 }
 
-.badge.hidden { 
+.cart-badge.hidden { 
   display: none !important; 
 }
 

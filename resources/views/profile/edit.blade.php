@@ -12,7 +12,13 @@
 
   <style>
     :root{ --accent:#0ea5e9; --accent-600:#0284c7; --header-btn-w:56px; }
-    .card{ border-radius:14px; background:#fff; border:1px solid rgba(15,23,42,0.04); }
+.card{
+  background:#fff;
+  border:1px solid rgba(15,23,42,0.06);
+  border-radius:16px;
+  box-shadow:0 4px 16px rgba(2,6,23,0.04);
+}
+
     .floating{ transition: transform .18s ease, box-shadow .18s ease; }
     .panel-hidden{ display:none; }
     .sidebar-active{ background: rgba(14,165,233,0.08); color:#0369a1; font-weight:600; }
@@ -159,6 +165,15 @@
 .btn-primary { padding:.55rem 1rem; border-radius:8px; background:#0ea5e9; color:#fff; font-weight:600; border:none; }
 .btn-danger  { padding:.55rem 1rem; border-radius:8px; background:#ef4444; color:#fff; font-weight:600; border:none; }
 
+.btn{
+  transition:all .15s ease;
+}
+
+.btn:hover{
+  transform:translateY(-1px);
+}
+
+
 /* limit modal body height a bit on small screens */
 @media(max-width:640px){
   .modal-content { max-width:96%; max-height: calc(100vh - 48px); border-radius:10px; }
@@ -234,7 +249,8 @@
         </div>
       </aside>
 
-      <section class="col-span-12 lg:col-span-9 space-y-0">
+<section class="col-span-12 lg:col-span-9 space-y-6">
+
 
         {{-- Redesigned PROFILE CARD --}}
         <div id="panel-detail" class="panel card p-6 shadow floating">
@@ -459,7 +475,10 @@
 
           <div>
             <label class="block text-sm text-slate-600 mb-1">Kode Negara</label>
-            <input name="phone_country" value="{{ old('phone_country', $user->phone_country) }}" class="form-input bg-gray-100 cursor-not-allowed" readonly aria-readonly="true">
+            <input
+              value="{{ $user->phone_country }}"
+              class="form-input bg-gray-100 cursor-not-allowed"
+              readonly>
           </div>
 
           <div>
