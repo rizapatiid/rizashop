@@ -1,6 +1,10 @@
-@extends('layouts.app')
-@section('title', 'Riwayat Pemesanan')
-@section('page-title', 'Riwayat Pemesanan')
+@extends('layouts.global')
+
+@section('title', 'Pesanan')
+
+@section('navbar')
+    @include('layouts.nav_dashboard')
+@endsection
 
 @section('content')
 
@@ -35,7 +39,7 @@ use Illuminate\Support\Facades\Route;
 }
 
 body {
-  background: linear-gradient(135deg, #38bdf8 0%, #fbbf24 100%);
+  background: white;
   color: var(--text);
   min-height: 100vh;
 }
@@ -1126,7 +1130,7 @@ body {
 
         <div class="card-actions">
           @if($isCancelled)
-            <a href="{{ route('payments.show', $order->id) }}" class="btn btn-outline">Bukti Bayar</a>
+            <!-- <a href="{{ route('payments.show', $order->id) }}" class="btn btn-outline">Bukti Bayar</a> -->
 
           @elseif($isReceived)
             <a href="{{ route('payments.show', $order->id) }}" class="btn btn-outline">Bukti Bayar</a>

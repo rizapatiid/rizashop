@@ -1,4 +1,13 @@
-{{-- navbar_marketplace_compact.php (Compact Version) --}}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title') - TokoRiza Seller Center</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
 /* ====== Tokopedia/Shopee Compact Navbar ====== */
 * {
@@ -257,7 +266,7 @@
   stroke: #6c757d;
 }
 
-.badge { 
+.cart-badge { 
   position: absolute;
   top: -4px;
   right: -4px;
@@ -1099,7 +1108,7 @@
     height: 16px; /* dari 17px → 16px */
   }
   
-  .badge {
+  .cart-badge {
     min-width: 15px; /* dari 17px → 15px */
     height: 15px; /* dari 17px → 15px */
     font-size: 8px; /* dari 9px → 8px */
@@ -1235,6 +1244,8 @@
   }
 }
 </style>
+</head>
+<body>
 
 {{-- HTML Structure tetap 100% SAMA seperti sebelumnya --}}
 {{-- (Copy semua HTML dari versi sebelumnya, tidak ada perubahan di HTML) --}}
@@ -1319,9 +1330,9 @@
             </svg>
 
             @if($cartCount>0)
-              <span class="badge" id="tk-cart-badge">{{ $cartCount }}</span>
+              <span class="cart-badge" id="tk-cart-badge">{{ $cartCount }}</span>
             @else
-              <span class="badge hidden" id="tk-cart-badge" aria-hidden="true"></span>
+              <span class="cart-badge hidden" id="tk-cart-badge" aria-hidden="true"></span>
             @endif
           </button>
 
@@ -1951,3 +1962,7 @@
 
 })();
 </script>
+@yield('scripts')
+</body>
+
+</html>

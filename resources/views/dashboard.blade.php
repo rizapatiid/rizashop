@@ -3,53 +3,49 @@
 
     <div class="dashboard-content">
 
-        {{-- ================= PROMO SLIDER ================= --}}
-        @if(isset($banners) && $banners->count())
-        <div class="promo-slider-wrapper">
-            <div class="promo-slider-container">
-                <div class="slider-track" id="sliderTrack">
+        {{-- ================= PROMO BLIBLI STYLE ================= --}}
+@if(isset($banners) && $banners->count())
+<section class="blibli-promo">
 
-                    @foreach($banners as $index => $banner)
-                        @php
-                            $bannerLink = null;
-                            if (!empty($banner->product_id)) {
-                                $bannerLink = route('shop.show', $banner->product_id);
-                            } elseif (!empty($banner->link_url)) {
-                                $bannerLink = $banner->link_url;
-                            }
-                        @endphp
+    <div class="blibli-slider">
 
-                        <div class="slide {{ $index===0?'active':'' }}">
-                            @if($bannerLink)
-                            <a href="{{ $bannerLink }}" class="slide-link">
-                            @endif
+        <div class="blibli-track" id="blibliTrack">
+            @foreach($banners as $index => $banner)
+                @php
+                    $link = null;
+                    if ($banner->product_id) {
+                        $link = route('shop.show', $banner->product_id);
+                    } elseif ($banner->link_url) {
+                        $link = $banner->link_url;
+                    }
+                @endphp
 
-                                <img src="{{ asset('storage/'.$banner->image_path) }}" alt="{{ $banner->title }}">
-                                <div class="slide-overlay">
-                                    
-                                </div>
-
-                            @if($bannerLink)
-                            </a>
-                            @endif
-                        </div>
-                    @endforeach
-
+                <div class="blibli-slide {{ $index === 0 ? 'active' : '' }}">
+                    @if($link)<a href="{{ $link }}">@endif
+                        <img src="{{ asset('storage/'.$banner->image_path) }}"
+                             alt="{{ $banner->title }}">
+                    @if($link)</a>@endif
                 </div>
+            @endforeach
+        </div>
 
-                @if($banners->count()>1)
-                <button class="slider-nav prev" onclick="prevSlide()">‹</button>
-                <button class="slider-nav next" onclick="nextSlide()">›</button>
+        {{-- NAV --}}
+        @if($banners->count() > 1)
+        <!-- <button class="blibli-nav prev" onclick="blibliPrev()">‹</button>
+        <button class="blibli-nav next" onclick="blibliNext()">›</button> -->
 
-                <div class="slider-dots">
-                    @foreach($banners as $i=>$b)
-                        <button class="dot {{ $i===0?'active':'' }}" onclick="goToSlide({{ $i }})"></button>
-                    @endforeach
-                </div>
-                @endif
-            </div>
+        <div class="blibli-dots">
+            @foreach($banners as $i => $b)
+                <button class="dot {{ $i===0?'active':'' }}"
+                        onclick="blibliGo({{ $i }})"></button>
+            @endforeach
         </div>
         @endif
+
+    </div>
+
+</section>
+@endif
 
 {{-- ================= KATEGORI MANUAL ================= --}}
 <div class="category-manual-wrap">
@@ -190,10 +186,11 @@
 
 
     </div>
+    <div class="category-dots" id="categoryDots"></div>
+
 </div>
 
 {{-- ================= PRODUK PER KATEGORI ================= --}}
-{{-- ================= PRODUK PER KATEGORI (STYLE SAMA DENGAN SHOP) ================= --}}
 <div class="shop-container">
 
 @foreach($categories as $category)
@@ -488,139 +485,250 @@
 /* ===== BASE ===== */
 .dashboard-content{background:#f5f5f5;min-height:100vh}
 
-/* ================= SLIDER ================= */
-.promo-slider-wrapper{
-    max-width:1280px;
-    margin:auto;
-    padding:16px 16px 8px;
-}
-.promo-slider-container{
-    position:relative;
-    height:320px; /* DIPERKECIL */
-    border-radius:18px;
-    overflow:hidden;
-}
-.slider-track{
-    display:flex;
-    height:100%;
-    transition:.6s ease;
-}
-.slide{
-    min-width:100%;
-    opacity:0;
-    transition:.6s;
-    position:relative;
-}
-.slide.active{opacity:1}
-.slide img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
-.slide-link{display:block;width:100%;height:100%}
-.slide-overlay{
-    position:absolute;
-    bottom:0;left:0;right:0;
-    padding:24px;
-    background:linear-gradient(to top,rgba(0,0,0,.65),transparent)
-}
-.slide-title{color:#fff;font-size:26px;font-weight:900}
-.slide-subtitle{color:#fff;font-size:14px}
-
-/* NAV */
-.slider-nav{
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    width:38px;height:38px;
-    border-radius:50%;
-    background:#fff;
-    border:none;
-    font-size:22px;
-    cursor:pointer;
-    opacity:.9;
-}
-.slider-nav.prev{left:12px}
-.slider-nav.next{right:12px}
-
-.slider-dots{
-    position:absolute;
-    bottom:12px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    gap:6px;
-}
-.dot{
-    width:10px;height:10px;
-    border-radius:50%;
-    background:#ddd;
-    border:none;
-}
-.dot.active{
-    width:26px;
-    border-radius:6px;
-    background:#fff;
-}
-
-/* ================= KATEGORI HORIZONTAL ================= */
-.category-manual-wrap{
-    max-width:1280px;
-    margin:8px auto 28px;
+/* ================= BLIBLI PROMO ================= */
+.blibli-promo{
+    max-width:1440px;
+    margin:0 auto 24px;
+    margin-top : 20px;
     padding:0 16px;
 }
 
+.blibli-slider{
+    position:relative;
+    overflow:hidden;
+}
+
+/* TRACK */
+.blibli-track{
+    display:flex;
+    transition:transform .6s ease;
+}
+
+/* SLIDE */
+.blibli-slide{
+    flex:0 0 100%;
+    padding:0 12px;   /* jarak visual, BUKAN gap */
+    box-sizing:border-box;
+}
+
+.blibli-slide.active{
+    opacity:1 !important;
+    transform:none !important;
+}
+
+/* IMAGE – DESKTOP */
+.blibli-slide img{
+    width:100%;
+    aspect-ratio:4 / 1;   /* 2000 x 500 */
+    object-fit:cover;
+    object-position:center;
+    border-radius:28px;
+    box-shadow:none !important;
+    background:transparent;
+}
+
+/* NAV */
+.blibli-nav{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:#fff;
+    border:none;
+    font-size:26px;
+    font-weight:700;
+    color:#2563eb;
+    cursor:pointer;
+    box-shadow:0 10px 22px rgba(0,0,0,.3);
+    z-index:10;
+}
+.blibli-nav.prev{left:0}
+.blibli-nav.next{right:0}
+
+/* DOT */
+.blibli-dots{
+    position:absolute;
+    bottom:14px;
+    right:32px;
+    display:flex;
+    gap:6px;
+}
+.blibli-dots .dot{
+    width:22px;
+    height:6px;
+    border-radius:999px;
+    background:#e5e7eb;
+    border:none;
+    cursor:pointer;
+}
+.blibli-dots .dot.active{
+    background:#2563eb;
+}
+
+/* ================= MOBILE (4:1 TETAP) ================= */
+@media(max-width:768px){
+    .blibli-promo{
+        padding:0 12px;
+    }
+
+    .blibli-track{
+        gap:0;
+    }
+
+    .blibli-slide{
+        opacity:1;
+        transform:scale(1);
+    }
+
+    .blibli-slide img{
+        aspect-ratio:4 / 1;     /* TETAP 2000x500 */
+        border-radius:18px;
+        box-shadow:0 10px 22px rgba(0,0,0,.22);
+    }
+
+    .blibli-nav{
+        width:34px;
+        height:34px;
+        font-size:20px;
+    }
+
+    .blibli-dots{
+        right:50%;
+        transform:translateX(50%);
+        bottom:10px;
+    }
+
+    .blibli-dots .dot{
+        width:18px;
+        height:5px;
+    }
+}
+/* ================= MENU CEPAT + DOT (FINAL) ================= */
+.category-manual-wrap{
+    max-width:1280px;
+    margin:10px auto 26px;
+    padding:0 16px;
+}
+
+/* ===== GRID ===== */
 .category-manual-grid{
     display:flex;
     gap:14px;
     overflow-x:auto;
-    padding:8px 2px 14px;
+    padding:10px 4px 14px;
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
 }
 
-/* hide scrollbar */
 .category-manual-grid::-webkit-scrollbar{display:none}
 .category-manual-grid{scrollbar-width:none}
 
+/* ITEM */
 .cat-item{
-    min-width:90px;
-    flex-shrink:0;
-    background:#fff;
+    min-width:88px;
+    background:transparent;  
     border-radius:16px;
-    padding:14px 8px;
+    padding:14px 6px;
     text-align:center;
     text-decoration:none;
     color:#111827;
-    transition:.25s;
+    flex-shrink:0;
     scroll-snap-align:start;
+    box-shadow:none;
 }
 
-.cat-item:hover{
-    transform:translateY(-3px);
-    box-shadow:0 10px 22px rgba(0,0,0,.1);
-}
-
+/* ICON */
 .cat-icon{
-    width:52px;
-    height:52px;
-    border-radius:16px;
-    margin:0 auto 8px;
+    width:46px;
+    height:46px;
+    border-radius:14px;
+    margin:0 auto 6px;
     display:flex;
     align-items:center;
     justify-content:center;
     color:#fff;
 }
 
-.cat-icon svg{width:24px;height:24px}
-
-.cat-item span{
-    font-size:12px;
-    font-weight:600;
-    white-space:nowrap;
+.cat-icon svg{
+    width:22px;
+    height:22px;
 }
 
-/* WARNA */
+.cat-item span{
+    font-size:11px;
+    font-weight:700;
+    line-height:1.2;
+    display:block;
+}
+
+/* ===== DOT ===== */
+.category-dots{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin-top:6px;
+}
+
+.category-dots .dot{
+    width:16px;
+    height:5px;
+    border-radius:999px;
+    background:#e5e7eb;
+    transition:.3s;
+}
+
+.category-dots .dot.active{
+    background:#2563eb;
+}
+
+/* ================= MOBILE: RAPATKAN JARAK SAJA ================= */
+@media(max-width:768px){
+
+    /* jarak antar item dipersempit */
+    .category-manual-grid{
+        gap:0.2px;                 /* sebelumnya 8 / 10 / 14 */
+        padding-bottom:6px;
+    }
+
+    /* ukuran item TETAP, hanya padding dirapikan */
+    .cat-item{
+        padding:4px 4px;         /* sebelumnya lebih lebar */
+        min-width:88px;          /* ⛔ JANGAN DIUBAH */
+    }
+
+    /* icon & teks TETAP */
+    .cat-icon{
+        width:48px;
+        height:48px;
+        margin-bottom:4px;
+    }
+
+    .cat-icon svg{
+        width:22px;
+        height:22px;
+    }
+
+    .cat-item span{
+        font-size:11px;
+        font-weight:700;
+    }
+
+    /* DOT dirapatkan (BUKAN dikecilkan drastis) */
+    .category-dots{
+        gap:3px;
+        margin-top:4px;
+    }
+
+    .category-dots .dot{
+        width:14px;
+        height:4px;
+    }
+}
+
+
+/* ===== WARNA ICON ===== */
 .blue{background:#2563eb}
 .purple{background:#7c3aed}
 .orange{background:#f97316}
@@ -634,27 +742,7 @@
 .cyan{background:#06b6d4}
 .gold{background:#f59e0b}
 
-/* ================= CARDS ================= */
-.welcome-card{
-    background:#2563eb;
-    color:#fff;
-    padding:32px;
-    border-radius:18px;
-    text-align:center;
-    margin-bottom:24px;
-}
-.stats-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
-}
-.stat-card{
-    background:#fff;
-    padding:24px;
-    border-radius:16px;
-}
-.stat-label{font-size:13px;color:#6b7280}
-.stat-value{font-size:32px;font-weight:900}
+
 
 /* RESPONSIVE */
 @media(max-width:640px){
@@ -666,24 +754,91 @@
 
 <script>
 (function(){
-    const slides=document.querySelectorAll('.slide');
-    const dots=document.querySelectorAll('.dot');
-    const track=document.getElementById('sliderTrack');
-    let cur=0,total=slides.length;
-    if(total<=1) return;
+
+    const track = document.getElementById('blibliTrack');
+    if(!track) return;
+
+    const slides = track.querySelectorAll('.blibli-slide');
+    const dots   = document.querySelectorAll('.blibli-dots .dot');
+
+    let current = 0;
+    const total = slides.length;
+
+    if(total <= 1) return;
 
     function update(){
-        slides.forEach(s=>s.classList.remove('active'));
-        dots.forEach(d=>d.classList.remove('active'));
-        slides[cur].classList.add('active');
-        dots[cur].classList.add('active');
-        track.style.transform=`translateX(-${cur*100}%)`;
+        slides.forEach(s => s.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+
+        slides[current].classList.add('active');
+        if(dots[current]) dots[current].classList.add('active');
+
+        const slideWidth = slides[0].offsetWidth;
+        track.style.transform = `translateX(-${current * slideWidth}px)`;
     }
 
-    window.nextSlide=()=>{cur=(cur+1)%total;update()}
-    window.prevSlide=()=>{cur=(cur-1+total)%total;update()}
-    window.goToSlide=i=>{cur=i;update()}
-    setInterval(nextSlide,5000);
+    function next(){
+        current = (current + 1) % total;
+        update();
+    }
+
+    function prev(){
+        current = (current - 1 + total) % total;
+        update();
+    }
+
+    // expose ke tombol
+    window.blibliNext = next;
+    window.blibliPrev = prev;
+    window.blibliGo = (i) => {
+        current = i;
+        update();
+    };
+
+    // AUTO (SAMA SEPERTI KODE ASLI KAMU)
+    setInterval(next, 5000);
+
+    // INIT
+    update();
+
 })();
+
+
+(function(){
+    const grid = document.querySelector('.category-manual-grid');
+    const dotsWrap = document.getElementById('categoryDots');
+    if(!grid || !dotsWrap) return;
+
+    const TOTAL_PAGES = 3; // ⬅️ KUNCI UTAMA (DOT = 3)
+
+    function buildDots(){
+        dotsWrap.innerHTML = '';
+        for(let i=0;i<TOTAL_PAGES;i++){
+            const dot = document.createElement('div');
+            dot.className = 'dot' + (i === 0 ? ' active' : '');
+            dotsWrap.appendChild(dot);
+        }
+    }
+
+    function updateDots(){
+        const maxScroll = grid.scrollWidth - grid.clientWidth;
+        const progress = grid.scrollLeft / maxScroll;
+        const page = Math.min(
+            TOTAL_PAGES - 1,
+            Math.round(progress * (TOTAL_PAGES - 1))
+        );
+
+        dotsWrap.querySelectorAll('.dot').forEach((d,i)=>{
+            d.classList.toggle('active', i === page);
+        });
+    }
+
+    buildDots();
+    grid.addEventListener('scroll', () =>
+        requestAnimationFrame(updateDots)
+    );
+})();
+
+
 </script>
 </x-app-layout>
