@@ -61,16 +61,37 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        $request->validate([
+        // Validasi berbeda untuk COD dan non-COD
+        $rules = [
             'method' => 'required|string',
             'amount' => 'required|numeric|min:0',
-            'proof'  => 'required|image|max:8192',
-        ]);
+        ];
 
-        // Simpan file
-        $file = $request->file('proof');
-        $path = $file->store('public/payments');
-        $publicPath = Storage::url($path);
+        // Jika bukan COD, proof wajib diupload
+        if ($request->method !== 'cod') {
+            $rules['proof'] = 'required|image|max:8192';
+        }
+
+        $request->validate($rules);
+
+        // Simpan file (jika ada)
+        $publicPath = null;
+        if ($request->hasFile('proof')) {
+            $file = $request->file('proof');
+            $path = $file->store('public/payments');
+            $publicPath = Storage::url($path);
+        }
+
+        // Tentukan status berdasarkan metode pembayaran
+        if ($request->method === 'cod') {
+            // COD langsung diproses, tidak perlu konfirmasi admin
+            $paymentStatus = 'confirmed';
+            $orderStatus = 'processing';
+        } else {
+            // Metode lain (VA, Transfer, QRIS) menunggu konfirmasi admin
+            $paymentStatus = 'waiting_confirm';
+            $orderStatus = 'waiting_confirm';
+        }
 
         // Create / Update payment
         $payment = $order->payment;
@@ -79,22 +100,27 @@ class PaymentController extends Controller
                 'order_id'   => $order->id,
                 'method'     => $request->method,
                 'amount'     => $request->amount,
-                'status'     => 'waiting_confirm',
+                'status'     => $paymentStatus,
                 'proof_path' => $publicPath,
             ]);
         } else {
             $payment->update([
                 'method'     => $request->method,
                 'amount'     => $request->amount,
-                'status'     => 'waiting_confirm',
+                'status'     => $paymentStatus,
                 'proof_path' => $publicPath,
             ]);
         }
 
         // Update status order
         $order->update([
-            'status' => 'waiting_confirm',
+            'status' => $orderStatus,
         ]);
+
+        // Pesan sukses berbeda untuk COD
+        $successMessage = $request->method === 'cod' 
+            ? 'Pesanan berhasil dikonfirmasi! Status pesanan Anda sudah diproses. Siapkan pembayaran tunai saat barang tiba.'
+            : 'Bukti pembayaran berhasil dikirim. Menunggu konfirmasi admin.';
 
         /**
          * ===============================
@@ -105,7 +131,7 @@ class PaymentController extends Controller
          */
         if ($request->has('from_popup')) {
             return redirect()->back()
-                ->with('success', 'Bukti pembayaran berhasil dikirim. Menunggu konfirmasi.');
+                ->with('success', $successMessage);
         }
 
         /**
@@ -116,21 +142,21 @@ class PaymentController extends Controller
          */
         if (Route::has('payments.show')) {
             return Redirect::route('payments.show', $order->id)
-                ->with('success', 'Bukti pembayaran berhasil dikirim. Menunggu konfirmasi.');
+                ->with('success', $successMessage);
         }
 
         if (Route::has('addresses.payments.show')) {
             return Redirect::route('addresses.payments.show', $order->id)
-                ->with('success', 'Bukti pembayaran berhasil dikirim. Menunggu konfirmasi.');
+                ->with('success', $successMessage);
         }
 
         if (Route::has('orders.show')) {
             return Redirect::route('orders.show', $order->id)
-                ->with('success', 'Bukti pembayaran berhasil dikirim. Menunggu konfirmasi.');
+                ->with('success', $successMessage);
         }
 
         return Redirect::to('/')
-            ->with('success', 'Bukti pembayaran berhasil dikirim. Menunggu konfirmasi.');
+            ->with('success', $successMessage);
     }
 
     /**

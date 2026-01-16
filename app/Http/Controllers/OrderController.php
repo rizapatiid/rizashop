@@ -50,10 +50,22 @@ class OrderController extends Controller
                     break;
                     
                 case 'dikemas':
-                    // Menampilkan: Pesanan Diproses (payment confirmed/paid) dan belum dikirim
-                    $query->whereHas('payment', function($q) {
-                        $q->whereIn('status', ['confirmed', 'paid'])
-                          ->whereNotNull('proof_path');
+                    // Menampilkan: Pesanan Diproses (payment confirmed/paid atau COD processing) dan belum dikirim
+                    $query->where(function($q) {
+                        // Payment confirmed/paid (transfer, VA, QRIS)
+                        $q->whereHas('payment', function($paymentQ) {
+                            $paymentQ->whereIn('status', ['confirmed', 'paid'])
+                                     ->whereNotNull('proof_path');
+                        });
+                        
+                        // COD yang sudah dikonfirmasi (status processing)
+                        $q->orWhere(function($codQ) {
+                            $codQ->whereHas('payment', function($paymentQ) {
+                                $paymentQ->where('method', 'cod')
+                                         ->where('status', 'confirmed');
+                            })
+                            ->where('status', 'processing');
+                        });
                     })
                     ->whereNotIn('status', ['terkirim', 'shipped', 'delivered', 'completed', 'received', 'diterima', 'cancelled']);
                     break;

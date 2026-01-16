@@ -1003,16 +1003,19 @@ body {
     $payment = $order->payment ?? null;
     $hasProof = $payment && !empty($payment->proof_path);
     $paymentStatus = $payment->status ?? null;
+    $paymentMethod = $payment->method ?? null;
     $orderStatus = $order->status ?? null;
 
-    // Status Logic
-    $isWaitingPayment = !$hasProof && in_array($orderStatus, ['pending', 'waiting_payment']);
-    $isWaitingConfirmation = $hasProof && in_array($paymentStatus, ['waiting_confirm', 'waiting']);
-    $isApproved = $hasProof && in_array($paymentStatus, ['confirmed', 'paid']);
-    $isRejected = ($hasProof && in_array($paymentStatus, ['rejected', 'declined', 'failed'])) || $orderStatus === 'need_confirmation';
-    $isShipped = in_array($orderStatus, ['terkirim', 'shipped', 'delivered']);
-    $isReceived = in_array($orderStatus, ['completed', 'received', 'diterima']);
+    // Status Logic berdasarkan sistem baru
     $isCancelled = $orderStatus === 'cancelled';
+    $isReceived = in_array($orderStatus, ['completed', 'received', 'diterima']);
+    $isShipped = in_array($orderStatus, ['terkirim', 'shipped', 'delivered']);
+    $isProcessing = in_array($orderStatus, ['processing', 'diproses']);
+    $isWaitingConfirmation = $orderStatus === 'waiting_confirm' || $paymentStatus === 'waiting_confirm';
+    $isWaitingPayment = in_array($orderStatus, ['pending', 'waiting_payment']) || (!$payment && !in_array($orderStatus, ['cancelled', 'completed']));
+
+    // Check if COD
+    $isCOD = $paymentMethod === 'cod';
 
     // Status Display
     if ($isCancelled) {
@@ -1027,16 +1030,17 @@ body {
       $statusLabel = 'Dikirim';
       $statusClass = 'status-shipped';
       $statusIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h13l4 4v6"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="18.5" cy="17.5" r="1.5"/></svg>';
-    } elseif ($isApproved) {
-      $statusLabel = 'Diproses';
+    } elseif ($isProcessing) {
+      // Processing - baik dari COD maupun payment confirmed
+      $statusLabel = 'Dikemas';
       $statusClass = 'status-processing';
       $statusIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10h-7l-4-4H3v13h18V10z"/></svg>';
-    } elseif ($isRejected || $isWaitingConfirmation) {
-      $statusLabel = $isRejected ? 'Perlu Konfirmasi' : 'Menunggu Konfirmasi';
+    } elseif ($isWaitingConfirmation) {
+      $statusLabel = 'Menunggu Konfirmasi';
       $statusClass = 'status-waiting';
       $statusIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
     } else {
-      $statusLabel = 'Menunggu Pembayaran';
+      $statusLabel = 'Belum Bayar';
       $statusClass = 'status-waiting';
       $statusIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>';
     }
@@ -1130,7 +1134,9 @@ body {
 
         <div class="card-actions">
           @if($isCancelled)
-            <!-- <a href="{{ route('payments.show', $order->id) }}" class="btn btn-outline">Bukti Bayar</a> -->
+            @if($payment)
+              <a href="{{ route('payments.show', $order->id) }}" class="btn btn-outline">Lihat Detail</a>
+            @endif
 
           @elseif($isReceived)
             <a href="{{ route('payments.show', $order->id) }}" class="btn btn-outline">Bukti Bayar</a>
@@ -1142,12 +1148,10 @@ body {
               <button type="submit" class="btn btn-success">Terima Pesanan</button>
             </form>
 
-          @elseif($isWaitingPayment)
-            <a href="{{ route('payments.create', $order->id) }}" class="btn btn-primary">Bayar Sekarang</a>
-            <form action="{{ route('orders.cancel', $order->id) }}" method="POST" style="display: inline;">
-              @csrf
-              <button type="submit" class="btn btn-outline">Batalkan</button>
-            </form>
+          @elseif($isProcessing)
+            @if($payment)
+              <a href="{{ route('payments.show', $order->id) }}" class="btn btn-outline">Lihat Detail</a>
+            @endif
 
           @elseif($isWaitingConfirmation)
             <a href="{{ route('payments.show', $order->id) }}" class="btn btn-outline">Bukti Bayar</a>
@@ -1156,11 +1160,9 @@ body {
               <button type="submit" class="btn btn-outline">Batalkan</button>
             </form>
 
-          @elseif($isApproved)
-            <a href="{{ route('payments.show', $order->id) }}" class="btn btn-outline">Bukti Bayar</a>
-
-          @elseif($isRejected)
-            <a href="{{ route('payments.create', $order->id) }}" class="btn btn-primary">Upload Ulang</a>
+          @else
+            {{-- Belum bayar --}}
+            <a href="{{ route('payments.create', $order->id) }}" class="btn btn-primary">Bayar Sekarang</a>
             <form action="{{ route('orders.cancel', $order->id) }}" method="POST" style="display: inline;">
               @csrf
               <button type="submit" class="btn btn-outline">Batalkan</button>

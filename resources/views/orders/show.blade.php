@@ -17,7 +17,11 @@
     $payment = $order->payment ?? null;
     $hasPaymentProof = ($payment && !empty($payment->proof_path));
     $paymentStatus = $payment->status ?? null;
+    $paymentMethod = $payment->method ?? null;
     $orderStatus = $order->status ?? null;
+
+    // Check if COD
+    $isCOD = $paymentMethod === 'cod';
 
     $cancellableStatuses = ['pending', 'waiting_payment', 'waiting_confirm', 'need_confirmation'];
     $shippedStatuses = ['terkirim','shipped','delivered'];
@@ -34,39 +38,77 @@
         $proofExt = strtolower(pathinfo($payment->proof_path, PATHINFO_EXTENSION) ?: '');
     }
 
-    // Display label & badge
+    // Display label & badge - UPDATED FOR NEW SYSTEM WITH COD
     if ($orderStatus === 'cancelled' || in_array($orderStatus, ['canceled','cancelled_by_user'])) {
-        $displayLabel = 'Pesanan Dibatalkan'; $badgeClass = 'badge-cancel'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-    } elseif (in_array($orderStatus, $shippedStatuses)) {
-        $displayLabel = 'Pesanan Dikirimkan'; $badgeClass = 'badge-info'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13l4 4v6a1 1 0 0 1-1 1h-1"/><path d="M16 3v4"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="18.5" cy="17.5" r="1.5"/></svg>';
-    } elseif (in_array($orderStatus, $receivedStatuses)) {
-        $displayLabel = 'Pesanan Diterima'; $badgeClass = 'badge-success'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-    } else {
-        if (!$hasPaymentProof) { $displayLabel = 'Menunggu Pembayaran'; $badgeClass = 'badge-warn'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>'; }
-        else {
-            if (in_array($paymentStatus, ['waiting_confirm','waiting_confirmation','waiting'])) {
-                $displayLabel = 'Menunggu Konfirmasi Pembayaran'; $badgeClass = 'badge-warn'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h11"/><path d="M17 2v4"/></svg>';
-            } elseif (in_array($paymentStatus, ['confirmed','paid'])) {
-                $displayLabel = 'Pesanan Diproses'; $badgeClass = 'badge-primary'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10v6a2 2 0 0 1-2 2H8"/><path d="M3 6h18"/><path d="M16 3v6"/></svg>';
-            } elseif (in_array($paymentStatus, ['rejected','declined','failed']) || $orderStatus === 'need_confirmation' || $paymentStatus === 'need_confirmation') {
-                $displayLabel = 'Perlu Konfirmasi'; $badgeClass = 'badge-warn'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/></svg>';
-            } else {
-                $displayLabel = ucfirst(str_replace('_',' ',$paymentStatus ?: ($orderStatus?: 'pending'))); $badgeClass = 'badge-warn'; $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>';
-            }
-        }
+        $displayLabel = 'Pesanan Dibatalkan'; 
+        $badgeClass = 'badge-cancel'; 
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    } 
+    elseif (in_array($orderStatus, $receivedStatuses)) {
+        $displayLabel = 'Pesanan Diterima'; 
+        $badgeClass = 'badge-success'; 
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    }
+    elseif (in_array($orderStatus, $shippedStatuses)) {
+        $displayLabel = 'Pesanan Dikirimkan'; 
+        $badgeClass = 'badge-info'; 
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13l4 4v6a1 1 0 0 1-1 1h-1"/><path d="M16 3v4"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="18.5" cy="17.5" r="1.5"/></svg>';
+    }
+    elseif ($isCOD && $paymentStatus === 'confirmed' && $orderStatus === 'processing') {
+        // COD yang sudah dikonfirmasi dan sedang diproses - sama seperti payment biasa
+        $displayLabel = 'Pesanan Diproses'; 
+        $badgeClass = 'badge-primary'; 
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10v6a2 2 0 0 1-2 2H8"/><path d="M3 6h18"/><path d="M16 3v6"/></svg>';
+    }
+    elseif ($orderStatus === 'processing' || in_array($paymentStatus, ['confirmed','paid'])) {
+        // Processing - payment confirmed
+        $displayLabel = 'Pesanan Diproses'; 
+        $badgeClass = 'badge-primary'; 
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10v6a2 2 0 0 1-2 2H8"/><path d="M3 6h18"/><path d="M16 3v6"/></svg>';
+    }
+    elseif ($orderStatus === 'waiting_confirm' || in_array($paymentStatus, ['waiting_confirm','waiting_confirmation','waiting'])) {
+        // Menunggu konfirmasi payment
+        $displayLabel = 'Menunggu Konfirmasi Pembayaran'; 
+        $badgeClass = 'badge-warn'; 
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h11"/><path d="M17 2v4"/></svg>';
+    }
+    elseif (in_array($paymentStatus, ['rejected','declined','failed']) || $orderStatus === 'need_confirmation' || $paymentStatus === 'need_confirmation') {
+        // Payment ditolak, perlu konfirmasi ulang
+        $displayLabel = 'Perlu Konfirmasi'; 
+        $badgeClass = 'badge-warn'; 
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/></svg>';
+    }
+    elseif (!$hasPaymentProof && !$isCOD) {
+        // Belum bayar (non-COD)
+        $displayLabel = 'Menunggu Pembayaran'; 
+        $badgeClass = 'badge-warn'; 
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>';
+    }
+    else {
+        // Default fallback
+        $displayLabel = ucfirst(str_replace('_',' ',$paymentStatus ?: ($orderStatus?: 'pending'))); 
+        $badgeClass = 'badge-warn'; 
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>';
     }
 
-    // convenience flags for action rendering
-    $noProofAndWaitingPayment = !$hasPaymentProof && in_array($orderStatus, ['pending','waiting_payment']);
+    // convenience flags for action rendering - UPDATED FOR COD
+    $noProofAndWaitingPayment = !$hasPaymentProof && !$isCOD && in_array($orderStatus, ['pending','waiting_payment']);
     $waitingConfirmation = $hasPaymentProof && in_array($paymentStatus, ['waiting_confirm','waiting_confirmation','waiting']);
-    $approved = $hasPaymentProof && in_array($paymentStatus, ['confirmed','paid']);
+    $approved = ($hasPaymentProof && in_array($paymentStatus, ['confirmed','paid'])) || ($isCOD && $paymentStatus === 'confirmed');
     $rejected = ($hasPaymentProof && in_array($paymentStatus, ['rejected','declined','failed'])) || $orderStatus === 'need_confirmation' || $paymentStatus === 'need_confirmation';
     $shipped = in_array($orderStatus, $shippedStatuses);
     $received = in_array($orderStatus, $receivedStatuses);
 
     // show cancel when explicitly allowed by statuses
+    // IMPORTANT: COD yang sudah confirmed tidak bisa dibatalkan
     $showCancel = ( in_array($orderStatus, $cancellableStatuses) || $noProofAndWaitingPayment || $waitingConfirmation || $rejected );
-    $nonCancellable = array_merge($shippedStatuses, $receivedStatuses, ['completed','cancelled','canceled','cancelled_by_user']);
+    
+    // COD yang sudah confirmed tidak bisa dibatalkan
+    if ($isCOD && $paymentStatus === 'confirmed') {
+        $showCancel = false;
+    }
+    
+    $nonCancellable = array_merge($shippedStatuses, $receivedStatuses, ['completed','cancelled','canceled','cancelled_by_user','processing']);
     if (in_array($orderStatus, $nonCancellable)) {
         $showCancel = false;
     }

@@ -49,7 +49,7 @@ class Order extends Model
     // helper: generate a simple order number
     public static function generateOrderNumber(): string
     {
-        return 'ORD-' . strtoupper(uniqid());
+        return 'TR-' . strtoupper(uniqid());
     }
 
 
