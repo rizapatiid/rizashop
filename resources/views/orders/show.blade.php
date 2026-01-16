@@ -390,7 +390,21 @@ a:focus, button:focus { outline:3px solid rgba(79,70,229,0.12); outline-offset:3
                   <div class="item-name" title="{{ $it->product_name }}">{{ $it->product_name }}</div>
                   <div class="item-qty">x{{ $it->qty }}</div>
                 </div>
-                <div class="item-meta">Rp {{ number_format($it->price,0,',','.') }} /pcs · <span class="small-muted">Berat: {{ $it->meta['weight'] ?? '-' }}</span></div>
+<div class="item-meta">
+  Rp {{ number_format($it->price,0,',','.') }} /pcs ·
+  <span class="small-muted">
+    @if(!empty($it->meta['variant']))
+      @if(is_array($it->meta['variant']))
+        Varian: {{ implode(', ', $it->meta['variant']) }}
+      @else
+        Varian: {{ $it->meta['variant'] }}
+      @endif
+    @else
+    @endif
+  </span>
+</div>
+
+
               </div>
             </div>
 

@@ -2,66 +2,172 @@
 @section('title', 'Checkout')
 @section('page-title', 'Checkout')
 
-
 @section('content')
 <style>
-/* Premium Checkout UI - Enhanced Version */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+:root {
+  --primary-blue: #0095DA;
+  --primary-blue-dark: #0077B5;
+  --primary-blue-light: #E6F5FC;
+  --bg-light: #F5F5F5;
+  --bg-white: #FFFFFF;
+  --border: #E5E5E5;
+  --border-light: #F0F0F0;
+  --text-dark: #212121;
+  --text-gray: #6D6D6D;
+  --text-light: #9E9E9E;
+  --success: #00C853;
+  --success-light: #E8F5E9;
+  --warning: #FF8A00;
+  --warning-light: #FFF3E0;
+  --danger: #EF4444;
+  --danger-light: #FFEBEE;
+  --shadow: 0 1px 6px rgba(0,0,0,.1);
+  --shadow-md: 0 2px 8px rgba(0,0,0,.12);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,.15);
 }
 
-.checkout-wrapper {
-  min-height: 100vh;
-  padding: 24px 0;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Open Sans', sans-serif;
+  background: var(--bg-light);
+  color: var(--text-dark);
+  line-height: 1.5;
 }
 
 .checkout-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 20px 16px;
 }
 
-/* Premium Header */
-.checkout-header {
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: #1a1a1a;
-  padding: 16px 20px;
-  border-radius: 14px;
+/* Breadcrumb */
+.breadcrumb {
+  background: var(--bg-white);
+  padding: 12px 20px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-gray);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow);
+}
+
+.breadcrumb a {
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+/* Page Header */
+.page-header {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+  color: white;
+  padding: 24px 28px;
+  border-radius: 12px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
 }
 
-.checkout-header-content {
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+}
+
+.page-header-content {
   display: flex;
   align-items: center;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.page-header-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.page-header-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: white;
+}
+
+.page-header-text h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.page-header-text p {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Alert Messages */
+.alert {
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
   gap: 12px;
+  font-size: 14px;
+  box-shadow: var(--shadow);
 }
 
-.checkout-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.alert svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.checkout-title h1 {
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.alert-error {
+  background: var(--danger-light);
+  border: 1px solid #FFCDD2;
+  color: #C62828;
 }
 
-.checkout-title svg {
-  width: 28px;
-  height: 28px;
-  color: #667eea;
+.alert-success {
+  background: var(--success-light);
+  border: 1px solid #C8E6C9;
+  color: #2E7D32;
+}
+
+.alert ul {
+  margin-top: 8px;
+  padding-left: 20px;
 }
 
 /* Grid Layout */
@@ -77,34 +183,33 @@ body {
   }
 }
 
-/* Premium Card */
+/* Card */
 .card {
-  background: #fff;
-  border-radius: 16px;
+  background: var(--bg-white);
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-  transition: all 0.3s;
-  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
 }
 
-.card:hover {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-  transform: translateY(-2px);
+.card:last-child {
+  margin-bottom: 0;
 }
 
 .card-header {
-  padding: 14px 18px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-bottom: 1px solid #e9ecef;
+  padding: 16px 20px;
+  background: #FAFAFA;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .card-header-icon {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 36px;
+  height: 36px;
+  background: var(--primary-blue-light);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -113,51 +218,49 @@ body {
 }
 
 .card-header-icon svg {
-  width: 16px;
-  height: 16px;
-  color: #fff;
+  width: 18px;
+  height: 18px;
+  stroke: var(--primary-blue);
 }
 
 .card-header h2 {
-  font-size: 15px;
-  font-weight: 800;
-  color: #1a1a1a;
-  letter-spacing: -0.3px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
 }
 
 .card-body {
-  padding: 18px;
+  padding: 20px;
 }
 
-/* Address Selection - Compact */
+/* Address Selection */
 .address-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .address-item {
-  position: relative;
   display: flex;
-  gap: 12px;
-  padding: 14px;
-  border: 2px solid #e9ecef;
+  gap: 14px;
+  padding: 16px;
+  border: 2px solid var(--border);
   border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s;
-  background: #fff;
+  transition: all 0.2s;
+  background: var(--bg-white);
 }
 
 .address-item:hover {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: var(--primary-blue);
+  background: var(--primary-blue-light);
+  box-shadow: 0 4px 12px rgba(0, 149, 218, 0.15);
 }
 
 .address-item input[type="radio"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #667eea;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary-blue);
   cursor: pointer;
   margin-top: 2px;
   flex-shrink: 0;
@@ -177,14 +280,14 @@ body {
 }
 
 .address-label {
-  font-weight: 800;
+  font-weight: 700;
   font-size: 14px;
-  color: #1a1a1a;
+  color: var(--text-dark);
 }
 
 .badge-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+  background: var(--primary-blue);
+  color: white;
   padding: 3px 10px;
   border-radius: 12px;
   font-size: 10px;
@@ -193,9 +296,9 @@ body {
 }
 
 .address-recipient-name {
-  font-weight: 700;
-  font-size: 13px;
-  color: #495057;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-gray);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -204,21 +307,21 @@ body {
 .address-recipient-name svg {
   width: 14px;
   height: 14px;
-  color: #667eea;
+  stroke: var(--primary-blue);
   flex-shrink: 0;
 }
 
 .address-detail {
-  color: #6c757d;
+  color: var(--text-gray);
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .address-phone {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #495057;
+  color: var(--text-gray);
   font-size: 13px;
   font-weight: 600;
 }
@@ -226,47 +329,48 @@ body {
 .address-phone svg {
   width: 14px;
   height: 14px;
-  color: #667eea;
+  stroke: var(--primary-blue);
   flex-shrink: 0;
 }
 
-/* Shipping Method - Compact */
+/* Shipping Method */
 .shipping-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .shipping-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border: 2px solid #e9ecef;
+  gap: 14px;
+  padding: 16px;
+  border: 2px solid var(--border);
   border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s;
-  background: #fff;
+  transition: all 0.2s;
+  background: var(--bg-white);
 }
 
 .shipping-item:hover {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: var(--primary-blue);
+  background: var(--primary-blue-light);
+  box-shadow: 0 4px 12px rgba(0, 149, 218, 0.15);
 }
 
 .shipping-item input[type="radio"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #667eea;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary-blue);
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .shipping-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
-  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  background: var(--primary-blue-light);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -274,9 +378,9 @@ body {
 }
 
 .shipping-icon svg {
-  width: 20px;
-  height: 20px;
-  color: #667eea;
+  width: 22px;
+  height: 22px;
+  stroke: var(--primary-blue);
 }
 
 .shipping-content {
@@ -284,50 +388,47 @@ body {
 }
 
 .shipping-name {
-  font-weight: 800;
+  font-weight: 700;
   font-size: 14px;
-  color: #1a1a1a;
-  margin-bottom: 3px;
+  color: var(--text-dark);
+  margin-bottom: 4px;
 }
 
 .shipping-eta {
-  color: #6c757d;
-  font-size: 12px;
+  color: var(--text-gray);
+  font-size: 13px;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .shipping-eta svg {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
 }
 
 .shipping-cost {
-  font-weight: 900;
+  font-weight: 700;
   font-size: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary-blue);
 }
 
-/* Product Items - Shopee/Tokopedia Style */
+/* Product Items */
 .product-list {
   display: flex;
   flex-direction: column;
   gap: 0;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
-  background: #fff;
+  background: var(--bg-white);
 }
 
 .product-item {
   display: flex;
-  gap: 12px;
-  padding: 14px;
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
+  gap: 14px;
+  padding: 16px;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-light);
   transition: all 0.2s;
 }
 
@@ -336,19 +437,19 @@ body {
 }
 
 .product-item:hover {
-  background: #fafafa;
+  background: #FAFAFA;
 }
 
 .product-image {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   border-radius: 8px;
   overflow: hidden;
-  background: #f8f9fa;
+  background: #F8F8F8;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border);
   flex-shrink: 0;
 }
 
@@ -368,8 +469,8 @@ body {
 
 .product-name {
   font-weight: 600;
-  font-size: 13px;
-  color: #1a1a1a;
+  font-size: 14px;
+  color: var(--text-dark);
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -377,35 +478,25 @@ body {
   overflow: hidden;
 }
 
-.product-variant-row{
+.product-variant-row {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 2px;     /* ⬅️ DIPERKECIL (NAIK KE ATAS) */
-  margin-bottom: 4px;  /* ⬅️ JARAK KE QTY */
-}
-
-.product-variant{
-  background: #f1f3f5;
-  color: #495057;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
+  margin-top: 2px;
+  margin-bottom: 4px;
 }
 
 .product-variant {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #f0f0f0;
-  color: #6c757d;
-  padding: 2px 8px;
+  background: var(--primary-blue-light);
+  color: var(--primary-blue-dark);
+  padding: 3px 8px;
   border-radius: 4px;
   font-size: 11px;
-  font-weight: 500;
-  width: fit-content;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .product-footer {
@@ -416,8 +507,8 @@ body {
 }
 
 .product-qty {
-  color: #9ca3af;
-  font-size: 12px;
+  color: var(--text-light);
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -426,7 +517,7 @@ body {
 }
 
 .product-unit-price {
-  color: #9ca3af;
+  color: var(--text-light);
   font-size: 11px;
   text-decoration: line-through;
   margin-bottom: 2px;
@@ -434,87 +525,76 @@ body {
 
 .product-total-price {
   font-weight: 700;
-  font-size: 14px;
-  color: #1a1a1a;
+  font-size: 15px;
+  color: var(--text-dark);
 }
 
-/* Notes Section - Premium */
-.notes-section {
-  margin-top: 0;
-}
-
+/* Notes Section */
 .notes-label {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #495057;
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 8px;
+  color: var(--text-gray);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
 .notes-label svg {
   width: 16px;
   height: 16px;
-  color: #667eea;
+  stroke: var(--primary-blue);
 }
 
 .notes-textarea {
   width: 100%;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
   padding: 12px;
-  font-size: 13px;
+  font-size: 14px;
   resize: vertical;
-  transition: all 0.3s;
+  transition: all 0.2s;
   font-family: inherit;
   line-height: 1.6;
 }
 
 .notes-textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 4px var(--primary-blue-light);
+  background: white;
 }
 
-/* Summary Section - Shopee/Tokopedia Style */
-.summary-section {
-  background: #fff;
-  border-radius: 0;
-  padding: 0;
-  margin-top: 0;
-}
-
+/* Summary Section */
 .summary-items-header {
-  padding: 12px 16px;
-  background: #fafafa;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 14px 16px;
+  background: #FAFAFA;
+  border-bottom: 1px solid var(--border-light);
   font-weight: 700;
-  font-size: 13px;
-  color: #1a1a1a;
+  font-size: 14px;
+  color: var(--text-dark);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .summary-items-header svg {
   width: 16px;
   height: 16px;
-  color: #667eea;
+  stroke: var(--primary-blue);
 }
 
 .summary-calculation {
-  padding: 16px;
-  background: #fff;
+  padding: 20px;
+  background: var(--bg-white);
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
-  font-size: 13px;
+  padding: 10px 0;
+  font-size: 14px;
 }
 
 .summary-row:first-child {
@@ -522,46 +602,45 @@ body {
 }
 
 .summary-label {
-  color: #6c757d;
+  color: var(--text-gray);
   font-weight: 500;
 }
 
 .summary-value {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text-dark);
 }
 
 .summary-divider {
   height: 1px;
-  background: #f0f0f0;
+  background: var(--border-light);
   margin: 12px 0;
 }
 
 .summary-total-row {
-  padding: 16px;
-  background: #fafafa;
+  padding: 20px;
+  background: var(--primary-blue-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 2px dashed #e9ecef;
+  border-top: 2px dashed var(--border);
 }
 
 .summary-total-label {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-dark);
 }
 
 .summary-total-value {
-  font-size: 20px;
-  font-weight: 900;
-  color: #ee4d2d;
-  letter-spacing: -0.3px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary-blue);
 }
 
-/* Buttons - Shopee/Tokopedia Style */
+/* Buttons */
 .btn {
-  padding: 12px 24px;
+  padding: 14px 24px;
   border-radius: 8px;
   font-weight: 700;
   font-size: 14px;
@@ -572,6 +651,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  text-decoration: none;
 }
 
 .btn svg {
@@ -580,18 +660,18 @@ body {
 }
 
 .btn-primary {
-  background: #ee4d2d;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(238, 77, 45, 0.3);
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 149, 218, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #d73211;
-  box-shadow: 0 4px 12px rgba(238, 77, 45, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 149, 218, 0.4);
 }
 
 .btn-primary:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
 .btn-primary:disabled {
@@ -600,53 +680,18 @@ body {
 }
 
 .btn-outline {
-  background: #fff;
-  border: 1px solid #e9ecef;
-  color: #495057;
+  background: white;
+  border: 2px solid var(--border);
+  color: var(--text-gray);
 }
 
 .btn-outline:hover {
-  border-color: #ee4d2d;
-  color: #ee4d2d;
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  background: var(--primary-blue-light);
 }
 
-/* Alert Messages - Premium */
-.alert {
-  padding: 16px 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.alert svg {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.alert-error {
-  background: linear-gradient(135deg, #fff5f5 0%, #fee2e2 100%);
-  border: 2px solid #fecaca;
-  color: #991b1b;
-}
-
-.alert-success {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border: 2px solid #bbf7d0;
-  color: #166534;
-}
-
-.alert ul {
-  margin-top: 8px;
-  padding-left: 20px;
-}
-
-/* Empty State - Premium */
+/* Empty State */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -656,7 +701,7 @@ body {
   width: 80px;
   height: 80px;
   margin: 0 auto 20px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: #F5F5F5;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -666,24 +711,24 @@ body {
 .empty-state-icon svg {
   width: 40px;
   height: 40px;
-  color: #adb5bd;
+  stroke: var(--text-light);
 }
 
 .empty-state p {
-  color: #6c757d;
+  color: var(--text-gray);
   font-size: 15px;
   margin-bottom: 20px;
 }
 
-/* Info Box - Shopee Style */
+/* Info Box */
 .info-box {
-  background: #fffbf0;
-  border: 1px solid #ffe8cc;
+  background: var(--warning-light);
+  border: 1px solid #FFE0B2;
   border-radius: 8px;
-  padding: 12px;
+  padding: 14px;
   margin-top: 16px;
-  font-size: 12px;
-  color: #856404;
+  font-size: 13px;
+  color: #E65100;
   display: flex;
   gap: 10px;
   line-height: 1.6;
@@ -694,59 +739,53 @@ body {
   height: 18px;
   flex-shrink: 0;
   margin-top: 2px;
-  color: #ffa726;
+  stroke: var(--warning);
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .checkout-steps {
-    display: none;
+  .checkout-grid {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
   .checkout-container {
-    padding: 0 12px;
+    padding: 16px 12px;
   }
   
-  .checkout-header {
-    padding: 16px 18px;
+  .page-header {
+    padding: 20px;
   }
   
-  .checkout-title h1 {
-    font-size: 22px;
+  .page-header-text h1 {
+    font-size: 20px;
   }
   
-  .checkout-title svg {
-    width: 28px;
-    height: 28px;
+  .page-header-text p {
+    font-size: 13px;
   }
   
   .card-body {
-    padding: 18px;
+    padding: 16px;
   }
   
   .product-item {
-    grid-template-columns: 70px 1fr;
     gap: 12px;
-    padding: 12px;
+    padding: 14px;
   }
   
   .product-image {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
   }
   
   .product-name {
-    font-size: 14px;
+    font-size: 13px;
   }
   
-  .product-total-price {
-    font-size: 16px;
-  }
-  
-  .summary-total .summary-value {
-    font-size: 24px;
+  .summary-total-value {
+    font-size: 20px;
   }
   
   .address-item,
@@ -760,346 +799,341 @@ body {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
 </style>
 
-<div class="checkout-wrapper">
-  <div class="checkout-container">
-    
-    <!-- Premium Header -->
-    <div class="checkout-header">
-      <div class="checkout-header-content">
-        <div class="checkout-title">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-          </svg>
-          <h1>Checkout Pesanan</h1>
-        </div>
+<div class="checkout-container">
+  
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="{{ url('/') }}">Beranda</a> › 
+    <span>Checkout</span>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <div class="page-header-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+      </div>
+      <div class="page-header-text">
+        <h1>Checkout Pesanan</h1>
+        <p>Lengkapi data pengiriman dan pilih metode pembayaran</p>
       </div>
     </div>
+  </div>
 
-    <!-- Alert Messages -->
-    @if($errors->any())
-      <div class="alert alert-error">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="15" y1="9" x2="9" y2="15"></line>
-          <line x1="9" y1="9" x2="15" y2="15"></line>
-        </svg>
-        <div>
-          <strong>Terjadi kesalahan:</strong>
-          <ul>
-            @foreach($errors->all() as $err)
-              <li>{{ $err }}</li>
-            @endforeach
-          </ul>
-        </div>
-      </div>
-    @endif
-
-    @if(session('error'))
-      <div class="alert alert-error">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="15" y1="9" x2="9" y2="15"></line>
-          <line x1="9" y1="9" x2="15" y2="15"></line>
-        </svg>
-        <div>{{ session('error') }}</div>
-      </div>
-    @endif
-
-    @if(session('success'))
-      <div class="alert alert-success">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="9 11 12 14 22 4"></polyline>
-        </svg>
-        <div>{{ session('success') }}</div>
-      </div>
-    @endif
-
-    <!-- Form -->
-    <form id="checkoutForm" action="{{ route('checkout.place') }}" method="POST" novalidate>
-      @csrf
-
-      <div class="checkout-grid">
-        
-        <!-- Left Column -->
-        <div style="display:flex;flex-direction:column;gap:20px;">
-          
-          <!-- Address Card -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-header-icon">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-              </div>
-              <h2>Alamat Pengiriman</h2>
-            </div>
-            <div class="card-body">
-              @if($addresses->isEmpty())
-                <div class="empty-state">
-                  <div class="empty-state-icon">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    </svg>
-                  </div>
-                  <p>Belum ada alamat pengiriman yang tersimpan</p>
-                  <a href="{{ route('profile.edit') }}#address" class="btn btn-outline">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    Tambah Alamat Baru
-                  </a>
-                </div>
-              @else
-                <div class="address-list">
-                  @foreach($addresses as $addr)
-                    <label class="address-item">
-                      <input type="radio" name="address_id" value="{{ $addr->id }}" {{ $addr->is_primary ? 'checked' : '' }}>
-                      <div class="address-content">
-                        {{-- Label Alamat --}}
-                        <div class="address-header">
-                          <span class="address-label">{{ $addr->label ?? 'Alamat' }}</span>
-                          @if($addr->is_primary)
-                            <span class="badge-primary">UTAMA</span>
-                          @endif
-                        </div>
-                        
-                        {{-- Nama Penerima --}}
-                        <div class="address-recipient-name">
-                          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                          </svg>
-                          {{ Auth::user()->name }}
-                        </div>
-                        
-                        {{-- Detail Alamat Lengkap --}}
-                        <div class="address-detail">
-                          {{ $addr->address_full }}{{ $addr->village ? ', ' . $addr->village : '' }}{{ $addr->subdistrict ? ', ' . $addr->subdistrict : '' }}{{ $addr->city ? ', ' . $addr->city : '' }}{{ $addr->province ? ', ' . $addr->province : '' }}{{ $addr->postal_code ? ' - ' . $addr->postal_code : '' }}
-                        </div>
-                        
-                        {{-- No HP Penerima --}}
-                        <div class="address-phone">
-                          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                          </svg>
-                          {{ $addr->phone_country ?? '' }} {{ $addr->phone ?? '' }}
-                        </div>
-                      </div>
-                    </label>
-                  @endforeach
-                </div>
-                
-                <a href="{{ route('profile.edit') }}#address" class="btn btn-outline" style="width:100%;margin-top:16px;">
-                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M12 4v16m8-8H4"></path>
-                  </svg>
-                  Kelola Alamat
-                </a>
-              @endif
-            </div>
-          </div>
-
-          <!-- Shipping Card -->
-{{-- PILIH METODE PENGIRIMAN --}}
-<div class="card">
-  <div class="card-header">
-    <div class="card-header-icon">
+  <!-- Alert Messages -->
+  @if($errors->any())
+    <div class="alert alert-error">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <rect x="1" y="3" width="22" height="13" rx="2"></rect>
-        <path d="M16 21h2a2 2 0 0 0 2-2v-3"></path>
-        <path d="M8 21H6a2 2 0 0 1-2-2v-3"></path>
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
       </svg>
+      <div>
+        <strong>Terjadi kesalahan:</strong>
+        <ul>
+          @foreach($errors->all() as $err)
+            <li>{{ $err }}</li>
+          @endforeach
+        </ul>
+      </div>
     </div>
-    <h2>Pilih Metode Pengiriman</h2>
-  </div>
+  @endif
 
-  <div class="card-body">
-    <div class="shipping-list">
-
-      @forelse($shippingMethods as $method)
-        @php
-          $price = $method->products->first()->pivot->price ?? 0;
-        @endphp
-
-        <label class="shipping-item">
-          <input
-            type="radio"
-            name="shipping_method"
-            value="{{ $method->code }}"
-            data-price="{{ $price }}"
-            data-courier="{{ $method->name }}"
-            class="shipping-radio"
-          >
-
-          <div class="shipping-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M3 7h13v10H3z"></path>
-              <path d="M16 10h4l1 2v5h-5z"></path>
-              <circle cx="7.5" cy="17.5" r="1.5"></circle>
-              <circle cx="17.5" cy="17.5" r="1.5"></circle>
-            </svg>
-          </div>
-
-          <div class="shipping-content">
-            <div class="shipping-name">{{ $method->name }}</div>
-            <div class="shipping-eta">
-              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 6v6l4 2"></path>
-              </svg>
-              {{ $method->description }}
-            </div>
-          </div>
-
-          <div class="shipping-cost">
-            Rp {{ number_format($price, 0, ',', '.') }}
-          </div>
-        </label>
-
-      @empty
-        <div class="empty-state">
-          <div class="empty-state-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="8" y1="15" x2="16" y2="15"></line>
-            </svg>
-          </div>
-          <p>Tidak ada metode pengiriman tersedia</p>
-        </div>
-      @endforelse
-
+  @if(session('error'))
+    <div class="alert alert-error">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+      </svg>
+      <div>{{ session('error') }}</div>
     </div>
-  </div>
-</div>
+  @endif
 
-{{-- HIDDEN INPUT (TETAP) --}}
-<input type="hidden" name="shipping_cost" id="shipping_cost">
-<input type="hidden" name="shipping_courier" id="shipping_courier">
+  @if(session('success'))
+    <div class="alert alert-success">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="9 11 12 14 22 4"></polyline>
+      </svg>
+      <div>{{ session('success') }}</div>
+    </div>
+  @endif
 
+  <!-- Form -->
+  <form id="checkoutForm" action="{{ route('checkout.place') }}" method="POST" novalidate>
+    @csrf
 
-          <!-- Notes Card -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-header-icon">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                </svg>
-              </div>
-              <h2>Catatan Pesanan</h2>
-            </div>
-            <div class="card-body">
-              <div class="notes-label">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-                Tambahkan catatan untuk penjual (opsional)
-              </div>
-              <textarea name="notes" class="notes-textarea" rows="4" placeholder="Contoh: Tolong bungkus dengan rapih dan sertakan kartu ucapan. Kirim pada sore hari jika memungkinkan. Terima kasih!"></textarea>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Right Column - Order Summary (NOT STICKY) -->
+    <div class="checkout-grid">
+      
+      <!-- Left Column -->
+      <div style="display:flex;flex-direction:column;">
+        
+        <!-- Address Card -->
         <div class="card">
           <div class="card-header">
             <div class="card-header-icon">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
               </svg>
             </div>
-            <h2>Ringkasan Pesanan</h2>
+            <h2>Alamat Pengiriman</h2>
           </div>
           <div class="card-body">
-            
-            <!-- Products List -->
-            <div class="summary-items-header">
-              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <path d="M3 9h18"></path>
-                <path d="M9 21V9"></path>
-              </svg>
-              Produk Dipesan
-            </div>
-            
-            <div class="product-list">
-              @foreach($cart as $c)
-                <div class="product-item">
-                  <div class="product-image">
-                    @if(!empty($c['image']))
-                      <img src="{{ asset('storage/' . ltrim($c['image'], '/')) }}" alt="{{ $c['name'] }}">
-                    @else
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="32" height="32" style="color:#adb5bd;">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                        <polyline points="21 15 16 10 5 21"></polyline>
-                      </svg>
-                    @endif
-                  </div>
-                  <div class="product-info">
-                    <div class="product-name">{{ $c['name'] }}</div>
-                      @if(!empty($c['variant']))
-                        <div class="product-variant-row">
-                          @if(is_array($c['variant']))
-                            @foreach($c['variant'] as $v)
-                              <span class="product-variant">{{ $v }}</span>
-                            @endforeach
-                          @else
-                            <span class="product-variant">{{ $c['variant'] }}</span>
-                          @endif
-                        </div>
-                      @endif
-
-                    <div class="product-footer">
-                      <div class="product-qty">× {{ $c['qty'] }}</div>
-                      <div class="product-price-section">
-                        @if($c['qty'] > 1)
-                          <div class="product-unit-price">@ Rp {{ number_format($c['price'] ?? 0,0,',','.') }}</div>
+            @if($addresses->isEmpty())
+              <div class="empty-state">
+                <div class="empty-state-icon">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  </svg>
+                </div>
+                <p>Belum ada alamat pengiriman yang tersimpan</p>
+                <a href="{{ route('profile.edit') }}#address" class="btn btn-outline">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  Tambah Alamat Baru
+                </a>
+              </div>
+            @else
+              <div class="address-list">
+                @foreach($addresses as $addr)
+                  <label class="address-item">
+                    <input type="radio" name="address_id" value="{{ $addr->id }}" {{ $addr->is_primary ? 'checked' : '' }}>
+                    <div class="address-content">
+                      <div class="address-header">
+                        <span class="address-label">{{ $addr->label ?? 'Alamat' }}</span>
+                        @if($addr->is_primary)
+                          <span class="badge-primary">UTAMA</span>
                         @endif
-                        <div class="product-total-price">Rp {{ number_format(($c['price'] ?? 0) * $c['qty'],0,',','.') }}</div>
                       </div>
+                      
+                      <div class="address-recipient-name">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        {{ Auth::user()->name }}
+                      </div>
+                      
+                      <div class="address-detail">
+                        {{ $addr->address_full }}{{ $addr->village ? ', ' . $addr->village : '' }}{{ $addr->subdistrict ? ', ' . $addr->subdistrict : '' }}{{ $addr->city ? ', ' . $addr->city : '' }}{{ $addr->province ? ', ' . $addr->province : '' }}{{ $addr->postal_code ? ' - ' . $addr->postal_code : '' }}
+                      </div>
+                      
+                      <div class="address-phone">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                        {{ $addr->phone_country ?? '' }} {{ $addr->phone ?? '' }}
+                      </div>
+                    </div>
+                  </label>
+                @endforeach
+              </div>
+              
+              <a href="{{ route('profile.edit') }}#address" class="btn btn-outline" style="width:100%;margin-top:16px;">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M12 4v16m8-8H4"></path>
+                </svg>
+                Kelola Alamat
+              </a>
+            @endif
+          </div>
+        </div>
+
+        <!-- Shipping Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="1" y="3" width="22" height="13" rx="2"></rect>
+                <path d="M16 21h2a2 2 0 0 0 2-2v-3"></path>
+                <path d="M8 21H6a2 2 0 0 1-2-2v-3"></path>
+              </svg>
+            </div>
+            <h2>Metode Pengiriman</h2>
+          </div>
+
+          <div class="card-body">
+            <div class="shipping-list">
+              @forelse($shippingMethods as $method)
+                @php
+                  $price = $method->products->first()->pivot->price ?? 0;
+                @endphp
+
+                <label class="shipping-item">
+                  <input
+                    type="radio"
+                    name="shipping_method"
+                    value="{{ $method->code }}"
+                    data-price="{{ $price }}"
+                    data-courier="{{ $method->name }}"
+                    class="shipping-radio"
+                  >
+
+                  <div class="shipping-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path d="M3 7h13v10H3z"></path>
+                      <path d="M16 10h4l1 2v5h-5z"></path>
+                      <circle cx="7.5" cy="17.5" r="1.5"></circle>
+                      <circle cx="17.5" cy="17.5" r="1.5"></circle>
+                    </svg>
+                  </div>
+
+                  <div class="shipping-content">
+                    <div class="shipping-name">{{ $method->name }}</div>
+                    <div class="shipping-eta">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 6v6l4 2"></path>
+                      </svg>
+                      {{ $method->description }}
+                    </div>
+                  </div>
+
+                  <div class="shipping-cost">
+                    Rp {{ number_format($price, 0, ',', '.') }}
+                  </div>
+                </label>
+
+              @empty
+                <div class="empty-state">
+                  <div class="empty-state-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="8" y1="15" x2="16" y2="15"></line>
+                    </svg>
+                  </div>
+                  <p>Tidak ada metode pengiriman tersedia</p>
+                </div>
+              @endforelse
+            </div>
+          </div>
+        </div>
+
+        <input type="hidden" name="shipping_cost" id="shipping_cost">
+        <input type="hidden" name="shipping_courier" id="shipping_courier">
+
+        <!-- Notes Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+            </div>
+            <h2>Catatan Pesanan</h2>
+          </div>
+          <div class="card-body">
+            <div class="notes-label">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              Tambahkan catatan untuk penjual (opsional)
+            </div>
+            <textarea name="notes" class="notes-textarea" rows="4" placeholder="Contoh: Tolong bungkus dengan rapih dan sertakan kartu ucapan. Terima kasih!"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column - Summary -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+          </div>
+          <h2>Ringkasan Pesanan</h2>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          
+          <!-- Products List -->
+          <div class="summary-items-header">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <path d="M3 9h18"></path>
+              <path d="M9 21V9"></path>
+            </svg>
+            Produk Dipesan
+          </div>
+          
+          <div class="product-list">
+            @foreach($cart as $c)
+              <div class="product-item">
+                <div class="product-image">
+                  @if(!empty($c['image']))
+                    <img src="{{ asset('storage/' . ltrim($c['image'], '/')) }}" alt="{{ $c['name'] }}">
+                  @else
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="32" height="32" style="color:#adb5bd;">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                  @endif
+                </div>
+                <div class="product-info">
+                  <div class="product-name">{{ $c['name'] }}</div>
+                  @if(!empty($c['variant']))
+                    <div class="product-variant-row">
+                      @if(is_array($c['variant']))
+                        @foreach($c['variant'] as $v)
+                          <span class="product-variant">{{ $v }}</span>
+                        @endforeach
+                      @else
+                        <span class="product-variant">{{ $c['variant'] }}</span>
+                      @endif
+                    </div>
+                  @endif
+
+                  <div class="product-footer">
+                    <div class="product-qty">× {{ $c['qty'] }}</div>
+                    <div class="product-price-section">
+                      @if($c['qty'] > 1)
+                        <div class="product-unit-price">@ Rp {{ number_format($c['price'] ?? 0,0,',','.') }}</div>
+                      @endif
+                      <div class="product-total-price">Rp {{ number_format(($c['price'] ?? 0) * $c['qty'],0,',','.') }}</div>
                     </div>
                   </div>
                 </div>
-              @endforeach
-            </div>
+              </div>
+            @endforeach
+          </div>
 
-            <!-- Summary Calculation -->
-            <div class="summary-calculation">
-              <div class="summary-row">
-                <span class="summary-label">Subtotal Produk</span>
-                <span class="summary-value" id="subtotal_display">Rp {{ number_format($subtotal,0,',','.') }}</span>
-              </div>
-              
-              <div class="summary-row">
-                <span class="summary-label">Ongkos Kirim</span>
-                <span class="summary-value" id="shipping_display">Rp 0</span>
-              </div>
+          <!-- Summary Calculation -->
+          <div class="summary-calculation">
+            <div class="summary-row">
+              <span class="summary-label">Subtotal Produk</span>
+              <span class="summary-value" id="subtotal_display">Rp {{ number_format($subtotal,0,',','.') }}</span>
             </div>
             
-            <div class="summary-total-row">
-              <span class="summary-total-label">Total Pembayaran</span>
-              <span class="summary-total-value" id="total_display">Rp {{ number_format($subtotal,0,',','.') }}</span>
+            <div class="summary-row">
+              <span class="summary-label">Ongkos Kirim</span>
+              <span class="summary-value" id="shipping_display">Rp 0</span>
             </div>
+          </div>
+          
+          <div class="summary-total-row">
+            <span class="summary-total-label">Total Pembayaran</span>
+            <span class="summary-total-value" id="total_display">Rp {{ number_format($subtotal,0,',','.') }}</span>
+          </div>
 
-            <!-- Submit Button -->
-            <button id="placeOrderBtn" class="btn btn-primary" type="submit" style="width:100%;margin-top:20px;" disabled>
+          <!-- Submit Button -->
+          <div style="padding: 20px;">
+            <button id="placeOrderBtn" class="btn btn-primary" type="submit" style="width:100%;" disabled>
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <polyline points="9 11 12 14 22 4"></polyline>
                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
@@ -1120,16 +1154,14 @@ body {
             </div>
           </div>
         </div>
-
       </div>
 
+    </div>
 
-    </form>
-  </div>
+  </form>
 </div>
 
 <script>
-  
 (function(){
   
   const shippingRadios = document.querySelectorAll('input[name="shipping_method"]');
@@ -1160,8 +1192,6 @@ body {
     shippingDisplay.textContent = formatRupiah(cost);
     totalDisplay.textContent = formatRupiah(subtotal + cost);
     
-    console.log('Shipping updated:', {cost, courier}); // Debug log
-    
     const addressSelected = !!document.querySelector('input[name="address_id"]:checked');
     placeBtn.disabled = !(addressSelected && !!selected);
   }
@@ -1182,6 +1212,9 @@ body {
     a.addEventListener('change', updateShippingAndTotal);
   });
 
+  // Form submit handler
+  let isSubmitting = false;
+  
   checkoutForm.addEventListener('submit', function(e){
     const sc = shippingCostInput.value;
     const courier = shippingCourierInput.value;
@@ -1205,8 +1238,9 @@ body {
       return false;
     }
 
-    console.log('Form submitted with courier:', courier); // Debug log
-
+    // Mark as submitting to prevent cache clear
+    isSubmitting = true;
+    
     placeBtn.disabled = true;
     placeBtn.innerHTML = `
       <svg style="animation:spin 1s linear infinite;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
@@ -1223,7 +1257,105 @@ body {
     `;
   });
   
-})();
+  // ====== CLEAR CACHE ON PAGE LEAVE ======
+  
+  // Function to clear checkout cache (client-side)
+  function clearClientCache() {
+    try {
+      // Clear localStorage items related to checkout
+      const checkoutKeys = [
+        'checkout_data',
+        'checkout_address',
+        'checkout_shipping',
+        'checkout_notes',
+        'cart_data',
+        'selected_address',
+        'selected_shipping'
+      ];
+      
+      checkoutKeys.forEach(key => {
+        localStorage.removeItem(key);
+      });
+      
+      // Clear sessionStorage
+      sessionStorage.removeItem('checkout_session');
+      sessionStorage.removeItem('checkout_temp');
+      
+      console.log('✓ Client cache cleared');
+    } catch (error) {
+      console.error('Failed to clear client cache:', error);
+    }
+  }
+  
+  // Function to clear server-side cache/session
+  function clearServerCache() {
+    // Don't clear if form is being submitted
+    if (isSubmitting) {
+      return;
+    }
 
+    // Use Beacon API for reliable request even when page is closing
+    if (navigator.sendBeacon) {
+      const formData = new FormData();
+      formData.append('_token', '{{ csrf_token() }}');
+      const beaconSent = navigator.sendBeacon('{{ route("checkout.clear") }}', formData);
+      console.log('✓ Server cache clear beacon sent:', beaconSent);
+    } else {
+      // Fallback for browsers that don't support Beacon
+      fetch('{{ route("checkout.clear") }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({}),
+        keepalive: true // Keep request alive even after page unload
+      })
+      .then(response => response.json())
+      .then(data => console.log('✓ Server cache cleared:', data))
+      .catch(err => console.log('Server cache clear failed:', err));
+    }
+  }
+  
+  // Combined cache clearing function
+  function clearAllCache() {
+    if (!isSubmitting) {
+      clearClientCache();
+      clearServerCache();
+    }
+  }
+  
+  // Clear cache when page is being unloaded (close tab, navigate away)
+  window.addEventListener('beforeunload', function(e) {
+    clearAllCache();
+  });
+
+  // Clear cache when user navigates away using browser back/forward  
+  window.addEventListener('pagehide', function(e) {
+    clearAllCache();
+  });
+
+  // Clear cache when visibility changes (tab switch, minimize)
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden && !isSubmitting) {
+      clearAllCache();
+    }
+  });
+
+  // Clear cache on page load (in case user hit back button)
+  window.addEventListener('load', function() {
+    if (!isSubmitting) {
+      clearClientCache(); // Only clear client cache on load
+    }
+  });
+
+  // Also clear cache when navigating away using popstate
+  window.addEventListener('popstate', function() {
+    clearAllCache();
+  });
+
+  console.log('✓ Checkout cache clearing initialized');
+  
+})();
 </script>
 @endsection

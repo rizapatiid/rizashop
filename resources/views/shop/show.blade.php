@@ -700,7 +700,6 @@ body {
     .pd-rec-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
-
 <script>
 (()=>{
     // Gallery
@@ -795,7 +794,11 @@ body {
         btnBuy.disabled = !canOrder;
     }
 
+    // ===================================================
+    // 🔥 FIX UTAMA: BELI SEKARANG MENGGUNAKAN CHECKOUT.START
+    // ===================================================
     async function submit(checkout) {
+        // Validasi variant
         if(hasVariants) {
             const groups = document.querySelectorAll('.variant-group').length;
             if(Object.keys(selected).length !== groups) {
@@ -820,11 +823,13 @@ body {
         const variantId = hasVariants ? Object.values(selected).map(v => v.id).join(',') : '';
         
         try {
-            const res = await fetch("{{ route('shop.cart.add', $product->id) }}", {
+            // ✅ Step 1: Add to cart dulu
+            const addRes = await fetch("{{ route('shop.cart.add', $product->id) }}", {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body: new URLSearchParams({
                     qty: qtyInput.value,
@@ -832,13 +837,65 @@ body {
                 })
             });
             
-            if(res.ok) {
-                checkout ? location.href="{{ route('checkout.index') }}" : location.reload();
-            } else {
-                msgBox.textContent = 'Gagal menambahkan';
+            if(!addRes.ok) {
+                const errorData = await addRes.json().catch(() => ({}));
+                msgBox.textContent = errorData.error || 'Gagal menambahkan ke keranjang';
                 msgBox.classList.add('show');
+                return;
             }
+
+            const addData = await addRes.json();
+            console.log('Add to cart response:', addData);
+            
+            // ✅ Step 2: Jika "Beli Sekarang", langsung checkout item ini
+            if(checkout) {
+                // Get cart key from response
+                const cartKey = addData.cart_key || null;
+                
+                if(!cartKey) {
+                    msgBox.textContent = 'Gagal mendapatkan data keranjang';
+                    msgBox.classList.add('show');
+                    return;
+                }
+                
+                console.log('Starting checkout with cart_key:', cartKey);
+                
+                // ✅ Step 3: POST ke checkout.start dengan only this item
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{{ route('checkout.start') }}";
+                
+                // CSRF Token
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = '{{ csrf_token() }}';
+                form.appendChild(csrfInput);
+                
+                // Item ID (format: product_id:variant_id atau product_id)
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'items[0][id]';
+                idInput.value = cartKey;
+                form.appendChild(idInput);
+                
+                // Item Qty
+                const qtyInputHidden = document.createElement('input');
+                qtyInputHidden.type = 'hidden';
+                qtyInputHidden.name = 'items[0][qty]';
+                qtyInputHidden.value = qtyInput.value;
+                form.appendChild(qtyInputHidden);
+                
+                // Submit form
+                document.body.appendChild(form);
+                form.submit();
+            } else {
+                // ✅ Hanya tambah ke keranjang, reload page
+                location.reload();
+            }
+            
         } catch(e) {
+            console.error('Submit error:', e);
             msgBox.textContent = 'Error. Coba lagi.';
             msgBox.classList.add('show');
         }

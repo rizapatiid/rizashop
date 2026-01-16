@@ -30,7 +30,9 @@ public function index(Request $request)
     $fullCart = session()->get('cart', []);
     $selected = session()->get('checkout_items', null);
 
+    // ✅ FIX: Hanya proses item yang dipilih untuk checkout
     if ($selected && is_array($selected) && count($selected) > 0) {
+        // Ada selected items dari cart page atau mini cart
         $cart = [];
         foreach ($selected as $sel) {
             $id = $sel['id'] ?? null;
@@ -47,11 +49,10 @@ public function index(Request $request)
                 ->with('error', 'Item checkout tidak ditemukan. Silakan cek keranjang.');
         }
     } else {
-        $cart = $fullCart;
-        if (empty($cart)) {
-            return Redirect::route('shop.cart')
-                ->with('error', 'Keranjang masih kosong.');
-        }
+        // ❌ PROBLEM: Ini mengambil SEMUA cart
+        // ✅ FIX: Redirect ke cart jika tidak ada selected items
+        return Redirect::route('shop.cart')
+            ->with('error', 'Silakan pilih item yang ingin di-checkout dari keranjang.');
     }
 
     $addresses = $user->addresses()
@@ -415,6 +416,59 @@ public function index(Request $request)
                 'user_id' => $user->id,
             ]);
             return back()->with('error', 'Gagal membuat pesanan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Clear checkout session/cache when user leaves checkout page
+     * 
+     * This method is called via Beacon API when:
+     * - User closes the checkout tab/window
+     * - User navigates away from checkout page
+     * - User switches tabs (optional)
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function clear(Request $request)
+    {
+        try {
+            // Clear cart session (optional - only if you want to clear entire cart)
+            // Uncomment if you want to clear cart when leaving checkout
+            // session()->forget('cart');
+            
+            // Clear checkout-related sessions only
+            session()->forget('checkout_items');
+            session()->forget('checkout_data');
+            session()->forget('selected_address_id');
+            session()->forget('selected_shipping_method');
+            session()->forget('checkout_notes');
+            
+            // Optional: Log the clearing action for audit
+            Log::info('Checkout cache cleared', [
+                'user_id' => auth()->id(),
+                'session_id' => session()->getId(),
+                'timestamp' => now(),
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Checkout cache cleared successfully'
+            ], 200);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to clear checkout cache', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to clear checkout cache'
+            ], 500);
         }
     }
 }

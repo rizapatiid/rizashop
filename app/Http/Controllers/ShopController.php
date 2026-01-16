@@ -79,6 +79,7 @@ public function show(Product $product)
     /*
     |--------------------------------------------------------------------------
     | ADD TO CART (SUPPORT MULTI VARIANT)
+    | ✅ UPDATED: Return cart_key untuk "Beli Sekarang"
     |--------------------------------------------------------------------------
     */
     public function addToCart(Request $request, Product $product)
@@ -174,7 +175,8 @@ public function show(Product $product)
 
         session()->put('cart', $cart);
 
-        if ($request->ajax()) {
+        // ✅ UPDATE: Tambahkan wantsJson() check dan return cart_key
+        if ($request->ajax() || $request->wantsJson()) {
             $total = collect($cart)->reduce(
                 fn ($c, $i) => $c + ($i['price'] * $i['qty']),
                 0
@@ -182,6 +184,8 @@ public function show(Product $product)
 
             return response()->json([
                 'success' => true,
+                'message' => 'Produk berhasil ditambahkan ke keranjang',
+                'cart_key' => $cartKey, // ✅ PENTING: Return cart_key untuk "Beli Sekarang"
                 'count'   => collect($cart)->sum('qty'),
                 'total'   => $total,
                 'total_formatted' => 'Rp ' . number_format($total, 0, ',', '.'),

@@ -479,6 +479,9 @@ body {
 
 .upload-icon {
   margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .upload-icon svg {
@@ -1028,7 +1031,7 @@ $storeRoute = \Illuminate\Support\Facades\Route::has('payments.store')
                 <div class="method-details">
                   <div class="qris-box">
                     <div class="qris-image">
-                      <img src="https://d2v6npc8wmnkqk.cloudfront.net/storage/26035/conversions/Tipe-QRIS-statis-small-large.jpg" alt="QRIS">
+                      <img src="{{ asset('images/qris/qris.jpeg') }}" alt="QRIS">
                     </div>
                     <div class="qris-info">
                       Scan kode QR dengan aplikasi e-wallet atau mobile banking Anda

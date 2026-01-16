@@ -86,6 +86,9 @@ Route::middleware('auth')->group(function () {
     
     // Place order (POST) - proses pembuatan order
     Route::post('/checkout/place', [CheckoutController::class, 'placeOrder'])->name('checkout.place');
+
+    Route::post('/checkout/clear', [CheckoutController::class, 'clear'])->name('checkout.clear'); // ⬅️ BARU!
+
     
     // ============================================
 

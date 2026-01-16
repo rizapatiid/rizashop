@@ -203,7 +203,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M3 4h18M3 12h18M3 20h18"/></svg>
             Semua
         </button>
-        <button class="filter-btn" data-filter="pending" data-filter="waiting_confirm">
+        <button class="filter-btn" data-filter="pending,waiting_payment,waiting_confirm">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M12 8v4l3 3"/></svg>
             Menunggu
         </button>
@@ -211,15 +211,15 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M19 11H5"/></svg>
             Diproses
         </button>
-        <button class="filter-btn" data-filter="shipped">
+        <button class="filter-btn" data-filter="shipped,delivered,terkirim">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M3 13l4 4L21 7"/></svg>
             Dikirim
         </button>
-        <button class="filter-btn" data-filter="completed">
+        <button class="filter-btn" data-filter="completed,received,diterima">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M9 12l2 2 4-4"/></svg>
             Selesai
         </button>
-        <button class="filter-btn" data-filter="cancelled">
+        <button class="filter-btn" data-filter="cancelled,canceled">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             Batal
         </button>
@@ -243,42 +243,73 @@
 <tbody>
 @forelse($orders as $order)
 @php
-/* ===== LOGIC STATUS ASLI (AMAN) ===== */
+/* ===== LOGIC STATUS DENGAN SISTEM BARU (COD SUPPORT) ===== */
 $payment = $order->payment ?? null;
 $hasPaymentProof = ($payment && !empty($payment->proof_path));
 $paymentStatus = $payment->status ?? null;
+$paymentMethod = $payment->method ?? null;
 $orderStatus = $order->status ?? 'pending';
 
+// Check if COD
+$isCOD = $paymentMethod === 'cod';
+
 $labelMap = [
- 'pending'=>'Pesanan Masuk','waiting_payment'=>'Menunggu Pembayaran',
- 'waiting_confirm'=>'Konfirmasi Pembayaran','processing'=>'Diproses',
- 'shipped'=>'Dikirimkan','completed'=>'Diterima','cancelled'=>'Dibatalkan'
+ 'pending'=>'Pesanan Masuk',
+ 'waiting_payment'=>'Menunggu Pembayaran',
+ 'waiting_confirm'=>'Konfirmasi Pembayaran',
+ 'processing'=>'Diproses',
+ 'shipped'=>'Dikirimkan',
+ 'completed'=>'Diterima',
+ 'cancelled'=>'Dibatalkan'
 ];
+
 $badgeMap = [
- 'pending'=>'badge-pending','waiting_payment'=>'badge-waiting',
- 'waiting_confirm'=>'badge-waiting','processing'=>'badge-processing',
- 'shipped'=>'badge-shipped','completed'=>'badge-completed',
+ 'pending'=>'badge-pending',
+ 'waiting_payment'=>'badge-waiting',
+ 'waiting_confirm'=>'badge-waiting',
+ 'processing'=>'badge-processing',
+ 'shipped'=>'badge-shipped',
+ 'completed'=>'badge-completed',
  'cancelled'=>'badge-cancelled'
 ];
 
-if($orderStatus==='cancelled'){
- $displayLabel=$labelMap['cancelled'];$badgeClass=$badgeMap['cancelled'];
-}elseif(in_array($orderStatus,['shipped','delivered'])){
- $displayLabel=$labelMap['shipped'];$badgeClass=$badgeMap['shipped'];
-}elseif($orderStatus==='completed'){
- $displayLabel=$labelMap['completed'];$badgeClass=$badgeMap['completed'];
-}else{
- if(!$hasPaymentProof){
-  $displayLabel=$labelMap['waiting_payment'];$badgeClass=$badgeMap['waiting_payment'];
- }else{
-  if(in_array($paymentStatus,['waiting_confirm','waiting'])){
-   $displayLabel=$labelMap['waiting_confirm'];$badgeClass=$badgeMap['waiting_confirm'];
-  }elseif(in_array($paymentStatus,['confirmed','paid'])){
-   $displayLabel=$labelMap['processing'];$badgeClass=$badgeMap['processing'];
-  }else{
-   $displayLabel=$labelMap[$orderStatus];$badgeClass=$badgeMap[$orderStatus];
-  }
- }
+// Determine display label & badge class based on new system
+if($orderStatus === 'cancelled'){
+ $displayLabel = $labelMap['cancelled'];
+ $badgeClass = $badgeMap['cancelled'];
+}
+elseif(in_array($orderStatus, ['shipped','delivered','terkirim'])){
+ $displayLabel = $labelMap['shipped'];
+ $badgeClass = $badgeMap['shipped'];
+}
+elseif($orderStatus === 'completed' || in_array($orderStatus, ['received','diterima'])){
+ $displayLabel = $labelMap['completed'];
+ $badgeClass = $badgeMap['completed'];
+}
+elseif($isCOD && $paymentStatus === 'confirmed' && $orderStatus === 'processing'){
+ // COD yang sudah dikonfirmasi dan sedang diproses
+ $displayLabel = $labelMap['processing'];
+ $badgeClass = $badgeMap['processing'];
+}
+elseif($orderStatus === 'processing' || in_array($paymentStatus, ['confirmed','paid'])){
+ // Processing - payment confirmed
+ $displayLabel = $labelMap['processing'];
+ $badgeClass = $badgeMap['processing'];
+}
+elseif($orderStatus === 'waiting_confirm' || in_array($paymentStatus, ['waiting_confirm','waiting_confirmation','waiting'])){
+ // Waiting for payment confirmation
+ $displayLabel = $labelMap['waiting_confirm'];
+ $badgeClass = $badgeMap['waiting_confirm'];
+}
+elseif(!$hasPaymentProof && !$isCOD){
+ // Waiting for payment (non-COD)
+ $displayLabel = $labelMap['waiting_payment'];
+ $badgeClass = $badgeMap['waiting_payment'];
+}
+else{
+ // Default fallback
+ $displayLabel = $labelMap[$orderStatus] ?? ucfirst(str_replace('_', ' ', $orderStatus));
+ $badgeClass = $badgeMap[$orderStatus] ?? 'badge-pending';
 }
 @endphp
 
@@ -341,7 +372,7 @@ if($orderStatus==='cancelled'){
 
 </div>
 
-{{-- ================= JS SEARCH & FILTER ================= --}}
+{{-- ================= JS SEARCH & FILTER (UPDATED) ================= --}}
 <script>
 const searchInput = document.getElementById('searchInput');
 const filterButtons = document.querySelectorAll('.filter-btn');
@@ -349,13 +380,19 @@ const rows = document.querySelectorAll('#orderTable tbody tr');
 
 function filterTable(){
     const keyword = searchInput.value.toLowerCase();
-    const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+    const activeBtn = document.querySelector('.filter-btn.active');
+    const activeFilter = activeBtn ? activeBtn.dataset.filter : 'all';
 
     rows.forEach(row=>{
         const text = row.innerText.toLowerCase();
         const status = row.dataset.status;
+        
+        // Check if status matches any of the filter values (comma-separated)
+        const filterStatuses = activeFilter.split(',');
+        const matchesFilter = activeFilter === 'all' || filterStatuses.includes(status);
+        
         row.style.display =
-            (text.includes(keyword) && (activeFilter === 'all' || status === activeFilter))
+            (text.includes(keyword) && matchesFilter)
             ? '' : 'none';
     });
 }
