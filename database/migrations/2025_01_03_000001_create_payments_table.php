@@ -15,7 +15,9 @@ return new class extends Migration
             $table->decimal('amount', 16, 2)->default(0);
             $table->string('status')->default('pending');
             $table->string('proof_path')->nullable();
-            $table->json('meta')->nullable();
+            // $table->json('meta')->nullable();
+            $table->text('meta')->nullable();
+
             $table->timestamps();
         });
     }

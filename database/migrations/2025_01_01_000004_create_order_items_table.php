@@ -17,7 +17,13 @@ return new class extends Migration
             $table->decimal('price', 16, 2)->default(0);
             $table->integer('qty')->default(1);
             $table->decimal('subtotal', 16, 2)->default(0);
-            $table->json('meta')->nullable();
+
+            
+            // ❌ json TIDAK didukung MySQL lama
+            // $table->json('meta')->nullable();
+
+            // ✅ Aman untuk FreeSQLDatabase
+            $table->text('meta')->nullable();
             $table->timestamps();
         });
     }
