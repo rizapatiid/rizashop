@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="order-page container mx-auto p-6 max-w-6xl">
+<div class="order-page">
 @php
     use Illuminate\Support\Facades\Route;
 
@@ -42,53 +42,47 @@
     if ($orderStatus === 'cancelled' || in_array($orderStatus, ['canceled','cancelled_by_user'])) {
         $displayLabel = 'Pesanan Dibatalkan'; 
         $badgeClass = 'badge-cancel'; 
-        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     } 
     elseif (in_array($orderStatus, $receivedStatuses)) {
         $displayLabel = 'Pesanan Diterima'; 
         $badgeClass = 'badge-success'; 
-        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     }
     elseif (in_array($orderStatus, $shippedStatuses)) {
         $displayLabel = 'Pesanan Dikirimkan'; 
         $badgeClass = 'badge-info'; 
-        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13l4 4v6a1 1 0 0 1-1 1h-1"/><path d="M16 3v4"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="18.5" cy="17.5" r="1.5"/></svg>';
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13l4 4v6a1 1 0 0 1-1 1h-1"/><path d="M16 3v4"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="18.5" cy="17.5" r="1.5"/></svg>';
     }
     elseif ($isCOD && $paymentStatus === 'confirmed' && $orderStatus === 'processing') {
-        // COD yang sudah dikonfirmasi dan sedang diproses - sama seperti payment biasa
         $displayLabel = 'Pesanan Diproses'; 
         $badgeClass = 'badge-primary'; 
-        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10v6a2 2 0 0 1-2 2H8"/><path d="M3 6h18"/><path d="M16 3v6"/></svg>';
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10v6a2 2 0 0 1-2 2H8"/><path d="M3 6h18"/><path d="M16 3v6"/></svg>';
     }
     elseif ($orderStatus === 'processing' || in_array($paymentStatus, ['confirmed','paid'])) {
-        // Processing - payment confirmed
         $displayLabel = 'Pesanan Diproses'; 
         $badgeClass = 'badge-primary'; 
-        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10v6a2 2 0 0 1-2 2H8"/><path d="M3 6h18"/><path d="M16 3v6"/></svg>';
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10v6a2 2 0 0 1-2 2H8"/><path d="M3 6h18"/><path d="M16 3v6"/></svg>';
     }
     elseif ($orderStatus === 'waiting_confirm' || in_array($paymentStatus, ['waiting_confirm','waiting_confirmation','waiting'])) {
-        // Menunggu konfirmasi payment
         $displayLabel = 'Menunggu Konfirmasi Pembayaran'; 
         $badgeClass = 'badge-warn'; 
-        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h11"/><path d="M17 2v4"/></svg>';
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h11"/><path d="M17 2v4"/></svg>';
     }
     elseif (in_array($paymentStatus, ['rejected','declined','failed']) || $orderStatus === 'need_confirmation' || $paymentStatus === 'need_confirmation') {
-        // Payment ditolak, perlu konfirmasi ulang
         $displayLabel = 'Perlu Konfirmasi'; 
         $badgeClass = 'badge-warn'; 
-        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/></svg>';
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/></svg>';
     }
     elseif (!$hasPaymentProof && !$isCOD) {
-        // Belum bayar (non-COD)
         $displayLabel = 'Menunggu Pembayaran'; 
         $badgeClass = 'badge-warn'; 
-        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>';
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>';
     }
     else {
-        // Default fallback
         $displayLabel = ucfirst(str_replace('_',' ',$paymentStatus ?: ($orderStatus?: 'pending'))); 
         $badgeClass = 'badge-warn'; 
-        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>';
+        $badgeIcon = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>';
     }
 
     // convenience flags for action rendering - UPDATED FOR COD
@@ -100,7 +94,6 @@
     $received = in_array($orderStatus, $receivedStatuses);
 
     // show cancel when explicitly allowed by statuses
-    // IMPORTANT: COD yang sudah confirmed tidak bisa dibatalkan
     $showCancel = ( in_array($orderStatus, $cancellableStatuses) || $noProofAndWaitingPayment || $waitingConfirmation || $rejected );
     
     // COD yang sudah confirmed tidak bisa dibatalkan
@@ -117,391 +110,1102 @@
 @endphp
 
 <style>
-:root{
-  --bg:#f7f8fb;
-  --muted:#6b7280;
-  --border:#e6eef6;
-  --accent:#4f46e5;
-  --accent-2:#06b6d4;
-  --danger:#ef4444;
-  --success:#10b981;
-  --warn:#f59e0b;
-  --card:#ffffff;
-  --radius:12px;
-  --shadow: 0 12px 30px rgba(2,6,23,0.06);
-
-  --icon-size:20px;
-  --icon-sm-size:14px;
-  --btn-height:44px;
-  --btn-radius:10px;
-  --badge-height:36px;
-  --badge-padding:10px 14px;
-
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+:root {
+  --primary: #0EA5E9;
+  --primary-dark: #0284C7;
+  --secondary: #06B6D4;
+  --info: #3B82F6;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --text-disabled: #9E9E9E;
+  
+  --bg-page: #F5F5F5;
+  --bg-card: #FFFFFF;
+  --border: #E0E0E0;
+  --border-light: #EEEEEE;
+  
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.08);
+  --shadow: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+  
+  --radius: 8px;
+  --radius-sm: 4px;
+  
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* ICON STANDARDS */
-.icon{ width:var(--icon-size); height:var(--icon-size); display:block; }
-.icon-sm{ width:var(--icon-sm-size); height:var(--icon-sm-size); display:block; }
-svg.icon, svg.icon-sm { vertical-align:middle; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-/* Page */
-.order-page{ background:var(--bg); padding:28px 18px; min-height:100vh; }
-.container{ max-width:1100px; margin:0 auto; }
+body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
 
-/* Top header */
-.order-top{ display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:22px; flex-wrap:wrap; }
-.breadcrumb{ display:flex; gap:12px; align-items:center; color:var(--muted); text-decoration:none; }
-.back-box{ width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--border); }
-.header-title{ font-weight:800; font-size:20px; color:#0f172a; display:flex; gap:10px; align-items:center; }
-.order-no{ color:var(--accent); font-weight:900; font-size:20px; }
-.header-sub{ color:var(--muted); font-size:13px; }
+.order-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  min-height: 100vh;
+}
 
-/* Grid */
-.grid-two{ display:grid; grid-template-columns: 1fr 380px; gap:22px; align-items:start; }
-@media(max-width:1024px){ .grid-two{ grid-template-columns: 1fr; } }
+/* Icons */
+.icon { width: 20px; height: 20px; }
+.icon-sm { width: 16px; height: 16px; }
+.icon-lg { width: 24px; height: 24px; }
 
-/* Cards: effects removed (no hover transform, no shadows) */
-.card{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:none; }
-.card--hover{ transition:none; }
-.card--hover:hover{ transform:none; box-shadow:none; }
+/* Top Navigation */
+.top-nav {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 500;
+  gap: 8px;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+}
+
+.back-link:hover {
+  background: var(--bg-page);
+}
+
+.back-link svg {
+  stroke: var(--text-secondary);
+}
+
+.divider-vertical {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+}
+
+.order-id {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.order-id strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Status Banner */
+.status-banner {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.status-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.status-icon.success { background: #E8F5E9; }
+.status-icon.success svg { stroke: var(--success); }
+
+.status-icon.info { background: #E3F2FD; }
+.status-icon.info svg { stroke: var(--info); }
+
+.status-icon.warning { background: #FFF3E0; }
+.status-icon.warning svg { stroke: var(--warning); }
+
+.status-icon.danger { background: #FFEBEE; }
+.status-icon.danger svg { stroke: var(--danger); }
+
+.status-text h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.status-text p {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
 
 /* Badge */
-.badge{ display:inline-flex; align-items:center; gap:8px; padding:var(--badge-padding); border-radius:999px; color:#fff; font-weight:800; font-size:13px; height:var(--badge-height); box-shadow:none; }
-.badge svg{ flex-shrink:0; width:var(--icon-sm-size); height:var(--icon-sm-size); }
-.badge-warn{ background:linear-gradient(90deg,#f59e0b,#f97316); }
-.badge-primary{ background:linear-gradient(90deg,var(--accent-2),#06b6d4); }
-.badge-info{ background:linear-gradient(90deg,var(--accent),#7c3aed); }
-.badge-cancel{ background:linear-gradient(90deg,#ef4444,#fb7185); }
-
-/* BADGE SUCCESS */
-.badge-success{
-  background: linear-gradient(90deg,#16a34a,#10b981);
-  color: #fff;
-  box-shadow: none;
-  height: var(--badge-height);
-  padding: var(--badge-padding);
-  font-weight: 800;
-  border-radius: 999px;
-}
-.badge-success svg { stroke: white; }
-
-/* Receiver */
-.receiver{ display:flex; gap:16px; align-items:flex-start; }
-.avatar-box{ width:72px;height:72px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#f0f7ff,#fff);border:1px solid var(--border); }
-.meta{ display:flex; flex-direction:column; gap:6px; min-width:0; }
-.addr-label{ font-weight:700; color:#0f172a; font-size:13px; }
-.addr-name{ font-weight:800; font-size:15px; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.addr-phone{ color:var(--muted); font-size:13px; }
-.addr-full{ color:var(--muted); font-size:13px; line-height:1.45; }
-
-/* Items */
-.items-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px; }
-.items-list{ display:flex; flex-direction:column; gap:12px; }
-.item{ display:flex; justify-content:space-between; gap:12px; align-items:center; padding:12px; border-radius:10px; border:1px solid #f3f6fb; background:linear-gradient(180deg,#fff,#fbfdff); }
-.item-left{ display:flex; gap:12px; align-items:center; min-width:0; }
-.thumb{ width:72px; height:72px; border-radius:10px; overflow:hidden; background:#f8fafc; border:1px solid #eef2f7; display:flex; align-items:center; justify-content:center; flex:0 0 72px; }
-.thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
-.item-name{ font-weight:800; color:#0f172a; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.item-meta{ color:var(--muted); font-size:13px; margin-top:6px; }
-.item-qty{ background:#f3f6fb; border-radius:8px; padding:6px 8px; font-weight:700; font-size:13px; color:#0f172a; }
-
-/* History */
-.history-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
-.history-controls{ display:flex; gap:8px; align-items:center; }
-/* icon-btn: remove rotation/hover effect per request (no animation) */
-.icon-btn{ width:40px; height:40px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border); background:linear-gradient(180deg,#fff,#fbfdff); cursor:pointer; padding:6px; box-shadow:none; transition:none; }
-.icon-btn:focus{ outline:3px solid rgba(79,70,229,0.12); outline-offset:2px; }
-.history-list{ display:flex; flex-direction:column; gap:12px; margin-top:12px; padding-left:6px; }
-/* improved history item layout */
-.history-item{ display:flex; gap:12px; align-items:center; padding:12px; border-radius:10px; border:1px solid #f3f6fb; background:#fff; }
-.h-icon{ width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #eef2f7; flex:0 0 44px; }
-.history-label{ font-weight:700; color:#0f172a; }
-.history-ts{ color:var(--muted); font-size:13px; margin-left:auto; text-align:right; }
-
-/* history header appearance */
-.riwayat-header{ display:flex; gap:12px; align-items:center; }
-.riwayat-title{ font-weight:900; font-size:15px; color:#0f172a; }
-.riwayat-sub{ color:var(--muted); font-size:13px; }
-
-/* Timeline for wide */
-@media(min-width:900px){
-  .history-list{ position:relative; padding-left:26px; }
-  .history-list::before{ content:""; position:absolute; left:22px; top:16px; bottom:16px; width:3px; background:linear-gradient(180deg, rgba(79,70,229,0.12), rgba(6,182,212,0.08)); border-radius:2px; }
-  .history-item{ padding-left:26px; position:relative; }
-  .history-item::before{ content:""; position:absolute; left:-4px; width:12px; height:12px; border-radius:50%; background:#fff; border:3px solid var(--accent-2); top:calc(50% - 9px); box-shadow:none; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-/* Summary */
-.summary{ position:sticky; top:86px; display:flex; flex-direction:column; gap:12px; min-width:300px; width:100%; }
-.summary-row{ display:flex; justify-content:space-between; gap:8px; align-items:center; }
-.summary-total{ font-weight:900; font-size:20px; color:#0f172a; }
-.actions{ display:flex; gap:12px; align-items:center; margin-top:12px; }
-
-/* Shipping card */
-.shipping-card{ margin-bottom:12px; display:flex; flex-direction:column; gap:8px; }
-.shipping-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
-.ship-left{ display:flex; gap:10px; align-items:center; min-width:0; }
-.ship-icon{ width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid var(--border); flex:0 0 44px; }
-.ship-meta{ display:flex; flex-direction:column; min-width:0; }
-.ship-title{ font-weight:800; color:#0f172a; font-size:14px; }
-.ship-sub{ color:var(--muted); font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-
-/* copy button */
-.copy-btn{ border:0; background:transparent; cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:8px; border-radius:8px; }
-.copy-btn:focus{ outline:3px solid rgba(79,70,229,0.12); outline-offset:3px; }
-
-/* Button system */
-.btn{ height:var(--btn-height); padding:0 16px; border-radius:var(--btn-radius); font-weight:800; cursor:pointer; border:0; display:inline-flex; gap:8px; align-items:center; text-decoration:none; transition:none; font-size:14px; }
-.btn svg.icon-sm{ margin-right:6px; width:var(--icon-sm-size); height:var(--icon-sm-size); }
-.btn-primary{ background:linear-gradient(90deg,var(--accent-2),#06b6d4); color:white; box-shadow:none; }
-.btn-indigo{ background:linear-gradient(90deg,var(--accent),#7c3aed); color:white; box-shadow:none; }
-.btn-ghost{ background:white; border:1px solid var(--border); color:#0f172a; }
-.btn-danger{ background:linear-gradient(90deg,#ef4444,#fb7185); color:white; }
-.btn-success{ background: linear-gradient(90deg,#16a34a,#10b981); color:white; }
-
-/* small text */
-.muted{ color:var(--muted); font-size:13px; }
-.sep{ height:1px;background:#f3f6fb;margin:10px 0;border-radius:4px; }
-
-/* responsive */
-@media(max-width:640px){
-  .actions{ flex-direction:column-reverse; width:100%; align-items:stretch; }
-  .summary{ position:static; }
-  .thumb{ width:64px; height:64px; flex:0 0 64px; }
-  .avatar-box{ width:64px;height:64px; }
+.badge-success {
+  background: #E8F5E9;
+  color: var(--success);
 }
 
-/* focus */
-a:focus, button:focus { outline:3px solid rgba(79,70,229,0.12); outline-offset:3px; }
+.badge-info {
+  background: #E3F2FD;
+  color: var(--info);
+}
 
-/* spinner inside buttons when processing */
-.btn .loader{ width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,0.2); border-top-color:rgba(255,255,255,0.9); animation:spin .9s linear infinite; }
-@keyframes spin{ to{ transform:rotate(360deg); } }
+.badge-warn {
+  background: #FFF3E0;
+  color: var(--warning);
+}
 
-/* proof modal */
-.proof-modal-overlay{ position:fixed; inset:0; background:rgba(2,6,23,0.6); display:none; align-items:center; justify-content:center; z-index:1100; padding:24px; }
-.proof-modal{ background:#fff; border-radius:12px; max-width:800px; width:100%; max-height:70vh; height:70vh; overflow:hidden; box-shadow:0 30px 80px rgba(2,6,23,0.4); display:flex; flex-direction:column; }
-.proof-modal-header{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #f3f6fb; flex:0 0 56px; }
-.proof-modal-body{ padding:12px; display:flex; align-items:center; justify-content:center; flex:1 1 auto; overflow:hidden; background:linear-gradient(180deg,#f8fafc,#fff); }
-.proof-modal-body img{ max-width:100%; max-height:calc(70vh - 120px); width:auto; height:auto; object-fit:contain; display:block; border-radius:8px; box-shadow:0 8px 30px rgba(2,6,23,0.06); }
-.proof-modal-body iframe{ width:100%; height:100%; border:0; display:block; border-radius:6px; }
-.proof-modal-caption{ font-size:13px; color:var(--muted); padding:8px 16px; border-top:1px solid #f3f6fb; flex:0 0 44px; display:none; }
-.proof-modal-close{ background:transparent; border:0; cursor:pointer; padding:8px; border-radius:8px; }
-#proofDownload{ text-decoration:none; display:none; align-items:center; }
-@media(max-width:640px){ .proof-modal{ max-width:92%; height:78vh; max-height:78vh; } .proof-modal-body img{ max-height:calc(78vh - 120px); } .proof-modal-caption{ flex:0 0 56px; } }
+.badge-primary {
+  background: #E0F2FE;
+  color: var(--primary);
+}
 
-/* receive modal */
-.receive-modal-overlay{ position:fixed; inset:0; background:rgba(2,6,23,0.45); display:none; align-items:center; justify-content:center; z-index:1200; padding:20px; }
-.receive-modal{ width:100%; max-width:520px; background:#fff; border-radius:12px; box-shadow:0 30px 60px rgba(2,6,23,0.25); padding:18px; display:flex; flex-direction:column; gap:12px; }
-.receive-modal h3{ margin:0; font-size:18px; font-weight:800; color:#0f172a; }
-.receive-modal p{ margin:0; color:var(--muted); font-size:14px; line-height:1.45; }
-.receive-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:8px; }
-.receive-actions .btn{ min-width:120px; }
-.receive-modal .btn-cancel{ background:#fff; border:1px solid var(--border); color:#0f172a; }
-@media(max-width:480px){ .receive-modal{ max-width:92%; padding:14px; } .receive-actions .btn{ min-width:100px; } }
+.badge-cancel {
+  background: #FFEBEE;
+  color: var(--danger);
+}
 
-/* upload modal (new) */
-.upload-modal-overlay{ position:fixed; inset:0; background:rgba(2,6,23,0.6); display:none; align-items:center; justify-content:center; z-index:1300; padding:20px; }
-.upload-modal{ width:100%; max-width:640px; background:#fff; border-radius:12px; box-shadow:0 30px 80px rgba(2,6,23,0.35); padding:18px; display:flex; flex-direction:column; gap:12px; }
-.upload-modal h3{ margin:0; font-size:18px; font-weight:800; color:#0f172a; }
-.upload-row{ display:flex; gap:12px; align-items:center; }
-.file-preview{ width:120px; height:84px; border-radius:8px; border:1px dashed var(--border); display:flex; align-items:center; justify-content:center; background:#fbfdff; overflow:hidden; }
-.file-meta{ flex:1; display:flex; flex-direction:column; gap:6px; }
-.file-name{ font-weight:700; font-size:14px; color:#0f172a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.file-hint{ color:var(--muted); font-size:13px; }
-.upload-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
-.upload-modal .btn { min-width:120px; }
+/* Grid Layout */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 12px;
+  align-items: start;
+}
 
-/* small helpers */
-.hidden{ display:none !important; }
+/* Card */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
+}
+
+.card-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.card-body {
+  padding: 16px;
+}
+
+/* Shipping Info */
+.shipping-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 16px;
+}
+
+.shipping-icon {
+  width: 40px;
+  height: 40px;
+  background: #E0F2FE;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.shipping-icon svg {
+  stroke: var(--primary);
+}
+
+.shipping-details {
+  flex: 1;
+}
+
+.shipping-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.shipping-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.tracking-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tracking-number {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 6px 10px;
+  background: var(--bg-page);
+  border-radius: var(--radius-sm);
+  flex: 1;
+}
+
+.copy-btn {
+  padding: 6px 12px;
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.copy-btn:hover {
+  background: var(--bg-card);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Address Card */
+.address-card {
+  display: flex;
+  gap: 12px;
+}
+
+.address-icon {
+  width: 40px;
+  height: 40px;
+  background: #E0F2FE;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.address-icon svg {
+  stroke: var(--primary);
+}
+
+.address-info {
+  flex: 1;
+}
+
+.address-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.address-label-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--bg-page);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-left: 8px;
+}
+
+.address-phone {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.address-full {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Product List */
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.product-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.product-item:hover {
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.product-image {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-page);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-light);
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.product-variant {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.product-price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.product-price {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.product-qty {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  background: var(--bg-page);
+  border-radius: var(--radius-sm);
+}
+
+.product-subtotal {
+  text-align: right;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* History Section */
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.history-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+.toggle-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.history-title-group h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.history-title-group p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.history-list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  position: relative;
+  padding-left: 24px;
+}
+
+.history-item::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 24px;
+  bottom: -12px;
+  width: 2px;
+  background: var(--border-light);
+}
+
+.history-item:last-child::before {
+  display: none;
+}
+
+.history-dot {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid var(--bg-card);
+  box-shadow: 0 0 0 2px var(--border-light);
+}
+
+.history-content {
+  flex: 1;
+}
+
+.history-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.history-time {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Notes */
+.notes-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+}
+
+.notes-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.notes-content {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding: 12px;
+  background: var(--bg-page);
+  border-radius: var(--radius);
+}
+
+/* Summary Card */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  font-size: 14px;
+}
+
+.summary-row.total {
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--border-light);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.summary-total {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.summary-label {
+  color: var(--text-secondary);
+}
+
+.summary-value {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #e65100;
+}
+
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #388E3C;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #D32F2F;
+}
+
+.btn-outline {
+  background: white;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--bg-page);
+  border-color: var(--text-secondary);
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.button-group .btn {
+  flex: 1;
+}
+
+/* Helper Text */
+.help-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+/* Loader */
+.loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal {
+  background: white;
+  border-radius: var(--radius);
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+}
+
+.modal-close:hover {
+  background: var(--bg-page);
+}
+
+.modal-body {
+  padding: 16px;
+}
+
+.modal-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Proof Modal */
+.proof-modal {
+  max-width: 800px;
+}
+
+.proof-image-container {
+  max-height: 70vh;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-page);
+}
+
+.proof-image-container img {
+  max-width: 100%;
+  display: block;
+}
+
+.proof-image-container iframe {
+  width: 100%;
+  height: 600px;
+  border: none;
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .order-page {
+    padding: 12px;
+  }
+  
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .status-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .product-item {
+    flex-direction: column;
+  }
+  
+  .product-image {
+    width: 100%;
+    height: 200px;
+  }
+  
+  .product-subtotal {
+    text-align: left;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+}
+
+/* Utility */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mb-12 { margin-bottom: 12px; }
 </style>
 
-<!-- Top header -->
-<div class="order-top">
-  <div style="display:flex;align-items:center;gap:12px;">
-    <a href="{{ $backRoute }}" class="breadcrumb" aria-label="Kembali ke daftar pesanan">
-      <div class="back-box" aria-hidden="true">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </div>
-      <div style="min-width:0;">
-        <div class="header-title">
-          <span>Order</span>
-          <span class="order-no">#{{ $order->order_number }}</span>
-        </div>
-        <div class="header-sub">{{ $order->created_at->format('d M Y, H:i') }}</div>
-      </div>
-    </a>
-  </div>
-
-  <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <span class="badge {{ $badgeClass ?? 'badge-warn' }}" role="status" aria-live="polite">
-        {!! $badgeIcon ?? '' !!} <span>{{ $displayLabel }}</span>
-      </span>
-    </div>
+<!-- Top Navigation -->
+<div class="top-nav">
+  <a href="{{ $backRoute }}" class="back-link">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Kembali
+  </a>
+  <div class="divider-vertical"></div>
+  <div class="order-id">
+    Order ID: <strong>#{{ $order->order_number }}</strong>
   </div>
 </div>
 
-<div class="grid-two">
-  <!-- LEFT -->
-  <div style="display:flex;flex-direction:column;gap:16px;">
-
-    <!-- Receiver -->
-    <div class="card receiver" role="region" aria-label="Detail Penerima">
-      <div class="avatar-box" aria-hidden="true">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/><path d="M6 20c0-3.31 2.69-6 6-6s6 2.69 6 6"/></svg>
-      </div>
-
-      <div class="meta">
-        <div class="addr-label">Detail & Alamat Penerima</div>
-        @php $addr = $order->address; @endphp
-        @if($addr)
-          <div class="addr-name" title="{{ $addr->recipient_name }}">{{ $addr->recipient_name }} <span class="kv">· {{ $addr->label ?? '' }}</span></div>
-          <div class="addr-phone">{{ trim(($addr->phone_country ?? '') . ' ' . ($addr->phone ?? '')) }}</div>
-          <div class="addr-full">{!! e($addr->address_full) !!}{{ $addr->village ? ', '.$addr->village : '' }}{{ $addr->subdistrict ? ', '.$addr->subdistrict : '' }}{{ $addr->city ? ', '.$addr->city : '' }}{{ $addr->province ? ', '.$addr->province : '' }}{{ $addr->postal_code ? ' - ' . $addr->postal_code : '' }}</div>
-        @else
-          <div class="muted">Tidak ada alamat pengiriman pada pesanan ini.</div>
-        @endif
-      </div>
+<!-- Status Banner -->
+<div class="status-banner">
+  <div class="status-info">
+    <div class="status-icon {{ in_array($orderStatus, $receivedStatuses) ? 'success' : (in_array($orderStatus, $shippedStatuses) ? 'info' : (in_array($orderStatus, ['cancelled','canceled','cancelled_by_user']) ? 'danger' : 'warning')) }}">
+      {!! $badgeIcon !!}
     </div>
-
-    <!-- Items -->
-    <div class="card" aria-labelledby="itemsHeading">
-      <div class="items-head">
-        <div style="font-weight:800;font-size:15px;" id="itemsHeading">Produk <span class="kv">({{ count($order->items) }})</span></div>
-        <div class="small-muted">Ringkasan item pesanan</div>
-      </div>
-
-      <div class="items-list" role="list" aria-label="Daftar produk">
-        @foreach($order->items as $it)
-          <div class="item" role="listitem" aria-label="{{ $it->product_name }}">
-            <div class="item-left">
-              <div class="thumb" aria-hidden="true">
-                @if(!empty($it->meta['image']))
-                  <img src="{{ asset('storage/'.ltrim($it->meta['image'],'/')) }}" alt="{{ $it->product_name }}">
-                @else
-                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 14s1.5-2 4-2 4 2 4 2"/><circle cx="9" cy="9" r="1"/></svg>
-                @endif
-              </div>
-
-              <div style="min-width:0;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <div class="item-name" title="{{ $it->product_name }}">{{ $it->product_name }}</div>
-                  <div class="item-qty">x{{ $it->qty }}</div>
-                </div>
-<div class="item-meta">
-  Rp {{ number_format($it->price,0,',','.') }} /pcs ·
-  <span class="small-muted">
-    @if(!empty($it->meta['variant']))
-      @if(is_array($it->meta['variant']))
-        Varian: {{ implode(', ', $it->meta['variant']) }}
-      @else
-        Varian: {{ $it->meta['variant'] }}
-      @endif
-    @else
-    @endif
+    <div class="status-text">
+      <h3>{{ $displayLabel }}</h3>
+      <p>{{ $order->created_at->format('d M Y, H:i') }}</p>
+    </div>
+  </div>
+  <span class="badge {{ $badgeClass }}">
+    {!! $badgeIcon !!}
+    {{ $displayLabel }}
   </span>
 </div>
 
-
-              </div>
-            </div>
-
-            <div style="text-align:right; min-width:140px;">
-              <div style="font-weight:800;">Rp {{ number_format($it->subtotal,0,',','.') }}</div>
-              <div class="muted" style="font-size:13px;">Subtotal</div>
+<!-- Content Grid -->
+<div class="content-grid">
+  <!-- Left Column -->
+  <div class="left-column">
+    
+    <!-- Shipping Info Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Info Pengiriman</div>
+      </div>
+      <div class="card-body">
+        <div class="shipping-section">
+          <div class="shipping-icon">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13"/>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+              <circle cx="5.5" cy="18.5" r="2.5"/>
+              <circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+          </div>
+          <div class="shipping-details">
+            <div class="shipping-label">Kurir</div>
+            <div class="shipping-value">{{ $shippingCarrier ?: '—' }}</div>
+          </div>
+          <div class="shipping-details" style="text-align: right;">
+            <div class="shipping-label">Status Pengiriman</div>
+            <div class="shipping-value">
+              {{ in_array($orderStatus, $shippedStatuses) ? 'Dalam Pengiriman' : (in_array($orderStatus, $receivedStatuses) ? 'Diterima' : 'Menunggu') }}
             </div>
           </div>
-        @endforeach
+        </div>
+        
+        @if($trackingNumber)
+        <div>
+          <div class="shipping-label">Nomor Resi</div>
+          <div class="tracking-row">
+            <div class="tracking-number">{{ $trackingNumber }}</div>
+            <button class="copy-btn" type="button" data-copy="{{ $trackingNumber }}">
+              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              Salin
+            </button>
+          </div>
+        </div>
+        @endif
       </div>
     </div>
 
-    <!-- History & Catatan -->
-    <div class="card" aria-live="polite" aria-labelledby="statusHeading">
-      <div class="history-head">
-        <div style="font-weight:800;" id="statusHeading">Status & Catatan</div>
+    <!-- Address Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Alamat Pengiriman</div>
       </div>
+      <div class="card-body">
+        <div class="address-card">
+          <div class="address-icon">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="address-info">
+            @php $addr = $order->address; @endphp
+            @if($addr)
+              <div class="address-name">
+                {{ $addr->recipient_name ?? auth()->user()->name ?? 'Nama Penerima' }}
+                @if($addr->label)
+                  <span class="address-label-tag">{{ $addr->label }}</span>
+                @endif
+              </div>
+              <div class="address-phone">{{ trim(($addr->phone_country ?? '') . ' ' . ($addr->phone ?? '')) }}</div>
+              <div class="address-full">
+                {!! e($addr->address_full) !!}{{ $addr->village ? ', '.$addr->village : '' }}{{ $addr->subdistrict ? ', '.$addr->subdistrict : '' }}{{ $addr->city ? ', '.$addr->city : '' }}{{ $addr->province ? ', '.$addr->province : '' }}{{ $addr->postal_code ? ' - ' . $addr->postal_code : '' }}
+              </div>
+            @else
+              <div class="address-full">Tidak ada alamat pengiriman</div>
+            @endif
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <div style="margin-top:12px;">
-        <!-- NEW Riwayat header (cleaner) -->
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
-          <div class="riwayat-header" style="display:flex;align-items:center;">
-            <button id="toggleHistoryBtn" class="icon-btn" aria-expanded="true" aria-controls="historyList" title="Tutup riwayat" aria-label="Tutup riwayat" style="margin-left:0;">
-              <!-- no rotation/hover effect -->
-              <svg id="chevIcon" class="icon" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div style="display:flex;flex-direction:column;">
-              <div class="riwayat-title">Riwayat Pesanan</div>
-              <div class="riwayat-sub">Ringkasan perubahan status & catatan terbaru</div>
+    <!-- Products Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Produk Dipesan ({{ count($order->items) }})</div>
+      </div>
+      <div class="card-body">
+        <div class="product-list">
+          @foreach($order->items as $it)
+            <div class="product-item">
+              <div class="product-image">
+                @if(!empty($it->meta['image']))
+                  <img src="{{ asset('storage/'.ltrim($it->meta['image'],'/')) }}" alt="{{ $it->product_name }}">
+                @else
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="9" cy="9" r="2"/>
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                  </svg>
+                @endif
+              </div>
+              <div class="product-details">
+                <div class="product-name">{{ $it->product_name }}</div>
+                @if(!empty($it->meta['variant']))
+                  <div class="product-variant">
+                    Varian: 
+                    @if(is_array($it->meta['variant']))
+                      {{ implode(', ', $it->meta['variant']) }}
+                    @else
+                      {{ $it->meta['variant'] }}
+                    @endif
+                  </div>
+                @endif
+                <div class="product-price-row">
+                  <span class="product-price">Rp {{ number_format($it->price,0,',','.') }}</span>
+                  <span class="product-qty">x{{ $it->qty }}</span>
+                </div>
+              </div>
+              <div class="product-subtotal">
+                Rp {{ number_format($it->subtotal,0,',','.') }}
+              </div>
+            </div>
+          @endforeach
+        </div>
+      </div>
+    </div>
+
+    <!-- History Card -->
+    <div class="card">
+      <div class="history-header" id="historyHeader">
+        <div class="history-toggle">
+          <div class="toggle-icon" id="toggleIcon">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+          <div class="history-title-group">
+            <h4>Riwayat Pesanan</h4>
+            <p>Lacak perjalanan pesanan Anda</p>
+          </div>
+        </div>
+      </div>
+      <div class="history-list" id="historyList">
+        @php
+          $history = [];
+          if ($order->created_at) {
+              $history[] = ['label' => 'Pesanan Dibuat', 'at' => $order->created_at];
+          }
+          if ($payment && $payment->created_at) {
+              $history[] = ['label' => 'Bukti Pembayaran Diunggah', 'at' => $payment->created_at];
+          }
+          if ($payment && in_array($payment->status, ['confirmed','paid']) && $payment->updated_at) {
+              $history[] = ['label' => 'Pembayaran Dikonfirmasi', 'at' => $payment->updated_at];
+          }
+          if ($order->updated_at && $order->updated_at->ne($order->created_at)) {
+              $already = false;
+              foreach ($history as $h) {
+                  if ($h['at'] && $order->updated_at && $h['at']->eq($order->updated_at)) { $already = true; break; }
+              }
+              if (!$already) {
+                  $label = 'Status diubah: ' . ($order->status ? ucfirst(str_replace('_',' ',$order->status)) : 'Updated');
+                  $history[] = ['label' => $label, 'at' => $order->updated_at];
+              }
+          }
+          usort($history, function($a,$b){
+              if ($a['at'] && $b['at']) {
+                  if ($a['at']->eq($b['at'])) return 0;
+                  return $a['at']->gt($b['at']) ? -1 : 1;
+              } elseif ($a['at']) return -1;
+              elseif ($b['at']) return 1;
+              return 0;
+          });
+        @endphp
+        
+        @forelse($history as $h)
+          <div class="history-item">
+            <div class="history-dot"></div>
+            <div class="history-content">
+              <div class="history-label">{{ $h['label'] }}</div>
+              <div class="history-time">
+                @if(!empty($h['at']))
+                  {{ $h['at']->format('d M Y, H:i') }}
+                @else
+                  —
+                @endif
+              </div>
             </div>
           </div>
-
-          <!-- <div class="small-muted">Klik ikon untuk tampil/sembunyi riwayat.</div> -->
-        </div>
-
-        <div id="historyList" class="history-list" style="margin-top:12px;">
-          @php
-            $history = [];
-            if ($order->created_at) {
-                $history[] = ['label' => 'Pesanan Dibuat', 'at' => $order->created_at, 'icon' => '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18"/><path d="M12 3v4"/><path d="M5 21h14"/></svg>'];
-            }
-            if ($payment && $payment->created_at) {
-                $history[] = ['label' => 'Bukti Pembayaran Diunggah', 'at' => $payment->created_at, 'icon' => '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3v4"/></svg>'];
-            }
-            if ($payment && in_array($payment->status, ['confirmed','paid']) && $payment->updated_at) {
-                $history[] = ['label' => 'Pembayaran Dikonfirmasi', 'at' => $payment->updated_at, 'icon' => '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'];
-            }
-            if (property_exists($order, 'previous_status') && !empty($order->previous_status)) {
-                $history[] = ['label' => 'Status Sebelumnya: ' . $order->previous_status, 'at' => null, 'icon' => '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/></svg>'];
-            }
-            if ($order->updated_at && $order->updated_at->ne($order->created_at)) {
-                $already = false;
-                foreach ($history as $h) {
-                    if ($h['at'] && $order->updated_at && $h['at']->eq($order->updated_at)) { $already = true; break; }
-                }
-                if (!$already) {
-                    $label = 'Status diubah: ' . ($order->status ? ucfirst(str_replace('_',' ',$order->status)) : 'Updated');
-                    $history[] = ['label' => $label, 'at' => $order->updated_at, 'icon' => '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/></svg>'];
-                }
-            }
-            usort($history, function($a,$b){
-                if ($a['at'] && $b['at']) {
-                    if ($a['at']->eq($b['at'])) return 0;
-                    return $a['at']->gt($b['at']) ? -1 : 1;
-                } elseif ($a['at']) return -1;
-                elseif ($b['at']) return 1;
-                return 0;
-            });
-          @endphp
-
-          @forelse($history as $h)
-            <div class="history-item" role="listitem">
-              <div class="h-icon" aria-hidden="true">
-                {!! $h['icon'] ?? '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>' !!}
-              </div>
-
-              <div style="min-width:0;">
-                <div class="history-label">{{ $h['label'] }}</div>
-                <div class="small-muted" style="margin-top:6px;">@if(!empty($h['at'])) {{ $h['at']->format('d M Y, H:i') }} @else — @endif</div>
-              </div>
-
-              <div class="history-ts" aria-hidden="true">@if(!empty($h['at'])) {{ $h['at']->format('d M Y, H:i') }} @else — @endif</div>
-            </div>
-          @empty
-            <div class="muted">Tidak ada riwayat tersedia.</div>
-          @endforelse
-        </div>
-
-        @if($order->updated_at && $order->updated_at->ne($order->created_at))
-          <div style="margin-top:12px;color:var(--muted);font-size:13px;"><strong>Terakhir Diperbarui:</strong> {{ $order->updated_at->format('d M Y, H:i') }}</div>
-        @endif
-
-        <div style="margin-top:12px;">
-          <div style="font-weight:800;">Catatan</div>
-          <div style="margin-top:6px;color:var(--muted);">
+        @empty
+          <div style="text-align: center; color: var(--text-secondary);">Tidak ada riwayat</div>
+        @endforelse
+        
+        <div class="notes-section">
+          <div class="notes-title">Catatan</div>
+          <div class="notes-content">
             @php
-              // show latest note only
               $latestNote = null;
               $rawNotes = $order->notes ?? null;
               if (is_null($rawNotes) || $rawNotes === '') $latestNote = null;
@@ -528,7 +1232,7 @@ a:focus, button:focus { outline:3px solid rgba(79,70,229,0.12); outline-offset:3
                 }
               }
             @endphp
-
+            
             @if($latestNote)
               {{ is_array($latestNote) || is_object($latestNote) ? json_encode($latestNote, JSON_UNESCAPED_UNICODE) : $latestNote }}
             @else
@@ -541,797 +1245,284 @@ a:focus, button:focus { outline:3px solid rgba(79,70,229,0.12); outline-offset:3
 
   </div>
 
-  <!-- RIGHT -->
-  <aside>
-    <!-- NEW: Shipping info card (above summary) -->
-    <div class="card shipping-card" role="region" aria-label="Informasi Pengiriman">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-weight:900;">Informasi Pengiriman</div>
-        <!-- <div class="small-muted">Detail pengiriman & resi</div> -->
+  <!-- Right Column -->
+  <aside class="right-column">
+    
+    <!-- Summary Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Ringkasan Belanja</div>
       </div>
-
-      <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
-        <div class="shipping-row">
-          <div class="ship-left">
-            <div class="ship-icon" aria-hidden="true">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h13l4 4v5h-1a2 2 0 0 1-2-2"/></svg>
-            </div>
-            <div class="ship-meta">
-              <div class="ship-title">Jasa Kirim</div>
-              <div class="ship-sub">{{ $shippingCarrier ? e($shippingCarrier) : '-' }}</div>
-            </div>
-          </div>
-
-          <div style="text-align:right;">
-            <div class="small-muted">Status</div>
-            <div style="font-weight:700;">{{ in_array($orderStatus, $shippedStatuses) ? 'Dikirim' : (in_array($orderStatus, $receivedStatuses) ? 'Diterima' : ucfirst(str_replace('_',' ',$orderStatus ?: '-'))) }}</div>
-          </div>
+      <div class="card-body">
+        <div class="summary-row">
+          <span class="summary-label">Subtotal</span>
+          <span class="summary-value">Rp {{ number_format($order->subtotal,0,',','.') }}</span>
         </div>
-
-        <div class="shipping-row" style="align-items:center;">
-          <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-            <div style="font-weight:700;">Nomor Resi</div>
-            <div class="small-muted" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:220px;">
-              {{ $trackingNumber ?? '-' }}
-            </div>
-          </div>
-
-          <div style="display:flex;gap:8px;">
-            @if($trackingNumber)
-              <button class="copy-btn" type="button" data-copy="{{ $trackingNumber }}" aria-label="Salin nomor resi">
-                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="10" height="10" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                <span class="small-muted">Salin</span>
+        <div class="summary-row">
+          <span class="summary-label">Ongkos Kirim</span>
+          <span class="summary-value">Rp {{ number_format($order->shipping_cost,0,',','.') }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Diskon</span>
+          <span class="summary-value">- Rp {{ number_format($order->discount ?? 0,0,',','.') }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span class="summary-total">Rp {{ number_format($order->total,0,',','.') }}</span>
+        </div>
+        
+        <div class="action-buttons">
+          {{-- Primary Action --}}
+          @if($noProofAndWaitingPayment)
+            @if($paymentsCreateRoute)
+              <a href="{{ route($paymentsCreateRoute, $order->id) }}" class="btn btn-primary">
+                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                Bayar Sekarang
+              </a>
+            @endif
+          @elseif($waitingConfirmation || $approved || $shipped || $received)
+            @if($hasPaymentProof)
+              <button type="button" class="btn btn-outline open-proof-btn" data-proof-url="{{ $proofUrl }}" data-proof-ext="{{ $proofExt }}">
+                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Lihat Bukti Bayar
               </button>
-            @else
-              <div class="small-muted">-</div>
+            @endif
+          @elseif($rejected)
+            @if($paymentsCreateRoute)
+              <a href="{{ route($paymentsCreateRoute, $order->id) }}" class="btn btn-primary">
+                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Upload Ulang Bukti
+              </a>
+            @endif
+          @endif
+          
+          {{-- Secondary Actions --}}
+          <div class="button-group">
+            @if($showReceive && $ordersReceiveRoute)
+              <button type="button" class="btn btn-success open-receive-modal" data-order-id="{{ $order->id }}">
+                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Pesanan Diterima
+              </button>
+              <form id="receiveForm" action="{{ route($ordersReceiveRoute, $order->id) }}" method="POST" style="display:none;">@csrf</form>
+            @endif
+            
+            @if($showCancel && $ordersCancelRoute)
+              <form action="{{ route($ordersCancelRoute, $order->id) }}" method="POST" style="flex: 1;" onsubmit="return confirmCancel(this);">
+                @csrf
+                <button type="submit" class="btn btn-outline">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                  Batalkan
+                </button>
+              </form>
             @endif
           </div>
         </div>
-
+        
+        <p class="help-text">
+          Butuh bantuan? Hubungi penjual untuk informasi lebih lanjut
+        </p>
       </div>
     </div>
 
-    <div class="card summary" role="complementary" aria-labelledby="summaryHeading">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-weight:900;" id="summaryHeading">Ringkasan Pesanan</div>
-        <div class="small-muted">Invoice</div>
-      </div>
-
-      <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
-        <div class="summary-row"><div class="small-muted">Subtotal</div><div>Rp {{ number_format($order->subtotal,0,',','.') }}</div></div>
-        <div class="summary-row"><div class="small-muted">Ongkos Kirim</div><div>Rp {{ number_format($order->shipping_cost,0,',','.') }}</div></div>
-        <div class="summary-row"><div class="small-muted">Diskon</div><div>Rp {{ number_format($order->discount ?? 0,0,',','.') }}</div></div>
-        <div class="sep" aria-hidden="true"></div>
-        <div class="summary-row"><div style="font-weight:800;">Total</div><div class="summary-total">Rp {{ number_format($order->total,0,',','.') }}</div></div>
-      </div>
-
-      <div style="margin-top:14px;">
-        <div class="actions" role="group" aria-label="Aksi pesanan">
-          <div style="flex:1;">
-            {{-- Primary action area (Pay / View / Upload) --}}
-            @if($noProofAndWaitingPayment)
-              @if($paymentsCreateRoute)
-                {{-- Button now opens upload modal; action set via data-action attribute --}}
-                <button type="button"
-                        class="btn btn-primary open-upload-btn"
-                        data-action="{{ route($paymentsCreateRoute, $order->id) }}"
-                        aria-label="Bayar sekarang">
-                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                  Bayar
-                </button>
-              @else
-                <button class="btn btn-ghost" disabled style="width:100%;">Pembayaran tidak tersedia</button>
-              @endif
-
-            @elseif($waitingConfirmation)
-              @if($hasPaymentProof)
-                <button type="button" class="btn btn-indigo open-proof-btn" data-proof-url="{{ $proofUrl }}" data-proof-ext="{{ $proofExt }}" aria-label="Lihat bukti pembayaran">
-                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
-                  Lihat Bukti Pembayaran
-                </button>
-              @else
-                @if($paymentsShowRoute)
-                  <a class="btn btn-indigo" href="{{ route($paymentsShowRoute, $order->id) }}" aria-label="Lihat bukti pembayaran">
-                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
-                    Lihat Bukti Pembayaran
-                  </a>
-                @else
-                  <button class="btn btn-indigo" disabled>Lihat Bukti</button>
-                @endif
-              @endif
-
-            @elseif($approved)
-              @if($hasPaymentProof)
-                <button type="button" class="btn btn-indigo open-proof-btn" data-proof-url="{{ $proofUrl }}" data-proof-ext="{{ $proofExt }}" aria-label="Lihat bukti pembayaran">
-                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
-                  Lihat Bukti Pembayaran
-                </button>
-              @else
-                @if($paymentsShowRoute)
-                  <a class="btn btn-indigo" href="{{ route($paymentsShowRoute, $order->id) }}" aria-label="Lihat bukti pembayaran">
-                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
-                    Lihat Bukti Pembayaran
-                  </a>
-                @else
-                  <button class="btn btn-indigo" disabled>Lihat Bukti</button>
-                @endif
-              @endif
-
-            @elseif($rejected)
-              @if($paymentsCreateRoute)
-                <button type="button"
-                        class="btn btn-primary open-upload-btn"
-                        data-action="{{ route($paymentsCreateRoute, $order->id) }}"
-                        aria-label="Unggah bukti pembayaran">
-                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M7 12h10"/><path d="M12 7v10"/></svg>
-                  Upload Bukti Pembayaran
-                </button>
-              @else
-                <button class="btn btn-primary" disabled>Upload Bukti</button>
-              @endif
-
-            @elseif($shipped)
-              @if($hasPaymentProof)
-                <button type="button" class="btn btn-indigo open-proof-btn" data-proof-url="{{ $proofUrl }}" data-proof-ext="{{ $proofExt }}" aria-label="Lihat bukti pembayaran">
-                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
-                  Lihat Bukti Pembayaran
-                </button>
-              @else
-                <button class="btn btn-indigo" disabled>Lihat Bukti</button>
-              @endif
-
-            @elseif($received)
-              @if($hasPaymentProof)
-                <button type="button" class="btn btn-indigo open-proof-btn" data-proof-url="{{ $proofUrl }}" data-proof-ext="{{ $proofExt }}" aria-label="Lihat bukti pembayaran">
-                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
-                  Lihat Bukti Pembayaran
-                </button>
-              @else
-                <button class="btn btn-indigo" disabled>Lihat Bukti</button>
-              @endif
-
-            @else
-              @if($hasPaymentProof)
-                <button type="button" class="btn btn-indigo open-proof-btn" data-proof-url="{{ $proofUrl }}" data-proof-ext="{{ $proofExt }}" aria-label="Lihat bukti pembayaran">
-                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
-                  Lihat Bukti Pembayaran
-                </button>
-              @else
-                @if($paymentsCreateRoute)
-                  <button type="button"
-                          class="btn btn-primary open-upload-btn"
-                          data-action="{{ route($paymentsCreateRoute, $order->id) }}"
-                          aria-label="Bayar sekarang">
-                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                    Bayar
-                  </button>
-                @else
-                  <button class="btn btn-ghost" disabled>Pembayaran tidak tersedia</button>
-                @endif
-              @endif
-            @endif
-          </div>
-
-          <div style="flex:1;text-align:right;">
-            {{-- receive button triggers modal confirmation --}}
-            @if($showReceive)
-              @if($ordersReceiveRoute)
-                <button type="button" class="btn btn-success open-receive-modal" data-order-id="{{ $order->id }}" aria-label="Konfirmasi pesanan diterima">
-                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Pesanan Diterima
-                </button>
-
-                {{-- hidden form used to submit the POST when user confirms in modal --}}
-                <form id="receiveForm" action="{{ route($ordersReceiveRoute, $order->id) }}" method="POST" style="display:none;">
-                  @csrf
-                </form>
-              @else
-                <button class="btn btn-success" disabled>Pesanan Diterima</button>
-              @endif
-            @elseif($showCancel)
-              @if($ordersCancelRoute)
-                <form action="{{ route($ordersCancelRoute, $order->id) }}" method="POST" style="margin:0;" onsubmit="return confirmCancel(this);">
-                  @csrf
-                  <button type="submit" class="btn btn-danger" aria-label="Batalkan pesanan">
-                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-                    Batalkan Pesanan
-                  </button>
-                </form>
-              @else
-                <button class="btn btn-danger" disabled>Batalkan</button>
-              @endif
-            @endif
-          </div>
-        </div>
-      </div>
-
-      <div class="muted" style="margin-top:10px;font-size:13px;">Jika ada kendala, kamu bisa hubungi penjual untuk mengatasinya.</div>
-    </div>
   </aside>
 </div>
 
-<!-- Upload / Pay Modal (sesuai form di file 2, dipanggil dari tombol .open-upload-btn) -->
-<div id="uploadModalOverlay" class="upload-modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="uploadModalTitle" style="display:none;">
-  <div class="upload-modal" role="document" aria-describedby="uploadModalDesc">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <h3 id="uploadModalTitle">Pembayaran – Unggah Bukti</h3>
-      <button id="uploadModalClose" class="proof-modal-close" aria-label="Tutup unggah">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+<!-- Proof Modal -->
+<div id="proofModalOverlay" class="modal-overlay">
+  <div class="modal proof-modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Bukti Pembayaran</h3>
+      <button id="proofModalClose" class="modal-close">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
       </button>
     </div>
-
-    <p id="uploadModalDesc" class="small-muted">Isi formulir berikut lalu unggah bukti pembayaran. Maks 4MB. Format: JPG/PNG.</p>
-
-    {{-- action akan diset dinamis dari tombol yang membuka modal (data-action) --}}
-    @php
-      $storeRoute = \Illuminate\Support\Facades\Route::has('payments.store') ? 'payments.store' : ( \Illuminate\Support\Facades\Route::has('payments.store') ? 'payments.store' : null );
-    @endphp
-
-    <form action="{{ route('payments.store', ['order' => $order->id]) }}" method="POST" enctype="multipart/form-data">
-      @csrf
-      
-      <input type="hidden" name="from_popup" value="1">
-
-      <div class="mb-4">
-        <label class="block mb-1 font-medium">Metode Pembayaran</label>
-        <select name="method" class="w-full border rounded p-2" required>
-            <option value="bank_transfer">Bank Transfer</option>
-            <option value="manual_transfer">Manual Transfer</option>
-            <option value="cod">Cash on Delivery (COD)</option>
-        </select>
-      </div>
-
-      <div class="mb-4">
-        <label class="block mb-1 font-medium">Jumlah yang dibayar (Rp)</label>
-        <input type="number" min="0" step="1" name="amount" id="uploadAmount" value="{{ old('amount', $order->total) }}" class="w-full border rounded p-2" required>
-      </div>
-
-      <div class="mb-4">
-        <label class="block mb-1 font-medium">Unggah Bukti Pembayaran</label>
-        <input id="proofFile" type="file" name="proof" accept="image/*" required>
-        <div class="muted text-sm mt-1">Maks 4MB. Format: JPG/PNG.</div>
-      </div>
-
-      {{-- hidden order id (otomatis terisi) --}}
-      <input type="hidden" name="order_id" id="uploadOrderId" value="{{ $order->id }}">
-
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-        <div class="small-muted">Anda dapat menambahkan catatan di halaman konfirmasi pembayaran jika diperlukan.</div>
-        <div class="upload-actions">
-          <button type="button" id="uploadCancelBtn" class="btn btn-cancel" style="background:#fff;border:1px solid var(--border);color:#0f172a;">Batal</button>
-          <button type="submit" id="uploadSubmitBtn" class="btn btn-primary">
-            <span id="uploadSubmitLabel">Kirim Bukti Pembayaran</span>
-          </button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Proof modal (existing) -->
-<div id="proofModalOverlay" class="proof-modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="proofModalTitle">
-  <div class="proof-modal" role="document" aria-describedby="proofModalCaption">
-    <div class="proof-modal-header">
-      <div id="proofModalTitle" style="font-weight:800;">Bukti Pembayaran</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <a id="proofDownload" class="btn btn-ghost" href="#" target="_blank" rel="noopener" style="display:none;">
-          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
-          Download
-        </a>
-        <button id="proofModalClose" class="proof-modal-close" aria-label="Tutup bukti">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <div class="proof-modal-body" id="proofModalBody">
-      <div id="proofLoader" style="display:none;">Memuat...</div>
-      <img id="proofImg" alt="Bukti pembayaran" style="display:none;">
-      <iframe id="proofIframe" title="Bukti pembayaran" style="display:none;"></iframe>
-    </div>
-
-    <div id="proofModalCaption" class="proof-modal-caption" style="display:none"></div>
-  </div>
-</div>
-
-<!-- Receive confirmation modal -->
-<div id="receiveModalOverlay" class="receive-modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="receiveModalTitle">
-  <div class="receive-modal" role="document" aria-describedby="receiveModalDesc">
-    <h3 id="receiveModalTitle">Konfirmasi Penerimaan Pesanan</h3>
-    <p id="receiveModalDesc">Apakah kamu yakin pesanan ini sudah diterima? Setelah konfirmasi, status pesanan akan diperbarui menjadi <strong>Pesanan Diterima</strong>.</p>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <div class="small-muted" id="receiveOrderInfo" style="font-size:13px;"></div>
-      <div class="receive-actions">
-        <button id="receiveCancelBtn" class="btn btn-cancel" type="button">Batal</button>
-        <button id="receiveConfirmBtn" class="btn btn-success" type="button">
-          <span id="receiveConfirmLabel">Konfirmasi</span>
-        </button>
-      </div>
+    <div class="modal-body proof-image-container" id="proofModalBody">
+      <img id="proofImg" style="display: none;">
+      <iframe id="proofIframe" style="display: none;"></iframe>
     </div>
   </div>
 </div>
 
-<!-- Optional preview box (ringkas) -->
-<style>
-  /* minimal styling preview agar tidak bergantung ke bagian lain */
-  .upload-modal-overlay{ position:fixed; inset:0; background:rgba(2,6,23,0.6); display:flex; align-items:center; justify-content:center; z-index:1300; padding:20px; }
-  .upload-modal{ width:100%; max-width:640px; background:#fff; border-radius:12px; box-shadow:0 30px 80px rgba(2,6,23,0.35); padding:18px; display:flex; flex-direction:column; gap:12px; }
-</style>
-
-<!-- Script: buka modal dari tombol .open-upload-btn, set action & order id otomatis, preview + validasi ukuran/tipe, disable tombol saat submit -->
-<script>
-(function(){
-  const uploadOverlay = document.getElementById('uploadModalOverlay');
-  const uploadCloseBtn = document.getElementById('uploadModalClose');
-  const uploadCancelBtn = document.getElementById('uploadCancelBtn');
-  const uploadForm = document.getElementById('uploadProofForm');
-  const proofFileInput = document.getElementById('proofFile');
-  const uploadSubmitBtn = document.getElementById('uploadSubmitBtn');
-  const uploadAmountInput = document.getElementById('uploadAmount');
-  const uploadOrderIdInput = document.getElementById('uploadOrderId');
-
-  // buka modal: tombol harus punya attribute data-action (opsional) dan data-order-id (opsional)
-  document.querySelectorAll('.open-upload-btn').forEach(function(btn){
-    btn.addEventListener('click', function(ev){
-      ev.preventDefault();
-      if(!uploadOverlay) return;
-
-      // set action jika disediakan oleh tombol (data-action)
-      const action = btn.getAttribute('data-action');
-      if(action && uploadForm){
-        uploadForm.action = action;
-      }
-
-      // jika tombol membawa order id, isi; jika tidak, biarkan nilai blade default
-      const orderId = btn.getAttribute('data-order-id') || btn.getAttribute('data-order') || null;
-      if(orderId && uploadOrderIdInput){
-        uploadOrderIdInput.value = orderId;
-        // jika route memerlukan parameter di URL Anda mungkin sudah set data-action; pastikan backend menerima order_id juga
-      }
-
-      // set jumlah default jika data-total diberikan atau gunakan value blade (order total)
-      const dataTotal = btn.getAttribute('data-total');
-      if(dataTotal && uploadAmountInput){
-        uploadAmountInput.value = dataTotal;
-      } else {
-        // already filled from blade with {{ $order->total }}
-      }
-
-      // reset file input
-      if(uploadForm) uploadForm.reset();
-      // show modal
-      uploadOverlay.style.display = 'flex';
-      uploadOverlay.setAttribute('aria-hidden','false');
-      setTimeout(()=> proofFileInput.focus(), 120);
-      document.body.style.overflow = 'hidden';
-    });
-  });
-
-  function closeUploadModal(){
-    if(!uploadOverlay) return;
-    uploadOverlay.style.display = 'none';
-    uploadOverlay.setAttribute('aria-hidden','true');
-    document.body.style.overflow = '';
-  }
-
-  if(uploadCloseBtn) uploadCloseBtn.addEventListener('click', function(){ if(!uploadFormSubmitting) closeUploadModal(); });
-  if(uploadCancelBtn) uploadCancelBtn.addEventListener('click', function(){ if(!uploadFormSubmitting) closeUploadModal(); });
-
-  if(uploadOverlay){
-    uploadOverlay.addEventListener('click', function(ev){
-      if(ev.target === uploadOverlay && !uploadFormSubmitting) closeUploadModal();
-    });
-  }
-
-  // basic client-side validation for file (image & <=4MB)
-  if(proofFileInput){
-    proofFileInput.addEventListener('change', function(){
-      const file = proofFileInput.files && proofFileInput.files[0];
-      if(!file) return;
-      const maxBytes = 4 * 1024 * 1024;
-      if(file.size > maxBytes){
-        alert('Ukuran file terlalu besar. Maksimal 4MB.');
-        proofFileInput.value = '';
-        return;
-      }
-      if(!file.type.startsWith('image/')){
-        alert('Tipe file tidak didukung. Gunakan JPG/PNG gambar.');
-        proofFileInput.value = '';
-        return;
-      }
-    });
-  }
-
-  // submit: non-AJAX (normal POST) — hanya disable tombol & tampilkan teks proses
-  let uploadFormSubmitting = false;
-  if(uploadForm){
-    uploadForm.addEventListener('submit', function(ev){
-      if(uploadFormSubmitting) {
-        ev.preventDefault();
-        return false;
-      }
-      // ensure file chosen
-      const f = proofFileInput.files && proofFileInput.files[0];
-      if(!f){
-        ev.preventDefault();
-        alert('Silakan pilih file bukti pembayaran terlebih dahulu.');
-        proofFileInput.focus();
-        return false;
-      }
-
-      uploadFormSubmitting = true;
-      uploadSubmitBtn.disabled = true;
-      uploadCancelBtn.disabled = true;
-      uploadSubmitBtn.innerHTML = '<span class="loader" aria-hidden="true"></span> Mengunggah';
-      // biarkan form submit normal (server akan redirect)
-      return true;
-    });
-  }
-
-  // esc close
-  document.addEventListener('keydown', function(ev){
-    if(ev.key === 'Escape'){
-      const vis = uploadOverlay && uploadOverlay.style.display === 'flex';
-      if(vis && !uploadFormSubmitting) closeUploadModal();
-    }
-  });
-})();
-</script>
+<!-- Receive Confirmation Modal -->
+<div id="receiveModalOverlay" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Konfirmasi Penerimaan Pesanan</h3>
+      <button id="receiveModalClose" class="modal-close">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="color: var(--text-secondary); line-height: 1.6;">
+        Pastikan Anda telah menerima pesanan ini dengan kondisi baik. Setelah dikonfirmasi, status pesanan akan berubah menjadi <strong>Pesanan Diterima</strong> dan tidak dapat dibatalkan.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button id="receiveCancelBtn" class="btn btn-outline" style="width: auto;">Belum</button>
+      <button id="receiveConfirmBtn" class="btn btn-success" style="width: auto;">
+        <span id="receiveConfirmLabel">Ya, Sudah Diterima</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
-  // History toggle (no animation)
-  const toggleBtn = document.getElementById('toggleHistoryBtn');
+  'use strict';
+  
+  // History Toggle
+  const historyHeader = document.getElementById('historyHeader');
   const historyList = document.getElementById('historyList');
-
-  if(toggleBtn && historyList){
-    let open = true;
-    function setState(){
-      if(open){
+  const toggleIcon = document.getElementById('toggleIcon');
+  
+  if (historyHeader && historyList && toggleIcon) {
+    let isOpen = true;
+    
+    historyHeader.addEventListener('click', function() {
+      isOpen = !isOpen;
+      if (isOpen) {
         historyList.style.display = 'flex';
-        toggleBtn.setAttribute('aria-expanded','true');
-        toggleBtn.title = 'Tutup riwayat';
+        toggleIcon.classList.remove('collapsed');
       } else {
         historyList.style.display = 'none';
-        toggleBtn.setAttribute('aria-expanded','false');
-        toggleBtn.title = 'Tampilkan riwayat';
+        toggleIcon.classList.add('collapsed');
       }
-    }
-    setState();
-    toggleBtn.addEventListener('click', function(){ open = !open; setState(); });
-    document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ if(open){ open = false; setState(); } } });
+    });
   }
-
-  // Confirm cancel (kept)
-  window.confirmCancel = function(form){
-    if(!confirm('Yakin ingin membatalkan pesanan ini? Tindakan ini tidak dapat dibatalkan.')) return false;
-    const btn = form.querySelector('button');
-    if(btn){
+  
+  // Copy Button
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const text = btn.getAttribute('data-copy');
+      if (!text) return;
+      
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          const original = btn.innerHTML;
+          btn.innerHTML = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Tersalin';
+          setTimeout(() => btn.innerHTML = original, 2000);
+        });
+      }
+    });
+  });
+  
+  // Cancel Confirmation
+  window.confirmCancel = function(form) {
+    if (!confirm('Yakin ingin membatalkan pesanan ini?')) return false;
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) {
       btn.disabled = true;
-      const original = btn.innerHTML;
-      btn.innerHTML = '<span class="loader" aria-hidden="true"></span> Memproses';
-      setTimeout(function(){ try{ btn.innerHTML = original; btn.disabled = false; }catch(e){} }, 8000);
+      btn.innerHTML = '<span class="loader"></span> Membatalkan...';
     }
     return true;
   };
-
-  // --- Proof modal logic (existing) ---
+  
+  // Proof Modal
   const proofOverlay = document.getElementById('proofModalOverlay');
-  const proofCloseBtn = document.getElementById('proofModalClose');
-  const imgEl = document.getElementById('proofImg');
-  const iframeEl = document.getElementById('proofIframe');
-  const loader = document.getElementById('proofLoader');
-  const caption = document.getElementById('proofModalCaption');
-  const downloadBtn = document.getElementById('proofDownload');
-
-  function openProofModal(url, ext){
-    if(!proofOverlay) return;
-    proofOverlay.style.display = 'flex';
-    proofOverlay.setAttribute('aria-hidden','false');
-    imgEl.style.display = 'none';
-    iframeEl.style.display = 'none';
-    caption.style.display = 'none';
-    downloadBtn.style.display = 'none';
-    loader.style.display = 'block';
-    setTimeout(function(){
-      loader.style.display = 'none';
-      const isPdf = ext === 'pdf';
-      if(isPdf){
-        iframeEl.src = url;
-        iframeEl.style.display = 'block';
-        caption.textContent = 'Menampilkan PDF bukti pembayaran. Jika tidak tampil, klik Download.';
-        caption.style.display = 'block';
-        downloadBtn.href = url;
-        downloadBtn.style.display = 'inline-flex';
-      } else {
-        imgEl.src = url;
-        imgEl.onload = function(){ imgEl.style.display = 'block'; caption.style.display = 'none'; };
-        imgEl.onerror = function(){
-          caption.textContent = 'Gagal memuat gambar. Silakan klik Download untuk membuka di tab baru.';
-          caption.style.display = 'block';
-          downloadBtn.href = url;
-          downloadBtn.style.display = 'inline-flex';
-        };
-        downloadBtn.href = url;
-        downloadBtn.style.display = 'inline-flex';
-      }
-    }, 180);
-    setTimeout(()=> proofCloseBtn.focus(), 250);
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeProofModal(){
-    if(!proofOverlay) return;
-    proofOverlay.style.display = 'none';
-    proofOverlay.setAttribute('aria-hidden','true');
-    iframeEl.src = '';
-    imgEl.src = '';
-    caption.style.display = 'none';
-    downloadBtn.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-
-  document.querySelectorAll('.open-proof-btn').forEach(function(btn){
-    btn.addEventListener('click', function(ev){
-      ev.preventDefault();
+  const proofClose = document.getElementById('proofModalClose');
+  const proofImg = document.getElementById('proofImg');
+  const proofIframe = document.getElementById('proofIframe');
+  
+  document.querySelectorAll('.open-proof-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
       const url = btn.getAttribute('data-proof-url');
-      const ext = (btn.getAttribute('data-proof-ext') || '').toLowerCase();
-      if(!url){
-        alert('Bukti pembayaran tidak tersedia.');
-        return;
-      }
-      openProofModal(url, ext);
-    });
-  });
-
-  if(proofCloseBtn) proofCloseBtn.addEventListener('click', closeProofModal);
-  if(proofOverlay) proofOverlay.addEventListener('click', function(ev){
-    if(ev.target === proofOverlay) closeProofModal();
-  });
-  document.addEventListener('keydown', function(ev){
-    if(ev.key === 'Escape'){
-      const vis = proofOverlay && proofOverlay.style.display === 'flex';
-      if(vis) closeProofModal();
-    }
-  });
-
-  // --- Receive modal logic (NEW) ---
-  const receiveOverlay = document.getElementById('receiveModalOverlay');
-  const receiveCancelBtn = document.getElementById('receiveCancelBtn');
-  const receiveConfirmBtn = document.getElementById('receiveConfirmBtn');
-  const receiveOrderInfo = document.getElementById('receiveOrderInfo');
-  const receiveForm = document.getElementById('receiveForm');
-  let receiveSubmitting = false;
-
-  function openReceiveModal(orderId){
-    if(!receiveOverlay) return;
-    receiveOrderInfo.textContent = 'Order #' + (orderId || '{{ $order->order_number }}');
-    receiveOverlay.style.display = 'flex';
-    receiveOverlay.setAttribute('aria-hidden','false');
-    setTimeout(()=> receiveConfirmBtn.focus(), 180);
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeReceiveModal(){
-    if(!receiveOverlay) return;
-    receiveOverlay.style.display = 'none';
-    receiveOverlay.setAttribute('aria-hidden','true');
-    document.body.style.overflow = '';
-  }
-
-  document.querySelectorAll('.open-receive-modal').forEach(function(btn){
-    btn.addEventListener('click', function(ev){
-      ev.preventDefault();
-      const orderId = btn.getAttribute('data-order-id') || '{{ $order->id }}';
-      openReceiveModal(orderId);
-    });
-  });
-
-  if(receiveCancelBtn) receiveCancelBtn.addEventListener('click', function(){ if(!receiveSubmitting) closeReceiveModal(); });
-
-  if(receiveConfirmBtn){
-    receiveConfirmBtn.addEventListener('click', function(){
-      if(receiveSubmitting) return;
-      if(!receiveForm){
-        alert('Form untuk konfirmasi tidak ditemukan.');
-        return;
-      }
-      receiveSubmitting = true;
-      const orig = receiveConfirmBtn.innerHTML;
-      receiveConfirmBtn.innerHTML = '<span class="loader" aria-hidden="true"></span> Memproses';
-      receiveConfirmBtn.disabled = true;
-      try{
-        receiveForm.submit();
-      } catch(e){
-        console.error(e);
-        receiveConfirmBtn.innerHTML = orig;
-        receiveConfirmBtn.disabled = false;
-        receiveSubmitting = false;
-        closeReceiveModal();
-      }
-    });
-  }
-
-  if(receiveOverlay) receiveOverlay.addEventListener('click', function(ev){
-    if(ev.target === receiveOverlay && !receiveSubmitting) closeReceiveModal();
-  });
-
-  document.addEventListener('keydown', function(ev){
-    if(ev.key === 'Escape'){
-      const vis = receiveOverlay && receiveOverlay.style.display === 'flex';
-      if(vis && !receiveSubmitting) closeReceiveModal();
-    }
-  });
-
-  // --- Copy tracking number ---
-  document.querySelectorAll('.copy-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      const toCopy = btn.getAttribute('data-copy') || '';
-      if(!toCopy) return;
-      // Use navigator.clipboard if available
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(toCopy).then(function(){
-          const old = btn.innerHTML;
-          btn.innerHTML = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/></svg><span class="small-muted">Tersalin</span>';
-          setTimeout(function(){ btn.innerHTML = old; }, 1500);
-        }).catch(function(){
-          alert('Gagal menyalin. Silakan salin manual.');
-        });
+      const ext = btn.getAttribute('data-proof-ext');
+      if (!url) return alert('Bukti tidak tersedia');
+      
+      proofImg.style.display = 'none';
+      proofIframe.style.display = 'none';
+      
+      if (ext === 'pdf') {
+        proofIframe.src = url;
+        proofIframe.style.display = 'block';
       } else {
-        // fallback
-        const ta = document.createElement('textarea');
-        ta.value = toCopy;
-        document.body.appendChild(ta);
-        ta.select();
-        try{
-          document.execCommand('copy');
-          btn.innerHTML = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/></svg><span class="small-muted">Tersalin</span>';
-          setTimeout(function(){ btn.innerHTML = '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="10" height="10" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class=\"small-muted\">Salin</span>'; }, 1500);
-        }catch(e){
-          alert('Gagal menyalin. Silakan salin manual.');
-        }
-        document.body.removeChild(ta);
+        proofImg.src = url;
+        proofImg.style.display = 'block';
       }
-    });
-  });
-
-  // --- Upload modal logic (NEW) ---
-  const uploadOverlay = document.getElementById('uploadModalOverlay');
-  const uploadCloseBtn = document.getElementById('uploadModalClose');
-  const uploadCancelBtn = document.getElementById('uploadCancelBtn');
-  const uploadForm = document.getElementById('uploadProofForm');
-  const proofFileInput = document.getElementById('proofFile');
-  const uploadPreview = document.getElementById('uploadPreview');
-  const uploadSubmitBtn = document.getElementById('uploadSubmitBtn');
-  const uploadSubmitLabel = document.getElementById('uploadSubmitLabel');
-
-  // open upload modal from buttons with class .open-upload-btn
-  document.querySelectorAll('.open-upload-btn').forEach(function(btn){
-    btn.addEventListener('click', function(ev){
-      ev.preventDefault();
-      if(!uploadOverlay) return;
-      // set form action dynamically if data-action provided
-      const action = btn.getAttribute('data-action');
-      if(action && uploadForm){
-        uploadForm.action = action;
-      }
-      // reset
-      uploadForm.reset();
-      clearPreview();
-      uploadOverlay.style.display = 'flex';
-      uploadOverlay.setAttribute('aria-hidden','false');
-      setTimeout(()=> proofFileInput.focus(), 120);
+      
+      proofOverlay.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     });
   });
-
-  function closeUploadModal(){
-    if(!uploadOverlay) return;
-    uploadOverlay.style.display = 'none';
-    uploadOverlay.setAttribute('aria-hidden','true');
+  
+  function closeProofModal() {
+    proofOverlay.style.display = 'none';
+    proofImg.src = '';
+    proofIframe.src = '';
     document.body.style.overflow = '';
   }
-
-  function clearPreview(){
-    uploadPreview.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 14s1.5-2 4-2 4 2 4 2"/><circle cx="9" cy="9" r="1"/></svg>';
+  
+  if (proofClose) proofClose.addEventListener('click', closeProofModal);
+  if (proofOverlay) proofOverlay.addEventListener('click', e => {
+    if (e.target === proofOverlay) closeProofModal();
+  });
+  
+  // Receive Modal
+  const receiveOverlay = document.getElementById('receiveModalOverlay');
+  const receiveClose = document.getElementById('receiveModalClose');
+  const receiveCancel = document.getElementById('receiveCancelBtn');
+  const receiveConfirm = document.getElementById('receiveConfirmBtn');
+  const receiveForm = document.getElementById('receiveForm');
+  let receiveSubmitting = false;
+  
+  document.querySelectorAll('.open-receive-modal').forEach(btn => {
+    btn.addEventListener('click', function() {
+      receiveOverlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  
+  function closeReceiveModal() {
+    if (receiveSubmitting) return;
+    receiveOverlay.style.display = 'none';
+    document.body.style.overflow = '';
   }
-
-  function setImagePreview(file){
-    clearPreview();
-    if(!file) return;
-    const ext = (file.name || '').split('.').pop().toLowerCase();
-    if(ext === 'pdf'){
-      // show pdf icon + filename
-      uploadPreview.innerHTML = '<div style="text-align:center;padding:8px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 14s1.5-2 4-2 4 2 4 2"/></svg><div style="font-size:12px;margin-top:6px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (file.name || '') + '</div></div>';
-      return;
-    }
-    // image preview
-    const reader = new FileReader();
-    reader.onload = function(e){
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      img.style.maxWidth = '100%';
-      img.style.maxHeight = '100%';
-      img.alt = 'Preview bukti';
-      uploadPreview.innerHTML = '';
-      uploadPreview.appendChild(img);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  if(proofFileInput){
-    proofFileInput.addEventListener('change', function(){
-      const file = proofFileInput.files && proofFileInput.files[0];
-      if(!file){
-        clearPreview();
-        return;
-      }
-      // validate size (5MB)
-      const maxBytes = 5 * 1024 * 1024;
-      if(file.size > maxBytes){
-        alert('Ukuran file terlalu besar. Maksimal 5MB.');
-        proofFileInput.value = '';
-        clearPreview();
-        return;
-      }
-      // validate type
-      const allowed = ['image/jpeg','image/png','application/pdf','image/jpg'];
-      if(allowed.indexOf(file.type) === -1){
-        // allow by extension fallback
-        const ext = (file.name || '').split('.').pop().toLowerCase();
-        if(['jpg','jpeg','png','pdf'].indexOf(ext) === -1){
-          alert('Tipe file tidak didukung. Gunakan jpg, png, atau pdf.');
-          proofFileInput.value = '';
-          clearPreview();
-          return;
-        }
-      }
-      setImagePreview(file);
+  
+  if (receiveClose) receiveClose.addEventListener('click', closeReceiveModal);
+  if (receiveCancel) receiveCancel.addEventListener('click', closeReceiveModal);
+  if (receiveOverlay) receiveOverlay.addEventListener('click', e => {
+    if (e.target === receiveOverlay) closeReceiveModal();
+  });
+  
+  if (receiveConfirm && receiveForm) {
+    receiveConfirm.addEventListener('click', function() {
+      if (receiveSubmitting) return;
+      receiveSubmitting = true;
+      receiveConfirm.disabled = true;
+      receiveCancel.disabled = true;
+      receiveConfirm.innerHTML = '<span class="loader"></span> Memproses...';
+      receiveForm.submit();
     });
   }
-
-  if(uploadCloseBtn) uploadCloseBtn.addEventListener('click', function(){ if(!uploadFormSubmitting) closeUploadModal(); });
-  if(uploadCancelBtn) uploadCancelBtn.addEventListener('click', function(){ if(!uploadFormSubmitting) closeUploadModal(); });
-
-  // close on overlay click
-  if(uploadOverlay) uploadOverlay.addEventListener('click', function(ev){
-    if(ev.target === uploadOverlay && !uploadFormSubmitting) closeUploadModal();
-  });
-
-  // submit handler: normal form submit (not ajax) but disable button and show loader
-  let uploadFormSubmitting = false;
-  if(uploadForm){
-    uploadForm.addEventListener('submit', function(ev){
-      // basic client-side validation
-      const file = proofFileInput.files && proofFileInput.files[0];
-      if(!file){
-        ev.preventDefault();
-        alert('Silakan pilih file bukti pembayaran terlebih dahulu.');
-        proofFileInput.focus();
-        return false;
-      }
-      if(uploadFormSubmitting) {
-        ev.preventDefault();
-        return false;
-      }
-      uploadFormSubmitting = true;
-      // disable buttons
-      uploadSubmitBtn.disabled = true;
-      uploadCancelBtn.disabled = true;
-      uploadSubmitBtn.innerHTML = '<span class="loader" aria-hidden="true"></span> Mengunggah';
-      // allow normal submit to proceed
-      return true;
-    });
-  }
-
-  document.addEventListener('keydown', function(ev){
-    if(ev.key === 'Escape'){
-      const vis = uploadOverlay && uploadOverlay.style.display === 'flex';
-      if(vis && !uploadFormSubmitting) closeUploadModal();
+  
+  // ESC to close
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (proofOverlay.style.display === 'flex') closeProofModal();
+      if (receiveOverlay.style.display === 'flex') closeReceiveModal();
     }
   });
-
 })();
 </script>
 
