@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,13 +22,31 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // ✅ Fix MySQL key too long (FreeSQLDatabase / MySQL lama)
+        /**
+         * =====================================================
+         * FIX MySQL key too long (FreeSQLDatabase / MySQL lama)
+         * =====================================================
+         */
         Schema::defaultStringLength(191);
 
-        // ✅ Locale Indonesia
+        /**
+         * =====================================================
+         * Locale & Timezone Indonesia
+         * =====================================================
+         */
         Carbon::setLocale('id');
-
-        // ✅ Timezone WIB Jakarta
         date_default_timezone_set('Asia/Jakarta');
+
+        /**
+         * =====================================================
+         * HTTPS HANDLING (LOCAL vs PRODUCTION)
+         * =====================================================
+         *
+         * - Local  → HTTP (biar artisan serve aman)
+         * - Railway / Production → HTTPS (hindari mixed content)
+         */
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
