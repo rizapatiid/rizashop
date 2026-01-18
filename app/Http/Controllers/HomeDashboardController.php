@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Banner;
 use App\Models\Product;
 use App\Models\Category;
@@ -18,25 +16,26 @@ class HomeDashboardController extends Controller
     {
         // ===== BANNER =====
         $banners = Banner::active()->ordered()->get();
-
+        
         // ===== STAT =====
         $totalProducts = Product::count();
         $totalOrders   = Order::count();
         $totalUsers    = User::count();
-
-        // ===== KATEGORI + 6 PRODUK PER KATEGORI =====
+        
+        // ===== KATEGORI + SEMUA PRODUK (limit di view) =====
         $categories = Category::with([
-    'products' => function ($q) {
-        $q->where('is_active', 1)
-          ->latest()
-          ->take(6);
-    }
-])
-->whereHas('products')
-->orderBy('name')
-->get();
-
-
+            'products' => function ($q) {
+                $q->where('is_active', 1)
+                  ->latest();
+                  // ⛔ HAPUS ->take(6) dari sini!
+            }
+        ])
+        ->whereHas('products', function($q) {
+            $q->where('is_active', 1);
+        })
+        ->orderBy('name')
+        ->get();
+        
         return view('dashboard', compact(
             'banners',
             'categories',
